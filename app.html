@@ -113,11 +113,12 @@ input,textarea,select{font-family:inherit}
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:300;display:flex;align-items:center;justify-content:center;animation:fadeIn .15s ease}
 .modal{background:#fff;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.2);max-width:520px;width:92vw;display:flex;flex-direction:column;max-height:90vh;animation:scaleIn .15s ease}
 .modal.lg{max-width:700px}
+.modal.xl{max-width:900px}
 .modal__header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid #e5e7eb;flex-shrink:0}
 .modal__header h3{font-size:15px;font-weight:600;color:#111827}
 .modal__close{background:none;border:none;font-size:22px;color:#9ca3af;cursor:pointer;line-height:1;padding:0 4px;border-radius:4px;transition:all .1s}
 .modal__close:hover{color:#111827;background:#f3f4f6}
-.modal__body{padding:20px;overflow-y:auto;flex:1}
+.modal__body{padding:20px;overflow-y:auto;overflow-x:auto;flex:1}
 .modal__body::-webkit-scrollbar{width:4px}.modal__body::-webkit-scrollbar-thumb{background:#e5e7eb;border-radius:2px}
 .modal__footer{display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:12px 20px;border-top:1px solid #e5e7eb;flex-shrink:0}
 
@@ -2582,7 +2583,7 @@ function DocumentPanel({docs,allDocs,filter,setFilter,search,setSearch,toggleSel
 /* ── Modals ── */
 function VersionModal({lob,onClose}){
   const versions=lob?.versions||[];
-  return(<div className="modal-overlay" onClick={onClose}><div className="modal" onClick={e=>e.stopPropagation()}>
+  return(<div className="modal-overlay" onClick={onClose}><div className="modal xl" onClick={e=>e.stopPropagation()}>
     <div className="modal__header"><h3>Manage Versions — {lob?.name||''}</h3><button className="modal__close" onClick={onClose}>×</button></div>
     <div className="modal__body">
       {versions.length===0
