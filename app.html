@@ -536,6 +536,54 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
 .add-modal-label{font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:6px}
 .add-modal-hint{font-size:11px;color:#9ca3af;margin-top:4px}
 
+/* ── Detail Scroll Layout (L1 only mode) ── */
+.detail-scroll{flex:1;display:flex;overflow:hidden;min-height:0}
+.detail-scroll__main{flex:1;overflow-y:auto;padding:16px 20px;background:#f3f4f6}
+.detail-scroll__main::-webkit-scrollbar{width:5px}.detail-scroll__main::-webkit-scrollbar-thumb{background:#d1d5db;border-radius:3px}
+.detail-scroll__toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-shrink:0}
+.detail-scroll__count{font-size:12px;color:#6b7280}
+.detail-scroll__actions{display:flex;gap:6px}
+.detail-scroll__action-btn{background:#fff;border:1px solid #e5e7eb;border-radius:6px;padding:4px 10px;font-size:11px;color:#6b7280;cursor:pointer;font-family:inherit;transition:all .12s}
+.detail-scroll__action-btn:hover{border-color:#9ca3af;color:#374151}
+/* Category accordion */
+.cat-sec{background:#fff;border:1px solid #e5e7eb;border-radius:12px;margin-bottom:12px;overflow:hidden;transition:box-shadow .15s}
+.cat-sec:hover{box-shadow:0 2px 10px rgba(0,0,0,.07)}
+.cat-sec__hdr{display:flex;align-items:center;gap:8px;padding:11px 16px;cursor:pointer;user-select:none;background:#fafafa;transition:background .12s}
+.cat-sec__hdr:hover{background:#f3f4f6}
+.cat-sec--open .cat-sec__hdr{border-bottom:1px solid #e5e7eb}
+.cat-sec__chevron{color:#9ca3af;display:flex;flex-shrink:0;transition:transform .2s}
+.cat-sec--closed .cat-sec__chevron{transform:rotate(-90deg)}
+.cat-sec__name{font-size:13px;font-weight:600;color:#111827;flex:1}
+.cat-sec__meta{display:flex;align-items:center;gap:5px}
+.cat-sec__tag{font-size:10px;font-weight:500;padding:2px 7px;border-radius:10px;background:#f3f4f6;color:#6b7280;white-space:nowrap}
+.cat-sec__tag--deployed{background:#dcfce7;color:#16a34a}.cat-sec__tag--failed{background:#fee2e2;color:#dc2626}.cat-sec__tag--draft{background:#f3f4f6;color:#6b7280}
+.cat-sec__body{display:grid;grid-template-columns:1fr 256px;overflow:hidden}
+.cat-sec__prompt{padding:18px 20px;border-right:1px solid #f3f4f6;display:flex;flex-direction:column;gap:12px}
+.cat-sec__docs{padding:14px;background:#fafafa;display:flex;flex-direction:column;gap:8px}
+/* Ver card inside section */
+.sec-ver-card{display:flex;align-items:center;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:8px 14px;gap:0;flex-shrink:0}
+.sec-ver-item{display:flex;flex-direction:column;gap:1px;flex:1}
+.sec-ver-lbl{font-size:10px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.04em}
+.sec-ver-val{font-size:12px;font-weight:600;color:#111827}
+.sec-ver-div{width:1px;background:#e5e7eb;height:26px;margin:0 12px;flex-shrink:0}
+/* Test button */
+.sec-test-btn{width:100%;padding:10px 16px;border:none;border-radius:8px;background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:7px;margin-top:4px}
+.sec-test-btn:hover{background:linear-gradient(135deg,#1d4ed8,#1e40af);transform:translateY(-1px);box-shadow:0 2px 8px rgba(37,99,235,.3)}
+.sec-test-btn:disabled{background:#93c5fd;transform:none;cursor:not-allowed}
+.sec-doc-info{font-size:11px;color:#9ca3af;text-align:center;margin-top:4px}
+/* Section doc panel */
+.sec-docs__title{font-size:11px;font-weight:700;color:#374151;margin-bottom:8px}
+.sec-docs__zone{border:1.5px dashed #d1d5db;border-radius:8px;padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;background:#fff;transition:all .15s}
+.sec-docs__zone:hover,.sec-docs__zone.drag-over{border-color:#2563eb;background:#eff6ff}
+.sec-docs__dz-text{font-size:11px;color:#6b7280;text-align:center}
+.sec-docs__browse{color:#2563eb;font-weight:500}.sec-docs__dz-hint{font-size:10px;color:#9ca3af;text-align:center}
+.sec-docs__filters{display:flex;gap:4px;flex-wrap:wrap}
+.sec-docs__list{overflow-y:auto;display:flex;flex-direction:column;gap:2px;max-height:200px}
+.sec-docs__list::-webkit-scrollbar{width:3px}.sec-docs__list::-webkit-scrollbar-thumb{background:#d1d5db;border-radius:2px}
+.sec-docs__empty{text-align:center;padding:14px;font-size:11px;color:#9ca3af}
+.sec-docs__footer{font-size:10px;color:#9ca3af;padding-top:6px;border-top:1px solid #f3f4f6;margin-top:2px}
+.sec-docs__footer strong{color:#6b7280}
+
 /* ── Classification Level Cards ── */
 .cl-card{border:1px solid #e5e7eb;border-radius:8px;padding:9px 12px;margin-bottom:6px;display:flex;align-items:flex-start;gap:9px;background:#fff;cursor:pointer;user-select:none;transition:border-color .15s}
 .cl-card:last-of-type{margin-bottom:8px}
@@ -1740,6 +1788,139 @@ function TypesModal({lob,category,onClose,onManagePrompt,addToast,onAddType}){
   );
 }
 
+/* ── Category Section (L1-only scroll mode) ── */
+function CategorySection({catItem,prompt,defaultPrompt,meta,saveState,onEdit,onSave,docs,onAddDoc,onToggleSel,onDelDoc,onMarkTested,addToast,onVersion}){
+  const [open,setOpen]=useState(true);
+  const [filter,setFilter]=useState('all');
+  const [dragOver,setDragOver]=useState(false);
+  const [showTest,setShowTest]=useState(false);
+  const [showPreview,setShowPreview]=useState(false);
+  const [showResetConfirm,setShowResetConfirm]=useState(false);
+  const fileRef=useRef(null);
+  const m=meta||{version:'V.1',score:'N/A',status:'Draft'};
+  const allCount=docs.length;
+  const testedCount=docs.filter(d=>d.status==='Tested').length;
+  const pendingCount=docs.filter(d=>d.status==='Pending').length;
+  const selCount=docs.filter(d=>d.selected).length;
+  const filteredDocs=docs.filter(d=>filter==='all'||d.status.toLowerCase()===filter);
+  const missing=!prompt.includes('{{CLASSIFICATION_HIERARCHY}}');
+  const ss=saveState;
+  const processFiles=files=>{
+    const all=Array.from(files);
+    const valid=all.filter(f=>['image/jpeg','image/png','application/pdf'].includes(f.type)&&f.size<=5*1024*1024);
+    valid.forEach(f=>onAddDoc({id:Date.now()+Math.random(),name:f.name,status:'Pending',selected:false}));
+    if(valid.length>0)addToast(`${valid.length} file(s) uploaded`,'success');
+    if(all.filter(f=>!['image/jpeg','image/png','application/pdf'].includes(f.type)).length>0)addToast('Some files rejected — PDF/JPG/PNG only','error');
+    if(all.filter(f=>f.type&&f.size>5*1024*1024).length>0)addToast('Some files rejected — max 5MB','error');
+  };
+  return(
+    <div className={`cat-sec cat-sec--${open?'open':'closed'}`}>
+      {/* Header */}
+      <div className="cat-sec__hdr" onClick={()=>setOpen(o=>!o)}>
+        <span className="cat-sec__chevron"><IC.ChevDown s={13}/></span>
+        <span style={{fontSize:'13px',marginRight:'4px'}}>🗂</span>
+        <span className="cat-sec__name">{catItem.name}</span>
+        <div className="cat-sec__meta">
+          <span className="cat-sec__tag">{catItem.l2.length} type{catItem.l2.length!==1?'s':''}</span>
+          <span className="cat-sec__tag">{allCount} doc{allCount!==1?'s':''}</span>
+          <span className={`cat-sec__tag cat-sec__tag--${m.status.toLowerCase()}`}>{m.status}</span>
+          {m.score&&m.score!=='N/A'&&m.score!=='0%'&&<span className="cat-sec__tag">{m.score}</span>}
+        </div>
+      </div>
+      {/* Body */}
+      {open&&<div className="cat-sec__body">
+        {/* Left: Prompt */}
+        <div className="cat-sec__prompt">
+          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+            <h4 style={{fontSize:'13px',fontWeight:700,color:'#111827'}}>{catItem.name} Prompt</h4>
+            <button className="workspace__manage-btn" onClick={e=>{e.stopPropagation();onVersion();}} style={{fontSize:'11px'}}>Manage version</button>
+          </div>
+          <div className="sec-ver-card">
+            <div className="sec-ver-item"><span className="sec-ver-lbl">Version</span><span className="sec-ver-val">{m.version}</span></div>
+            <div className="sec-ver-div"/>
+            <div className="sec-ver-item"><span className="sec-ver-lbl">Confidence</span><span className="sec-ver-val">{m.score}</span></div>
+            <div className="sec-ver-div"/>
+            <div className="sec-ver-item"><span className="sec-ver-lbl">Status</span><span className={`workspace__status ${m.status.toLowerCase()}`}>{m.status}</span></div>
+          </div>
+          <div>
+            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'6px'}}>
+              <div style={{display:'flex',alignItems:'center',gap:'6px'}}>
+                <span className="prompt-ctx-chip prompt-ctx-chip--l1">L1</span>
+                <span style={{fontSize:'12px',fontWeight:600,color:'#374151'}}>Prompt Template for {catItem.name}</span>
+                {!missing&&<span style={{fontSize:'11px',background:'#dcfce7',color:'#16a34a',padding:'1px 7px',borderRadius:'10px',fontWeight:500}}>✓ Placeholder detected</span>}
+              </div>
+              <div style={{display:'flex',alignItems:'center',gap:'8px'}}>
+                {ss==='unsaved'&&<span className="save-indicator unsaved">● Unsaved</span>}
+                {ss==='saved'&&<span className="save-indicator saved"><IC.Check/> Saved</span>}
+                <button className="workspace__reset-btn" onClick={()=>setShowResetConfirm(s=>!s)}>Reset</button>
+                <button className="workspace__preview-link" onClick={()=>setShowPreview(true)}>Preview</button>
+              </div>
+            </div>
+            {missing&&<div style={{display:'flex',alignItems:'center',gap:'7px',padding:'7px 10px',background:'#fffbeb',border:'1px solid #fde68a',borderRadius:'6px',marginBottom:'8px',fontSize:'11px',color:'#92400e'}}><IC.Warn/> The <code style={{fontFamily:'monospace',background:'#fef3c7',padding:'1px 4px',borderRadius:'3px'}}>{'{{CLASSIFICATION_HIERARCHY}}'}</code> placeholder is required</div>}
+            <textarea className="workspace__textarea" style={{minHeight:'180px',width:'100%'}} value={prompt}
+              onChange={e=>{onEdit(e.target.value);}} spellCheck={false}
+              placeholder={`Enter classification prompt for ${catItem.name}…`}/>
+            {showResetConfirm&&<div className="reset-confirm" style={{marginTop:'6px'}}>
+              <span>Reset prompt to default?</span>
+              <div className="reset-confirm__actions">
+                <button className="btn-sm btn-outline" onClick={()=>setShowResetConfirm(false)}>Cancel</button>
+                <button className="btn-sm btn-danger" onClick={()=>{onEdit(defaultPrompt);setShowResetConfirm(false);}}>Reset</button>
+              </div>
+            </div>}
+            <div className="prompt-footer" style={{marginTop:'6px'}}>
+              {prompt.includes('{{CLASSIFICATION_HIERARCHY}}')&&<span className="ph-badge found"><IC.Check/> {'{{CLASSIFICATION_HIERARCHY}}'}</span>}
+              <span className="char-count">{prompt.length.toLocaleString()} chars</span>
+            </div>
+          </div>
+          <div>
+            <button className="sec-test-btn" onClick={()=>{onSave();setShowTest(true);}}>
+              🧪 Test {catItem.name} Classification
+            </button>
+            <p className="sec-doc-info">{selCount>0?`${selCount} document(s) selected`:`${allCount} document(s) available`}</p>
+          </div>
+        </div>
+        {/* Right: Docs */}
+        <div className="cat-sec__docs">
+          <p className="sec-docs__title">{catItem.name} Documents</p>
+          <div className={`sec-docs__zone${dragOver?' drag-over':''}`}
+            onDragOver={e=>{e.preventDefault();setDragOver(true);}} onDragLeave={()=>setDragOver(false)}
+            onDrop={e=>{e.preventDefault();setDragOver(false);processFiles(e.dataTransfer.files);}}
+            onClick={()=>fileRef.current?.click()}>
+            <input ref={fileRef} type="file" accept=".jpg,.jpeg,.png,.pdf" multiple style={{display:'none'}} onChange={e=>processFiles(e.target.files)}/>
+            <IC.Upload/>
+            <p className="sec-docs__dz-text">Drop file or <span className="sec-docs__browse">browse</span></p>
+            <p className="sec-docs__dz-hint">PDF · JPG · PNG · max 5MB</p>
+          </div>
+          {allCount>0&&<div className="sec-docs__filters">
+            {[['all','All',allCount],['tested','Tested',testedCount],['pending','Pending',pendingCount]].map(([id,lbl,cnt])=>(
+              <button key={id} className={`doc-panel__filter-btn${filter===id?' active':''}`} onClick={()=>setFilter(id)}>
+                <span className={`doc-panel__cnt ${id}`}>{cnt}</span>{lbl}
+              </button>
+            ))}
+          </div>}
+          <div className="sec-docs__list">
+            {filteredDocs.length===0
+              ?<div className="sec-docs__empty">{allCount===0?'No documents yet — upload to test':'No results'}</div>
+              :filteredDocs.map(doc=>(
+                <div key={doc.id} className={`doc-panel__item${doc.selected?' selected':''}`}>
+                  <input type="checkbox" className="doc-panel__cb" checked={doc.selected} onChange={()=>onToggleSel(doc.id)}/>
+                  <span className="doc-panel__file-icon"><IC.File/></span>
+                  <span className="doc-panel__file-name" title={doc.name}>{doc.name}</span>
+                  <span className={`doc-panel__status ${doc.status.toLowerCase()}`}>{doc.status}</span>
+                  <button className="doc-panel__del" onClick={()=>onDelDoc(doc.id)} title="Delete"><IC.Trash/></button>
+                </div>
+              ))
+            }
+          </div>
+          {allCount>0&&<div className="sec-docs__footer">Showing <strong>{filteredDocs.length}</strong> of <strong>{allCount}</strong></div>}
+        </div>
+      </div>}
+      {showPreview&&<PreviewModal prompt={prompt} onClose={()=>setShowPreview(false)}/>}
+      {showTest&&<TestModal prompt={prompt} docs={docs} onMarkTested={onMarkTested} onClose={()=>setShowTest(false)}/>}
+    </div>
+  );
+}
+
 /* ── Pipeline Stage Bar ── */
 function PipelineBar(){
   const STAGES=['Ingestion','Classification','Completion','Validation','Export'];
@@ -2580,9 +2761,18 @@ function App(){
   const [showMenu,setShowMenu]=useState(null);
   const [modal,setModal]=useState(null);
   const [confirmState,setConfirmState]=useState(null);
+  // L1+L2 mode: global docs
   const [docs,setDocs]=useState(makeDocs());
   const [filter,setFilter]=useState('pending');
   const [search,setSearch]=useState('');
+  // L1 only mode: per-category docs {[catId]: [{id,name,status,selected}]}
+  const [catDocs,setCatDocs]=useState({});
+  const getCatDocs=catId=>catDocs[catId]||[];
+  const setCatDocsFor=(catId,updater)=>setCatDocs(prev=>({...prev,[catId]:typeof updater==='function'?updater(prev[catId]||[]):updater}));
+  const addCatDoc=(catId,doc)=>setCatDocsFor(catId,prev=>[...prev,doc]);
+  const toggleCatSel=(catId,docId)=>setCatDocsFor(catId,prev=>prev.map(d=>d.id===docId?{...d,selected:!d.selected}:d));
+  const delCatDoc=(catId,docId)=>{setCatDocsFor(catId,prev=>prev.filter(d=>d.id!==docId));addToast('Document removed','warning');};
+  const markCatTested=(catId,docId)=>setCatDocsFor(catId,prev=>prev.map(d=>d.id===docId?{...d,status:'Tested',selected:false}:d));
 
   const onSelectLob=lob=>{
     setSelectedLob(lob);
@@ -2743,22 +2933,56 @@ function App(){
           <button className="app__back-btn" onClick={onBackToList}><IC.Back/> Back to Categories</button>
           <PipelineBar/>
         </div>
-        <div className="app__content">
-          <Sidebar cbLevels={cbLevels} setCbLevels={setCbLevels} l0Name={l0Name} setL0Name={setL0Name}
-            l1Items={l1Items} setL1Items={setL1Items} showMenu={showMenu} setShowMenu={setShowMenu}
-            addToast={addToast} onConfirm={setConfirmState}/>
-          <Workspace activeL1Tab={activeL1Tab} setActiveL1Tab={setActiveL1Tab} activeTab={activeTab} setActiveTab={setActiveTab} l1Items={l1Items}
-            prompts={prompts} defaultPrompts={defaultPrompts} tabMeta={tabMeta} saveStates={saveStates}
-            onEdit={handleEdit} onSave={handleSave} cbLevels={cbLevels}
-            ofSchemas={ofSchemas} docs={docs}
-            onVersion={()=>setModal('version')} onPreview={()=>setModal('preview')} onTest={()=>setModal('test')}/>
-          <DocumentPanel docs={filteredDocs} allDocs={docs} filter={filter} setFilter={setFilter}
-            search={search} setSearch={setSearch} toggleSel={toggleSel} selAll={selAll}
-            delDoc={delDoc} bulkDelete={bulkDelete} handleUpload={handleUpload}/>
-        </div>
+        {cbLevels.l2
+          /* ── L1+L2: single unified prompt + global doc panel ── */
+          ?<div className="app__content">
+            <Sidebar cbLevels={cbLevels} setCbLevels={setCbLevels} l0Name={l0Name} setL0Name={setL0Name}
+              l1Items={l1Items} setL1Items={setL1Items} showMenu={showMenu} setShowMenu={setShowMenu}
+              addToast={addToast} onConfirm={setConfirmState}/>
+            <Workspace activeL1Tab={activeL1Tab} setActiveL1Tab={setActiveL1Tab} activeTab={activeTab} setActiveTab={setActiveTab} l1Items={l1Items}
+              prompts={prompts} defaultPrompts={defaultPrompts} tabMeta={tabMeta} saveStates={saveStates}
+              onEdit={handleEdit} onSave={handleSave} cbLevels={cbLevels}
+              ofSchemas={ofSchemas} docs={docs}
+              onVersion={()=>setModal('version')} onPreview={()=>setModal('preview')} onTest={()=>setModal('test')}/>
+            <DocumentPanel docs={filteredDocs} allDocs={docs} filter={filter} setFilter={setFilter}
+              search={search} setSearch={setSearch} toggleSel={toggleSel} selAll={selAll}
+              delDoc={delDoc} bulkDelete={bulkDelete} handleUpload={handleUpload}/>
+          </div>
+          /* ── L1 only: scroll accordion, per-category docs ── */
+          :<div className="detail-scroll">
+            <Sidebar cbLevels={cbLevels} setCbLevels={setCbLevels} l0Name={l0Name} setL0Name={setL0Name}
+              l1Items={l1Items} setL1Items={setL1Items} showMenu={showMenu} setShowMenu={setShowMenu}
+              addToast={addToast} onConfirm={setConfirmState}/>
+            <div className="detail-scroll__main">
+              <div className="detail-scroll__toolbar">
+                <span className="detail-scroll__count">{l1Items.length} categor{l1Items.length!==1?'ies':'y'}</span>
+              </div>
+              {l1Items.length===0
+                ?<div style={{textAlign:'center',padding:'48px',color:'#9ca3af',fontSize:'13px'}}>No categories yet — add one in the sidebar</div>
+                :l1Items.map(item=>(
+                  <CategorySection key={item.id}
+                    catItem={item}
+                    prompt={prompts[item.id]||''}
+                    defaultPrompt={defaultPrompts[item.id]||''}
+                    meta={tabMeta[item.id]}
+                    saveState={saveStates[item.id]}
+                    onEdit={val=>handleEdit(item.id,val)}
+                    onSave={()=>handleSave(item.id)}
+                    docs={getCatDocs(item.id)}
+                    onAddDoc={doc=>addCatDoc(item.id,doc)}
+                    onToggleSel={docId=>toggleCatSel(item.id,docId)}
+                    onDelDoc={docId=>delCatDoc(item.id,docId)}
+                    onMarkTested={docId=>markCatTested(item.id,docId)}
+                    addToast={addToast}
+                    onVersion={()=>setModal('version')}/>
+                ))
+              }
+            </div>
+          </div>
+        }
         {modal==='version'&&<VersionModal lob={selectedLobFromState} onClose={()=>setModal(null)}/>}
         {modal==='preview'&&<PreviewModal prompt={prompts[activeTab]||''} onClose={()=>setModal(null)}/>}
-        {modal==='test'&&<TestModal prompt={prompts[activeTab]||''} docs={docs} onMarkTested={markTested} onClose={()=>setModal(null)}/>}
+        {modal==='test'&&cbLevels.l2&&<TestModal prompt={prompts[activeTab]||''} docs={docs} onMarkTested={markTested} onClose={()=>setModal(null)}/>}
       </>}
 
       {typesModal&&(()=>{
