@@ -535,6 +535,22 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
 .add-modal-label{font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:6px}
 .add-modal-hint{font-size:11px;color:#9ca3af;margin-top:4px}
 
+/* ── Classification Level Cards ── */
+.cl-card{border:1px solid #e5e7eb;border-radius:8px;padding:9px 12px;margin-bottom:6px;display:flex;align-items:flex-start;gap:9px;background:#fff;cursor:pointer;user-select:none;transition:border-color .15s}
+.cl-card:last-of-type{margin-bottom:8px}
+.cl-card--active{border-color:#bfdbfe;background:#eff6ff}
+.cl-card--required{background:#f9fafb;cursor:default;opacity:.75}
+.cl-card__cb{margin-top:2px;width:14px;height:14px;accent-color:#2563eb;flex-shrink:0}
+.cl-card__cb:disabled{cursor:not-allowed}
+.cl-card__name{font-size:12px;font-weight:600;color:#111827;line-height:1.4}
+.cl-card__sub{font-size:10px;color:#9ca3af;margin-top:1px}
+.cl-mode{padding:9px 12px;border-radius:8px;border:1.5px solid #e5e7eb;background:#f9fafb;display:flex;align-items:flex-start;gap:8px;transition:all .2s}
+.cl-mode--l1l2{border-color:#bfdbfe;background:#eff6ff}
+.cl-mode__icon{font-size:13px;flex-shrink:0;margin-top:1px}
+.cl-mode__title{font-size:11px;font-weight:700;color:#374151;margin-bottom:2px;line-height:1.3}
+.cl-mode--l1l2 .cl-mode__title{color:#1d4ed8}
+.cl-mode__desc{font-size:10px;color:#6b7280;line-height:1.4}
+
 /* ── Stage Pipeline Bar ── */
 .stage-bar{display:flex;align-items:center;gap:2px;margin-left:auto;padding-left:16px;flex-shrink:0;overflow:hidden}
 .stage-step{display:flex;align-items:center;gap:4px;font-size:11px;font-weight:500;color:#9ca3af;padding:2px 7px;border-radius:4px;white-space:nowrap}
@@ -1802,9 +1818,35 @@ function Sidebar({cbLevels,setCbLevels,l0Name,setL0Name,l1Items,setL1Items,showM
     <aside className="sidebar">
       <div className="sidebar__header"><h2 className="sidebar__title">Document Classification</h2></div>
       <div className="sidebar__section">
-        <p className="sidebar__section-lbl">Classification level</p>
-        <label className="sidebar__cb-label"><input type="checkbox" checked={cbLevels.l1} onChange={e=>setCbLevels(p=>({...p,l1:e.target.checked}))}/><span>L1 - Document categories</span></label>
-        <label className="sidebar__cb-label"><input type="checkbox" checked={cbLevels.l2} onChange={e=>setCbLevels(p=>({...p,l2:e.target.checked}))}/><span>L2 - Document types</span></label>
+        <p className="sidebar__section-lbl">Classification Levels</p>
+        <label className="cl-card cl-card--required" onClick={e=>e.preventDefault()}>
+          <input type="checkbox" className="cl-card__cb" checked disabled/>
+          <div>
+            <div className="cl-card__name">L1 - Document Categories</div>
+            <div className="cl-card__sub">Main classification categories (Required)</div>
+          </div>
+        </label>
+        <label className={`cl-card${cbLevels.l2?' cl-card--active':''}`}>
+          <input type="checkbox" className="cl-card__cb" checked={cbLevels.l2}
+            onChange={e=>setCbLevels(p=>({...p,l2:e.target.checked}))}/>
+          <div>
+            <div className="cl-card__name">L2 - Document Types</div>
+            <div className="cl-card__sub">Sub-types under each category (Optional)</div>
+          </div>
+        </label>
+        <div className={`cl-mode${cbLevels.l2?' cl-mode--l1l2':''}`}>
+          <span className="cl-mode__icon">{cbLevels.l2?'💡':'📄'}</span>
+          <div>
+            <div className="cl-mode__title">
+              Current Mode: {cbLevels.l2?'Global Classification (L1 + L2)':'L1 Classification only'}
+            </div>
+            <div className="cl-mode__desc">
+              {cbLevels.l2
+                ?'Classify documents across all categories and types.'
+                :'Classify documents into top-level categories only.'}
+            </div>
+          </div>
+        </div>
       </div>
       <div className="sidebar__divider"/>
       <div className="sidebar__level0">
@@ -2524,6 +2566,7 @@ function App(){
 
   /* Detail page state — initialized from selected LOB */
   const [selectedLobId,setSelectedLobId]=useState(null);
+  // l1 is always true (Required); only l2 can be toggled
   const [cbLevels,setCbLevels]=useState({l1:true,l2:false});
   const [l1Items,setL1Items]=useState([]);
   const [l0Name,setL0Name]=useState('');
