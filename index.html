@@ -113,11 +113,12 @@ input,textarea,select{font-family:inherit}
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:300;display:flex;align-items:center;justify-content:center;animation:fadeIn .15s ease}
 .modal{background:#fff;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.2);max-width:520px;width:92vw;display:flex;flex-direction:column;max-height:90vh;animation:scaleIn .15s ease}
 .modal.lg{max-width:700px}
+.modal.xl{max-width:900px}
 .modal__header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid #e5e7eb;flex-shrink:0}
 .modal__header h3{font-size:15px;font-weight:600;color:#111827}
 .modal__close{background:none;border:none;font-size:22px;color:#9ca3af;cursor:pointer;line-height:1;padding:0 4px;border-radius:4px;transition:all .1s}
 .modal__close:hover{color:#111827;background:#f3f4f6}
-.modal__body{padding:20px;overflow-y:auto;flex:1}
+.modal__body{padding:20px;overflow-y:auto;overflow-x:auto;flex:1}
 .modal__body::-webkit-scrollbar{width:4px}.modal__body::-webkit-scrollbar-thumb{background:#e5e7eb;border-radius:2px}
 .modal__footer{display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:12px 20px;border-top:1px solid #e5e7eb;flex-shrink:0}
 
@@ -323,14 +324,18 @@ input,textarea,select{font-family:inherit}
 .doc-panel__status.tested{background:#dcfce7;color:#16a34a}
 .doc-panel__status.pending{background:#fef3c7;color:#92400e}
 .doc-panel__cnt.tested{background:#16a34a}
-.test-doc-section{margin-bottom:4px}
-.test-doc-section h4,.test-result-section h4{font-size:12px;font-weight:600;color:#374151;margin-bottom:8px}
-.test-doc-list{display:flex;flex-direction:column;gap:3px;max-height:130px;overflow-y:auto}
-.test-doc-item{display:flex;align-items:center;gap:8px;padding:6px 10px;border:1px solid #e5e7eb;border-radius:6px;cursor:pointer;font-size:12px;color:#374151;transition:all .1s;user-select:none}
-.test-doc-item:hover{border-color:#bfdbfe;background:#f0f7ff}
-.test-doc-item.selected{border-color:#2563eb;background:#eff6ff;color:#1d4ed8;font-weight:500}
+.test-doc-section{margin-bottom:2px}
+.test-doc-section h4,.test-result-section h4{font-size:12px;font-weight:600;color:#374151;margin-bottom:10px}
+.test-doc-list{display:flex;flex-direction:column;gap:3px;max-height:180px;overflow-y:auto;padding-right:2px}
+.test-doc-list::-webkit-scrollbar{width:3px}.test-doc-list::-webkit-scrollbar-thumb{background:#e5e7eb;border-radius:2px}
+.test-doc-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;border:1.5px solid transparent;background:#f9fafb;cursor:pointer;font-size:12px;color:#374151;transition:all .12s;user-select:none}
+.test-doc-item:hover{border-color:#bfdbfe;background:#f0f7ff;color:#1e40af}
+.test-doc-item.selected{border-color:#2563eb;background:#eff6ff;color:#1d4ed8;font-weight:500;box-shadow:0 0 0 3px rgba(37,99,235,.07)}
 .test-doc-item input[type=radio]{display:none}
-.test-doc-none{font-size:12px;color:#9ca3af;padding:10px 12px;background:#f9fafb;border-radius:6px;text-align:center;margin-bottom:4px}
+.test-status-badge{font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px;flex-shrink:0;white-space:nowrap;line-height:1.4}
+.test-status-badge--tested{background:#dcfce7;color:#15803d}
+.test-status-badge--pending{background:#fef3c7;color:#92400e}
+.test-doc-none{font-size:12px;color:#9ca3af;padding:14px;background:#f9fafb;border-radius:8px;text-align:center;border:1px solid #f3f4f6}
 .test-prompt-toggle{background:none;border:none;font-size:11px;color:#9ca3af;cursor:pointer;padding:4px 0 8px;font-family:inherit;text-align:left;display:flex;align-items:center;gap:4px}
 .test-prompt-toggle:hover{color:#6b7280}
 .workspace__preview-link{background:none;border:none;font-size:11px;color:#9ca3af;cursor:pointer;padding:0;font-family:inherit;text-decoration:underline;text-underline-offset:2px}
@@ -429,6 +434,7 @@ input,textarea,select{font-family:inherit}
 .prompt-ctx-chip--global{background:#f3e8ff;color:#7c3aed}
 .prompt-ctx-chip--l1{background:#dbeafe;color:#1d4ed8}
 .prompt-ctx-chip--l2{background:#d1fae5;color:#065f46}
+.prompt-ctx-chip--l1l2{background:linear-gradient(135deg,#dbeafe,#d1fae5);color:#1d4ed8;border:1px solid #bfdbfe}
 .prompt-ctx-scope{font-size:11px;color:#9ca3af;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 /* ── Output Format Modal ── */
@@ -527,6 +533,8 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
 /* Sidebar */
 .sidebar{background:#fafafa}
 .sidebar__l1-toggle:hover{background:linear-gradient(to right,#eff6ff,#f9fafb)}
+.sidebar__l1-toggle.active{background:linear-gradient(to right,#eff6ff,#f0f7ff);color:#2563eb}
+.sidebar__l1-toggle.active .sidebar__l1-name{color:#2563eb;font-weight:600}
 /* Toast polish */
 .toast{border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,.1)}
 /* Add category modal input */
@@ -534,6 +542,137 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
 .add-modal-input:focus{border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.08)}
 .add-modal-label{font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:6px}
 .add-modal-hint{font-size:11px;color:#9ca3af;margin-top:4px}
+
+/* ── Detail Scroll Layout (L1 only mode) ── */
+.detail-scroll{flex:1;display:flex;overflow:hidden;min-height:0}
+.detail-scroll__main{flex:1;overflow-y:auto;padding:16px 20px;background:#f3f4f6}
+.detail-scroll__main::-webkit-scrollbar{width:5px}.detail-scroll__main::-webkit-scrollbar-thumb{background:#d1d5db;border-radius:3px}
+.detail-scroll__toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-shrink:0}
+.detail-scroll__count{font-size:12px;color:#6b7280}
+.detail-scroll__actions{display:flex;gap:6px}
+.detail-scroll__action-btn{background:#fff;border:1px solid #e5e7eb;border-radius:6px;padding:4px 10px;font-size:11px;color:#6b7280;cursor:pointer;font-family:inherit;transition:all .12s}
+.detail-scroll__action-btn:hover{border-color:#9ca3af;color:#374151}
+/* Category accordion */
+.cat-sec{background:#fff;border:1px solid #e5e7eb;border-radius:12px;margin-bottom:12px;overflow:hidden;transition:box-shadow .15s}
+.cat-sec:hover{box-shadow:0 2px 10px rgba(0,0,0,.07)}
+.cat-sec__hdr{display:flex;align-items:center;gap:8px;padding:11px 16px;cursor:pointer;user-select:none;background:#fafafa;transition:background .12s}
+.cat-sec__hdr:hover{background:#f3f4f6}
+.cat-sec--open .cat-sec__hdr{border-bottom:1px solid #e5e7eb}
+.cat-sec__chevron{color:#9ca3af;display:flex;flex-shrink:0;transition:transform .2s}
+.cat-sec--closed .cat-sec__chevron{transform:rotate(-90deg)}
+.cat-sec__name{font-size:13px;font-weight:600;color:#111827;flex:1}
+.cat-sec__meta{display:flex;align-items:center;gap:5px}
+.cat-sec__tag{font-size:10px;font-weight:500;padding:2px 7px;border-radius:10px;background:#f3f4f6;color:#6b7280;white-space:nowrap}
+.cat-sec__tag--deployed{background:#dcfce7;color:#16a34a}.cat-sec__tag--failed{background:#fee2e2;color:#dc2626}.cat-sec__tag--draft{background:#f3f4f6;color:#6b7280}
+.cat-sec__body{overflow:hidden}
+.cat-sec__prompt{padding:18px 20px;display:flex;flex-direction:column;gap:12px}
+/* ── Test action zone (section footer bar) ── */
+.test-action-zone{display:flex;flex-direction:column;gap:8px;padding:12px 14px;background:#f8faff;border:1px solid #dbeafe;border-radius:10px;margin-top:8px}
+.test-action-zone__top{display:flex;align-items:center;gap:8px}
+.test-action-zone__title{font-size:12px;font-weight:600;color:#1d4ed8;flex:1}
+.test-action-zone__actions{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.test-action-zone__bottom{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.test-action-zone__hint{font-size:10px;color:#93c5fd;margin-left:auto;white-space:nowrap}
+.test-chip{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap;line-height:1.5}
+.test-chip--tested{background:#dcfce7;color:#15803d}
+.test-chip--pending{background:#fef3c7;color:#92400e}
+.test-chip--empty{background:#f3f4f6;color:#9ca3af;font-weight:400}
+.test-action-zone__add{background:#fff;border:1px solid #d1d5db;border-radius:7px;padding:5px 11px;font-size:11px;font-weight:500;color:#6b7280;cursor:pointer;font-family:inherit;transition:all .12s;white-space:nowrap}
+.test-action-zone__add:hover{border-color:#93c5fd;color:#2563eb;background:#f0f7ff}
+.test-action-zone__btn{background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff;border:none;border-radius:8px;padding:7px 16px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap;box-shadow:0 1px 3px rgba(37,99,235,.2);display:inline-flex;align-items:center;gap:5px}
+.test-action-zone__btn:hover{background:linear-gradient(135deg,#1d4ed8,#1e40af);box-shadow:0 2px 8px rgba(37,99,235,.3);transform:translateY(-1px)}
+/* TestModal doc picker */
+.test-doc-search{width:100%;padding:7px 11px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:12px;outline:none;font-family:inherit;transition:border-color .15s,box-shadow .15s;margin-bottom:8px;color:#111827;background:#fff}
+.test-doc-search:focus{border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.07)}
+.test-doc-upload-row{display:flex;align-items:center;justify-content:center;gap:6px;padding:8px 14px;background:#fafafa;border:1.5px dashed #e5e7eb;border-radius:8px;cursor:pointer;font-size:11px;color:#9ca3af;transition:all .12s;margin-bottom:8px;user-select:none;font-family:inherit}
+.test-doc-upload-row:hover{border-color:#93c5fd;background:#f0f7ff;color:#2563eb}
+/* Ver card inside section */
+.sec-ver-card{display:flex;align-items:center;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:8px 14px;gap:0;flex-shrink:0}
+.sec-ver-item{display:flex;flex-direction:column;gap:1px;flex:1}
+.sec-ver-lbl{font-size:10px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.04em}
+.sec-ver-val{font-size:12px;font-weight:600;color:#111827}
+.sec-ver-div{width:1px;background:#e5e7eb;height:26px;margin:0 12px;flex-shrink:0}
+/* Section doc panel */
+.sec-docs__title{font-size:11px;font-weight:700;color:#374151;margin-bottom:8px}
+.sec-docs__zone{border:1.5px dashed #d1d5db;border-radius:8px;padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;background:#fff;transition:all .15s}
+.sec-docs__zone:hover,.sec-docs__zone.drag-over{border-color:#2563eb;background:#eff6ff}
+.sec-docs__dz-text{font-size:11px;color:#6b7280;text-align:center}
+.sec-docs__browse{color:#2563eb;font-weight:500}.sec-docs__dz-hint{font-size:10px;color:#9ca3af;text-align:center}
+.sec-docs__filters{display:flex;gap:4px;flex-wrap:wrap}
+.sec-docs__list{overflow-y:auto;display:flex;flex-direction:column;gap:2px;max-height:200px}
+.sec-docs__list::-webkit-scrollbar{width:3px}.sec-docs__list::-webkit-scrollbar-thumb{background:#d1d5db;border-radius:2px}
+.sec-docs__empty{text-align:center;padding:14px;font-size:11px;color:#9ca3af}
+.sec-docs__footer{font-size:10px;color:#9ca3af;padding-top:6px;border-top:1px solid #f3f4f6;margin-top:2px}
+.sec-docs__footer strong{color:#6b7280}
+
+/* ── Classification Level Cards ── */
+.cl-card{border:1px solid #e5e7eb;border-radius:8px;padding:9px 12px;margin-bottom:6px;display:flex;align-items:flex-start;gap:9px;background:#fff;cursor:pointer;user-select:none;transition:border-color .15s}
+.cl-card:last-of-type{margin-bottom:8px}
+.cl-card--active{border-color:#bfdbfe;background:#eff6ff}
+.cl-card--required{background:#f9fafb;cursor:default;opacity:.75}
+.cl-card__cb{margin-top:2px;width:14px;height:14px;accent-color:#2563eb;flex-shrink:0}
+.cl-card__cb:disabled{cursor:not-allowed}
+.cl-card__name{font-size:12px;font-weight:600;color:#111827;line-height:1.4}
+.cl-card__sub{font-size:10px;color:#9ca3af;margin-top:1px}
+.cl-mode{padding:9px 12px;border-radius:8px;border:1.5px solid #e5e7eb;background:#f9fafb;display:flex;align-items:flex-start;gap:8px;transition:all .2s}
+.cl-mode--l1l2{border-color:#bfdbfe;background:#eff6ff}
+.cl-mode__icon{font-size:13px;flex-shrink:0;margin-top:1px}
+.cl-mode__title{font-size:11px;font-weight:700;color:#374151;margin-bottom:2px;line-height:1.3}
+.cl-mode--l1l2 .cl-mode__title{color:#1d4ed8}
+.cl-mode__desc{font-size:10px;color:#6b7280;line-height:1.4}
+
+/* ── Stage Pipeline Bar ── */
+.stage-bar{display:flex;align-items:center;gap:2px;margin-left:auto;padding-left:16px;flex-shrink:0;overflow:hidden}
+.stage-step{display:flex;align-items:center;gap:4px;font-size:11px;font-weight:500;color:#9ca3af;padding:2px 7px;border-radius:4px;white-space:nowrap}
+.stage-step--active{color:#2563eb;background:#eff6ff;font-weight:600}
+.stage-step--done{color:#16a34a}
+.stage-sep{color:#d1d5db;font-size:11px;padding:0 1px;flex-shrink:0}
+
+/* ── Readiness Checklist ── */
+.readiness{display:flex;gap:6px;padding:9px 14px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:9px;flex-wrap:wrap;align-items:center}
+.readiness__title{font-size:10px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em;flex-shrink:0;margin-right:2px}
+.readiness__item{display:flex;align-items:center;gap:4px;font-size:11px;font-weight:500;white-space:nowrap}
+.readiness__item--ok{color:#16a34a}.readiness__item--fail{color:#9ca3af}
+.readiness__sep{width:1px;height:14px;background:#e5e7eb;flex-shrink:0;align-self:center}
+
+/* ── Test Expected vs Predicted ── */
+.test-expected{display:flex;flex-direction:column;gap:6px}
+.test-expected h4{font-size:12px;font-weight:600;color:#374151;margin-bottom:2px}
+.test-expected__input{width:100%;padding:7px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:12px;outline:none;font-family:inherit;color:#111827;transition:border-color .15s}
+.test-expected__input:focus{border-color:#2563eb;box-shadow:0 0 0 2px rgba(37,99,235,.08)}
+.test-comparison{display:flex;flex-direction:column;gap:6px}
+.test-comparison h4{font-size:12px;font-weight:600;color:#374151;margin-bottom:2px}
+.test-comparison__row{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:8px;font-size:12px}
+.test-comparison__row--match{background:#f0fdf4;border:1px solid #bbf7d0}
+.test-comparison__row--mismatch{background:#fef2f2;border:1px solid #fecaca}
+.test-comparison__lbl{font-size:10px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.04em;min-width:70px;flex-shrink:0}
+.test-comparison__val{font-weight:600;color:#111827;flex:1}
+.test-comparison__badge{font-size:11px;font-weight:600;padding:2px 9px;border-radius:10px;margin-left:auto;flex-shrink:0}
+.test-comparison__badge--match{background:#dcfce7;color:#16a34a}
+.test-comparison__badge--mismatch{background:#fee2e2;color:#dc2626}
+
+/* ── Schema badge ── */
+.schema-badge{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px;background:#eff6ff;color:#2563eb;border:1px solid #bfdbfe;white-space:nowrap}
+.schema-badge--empty{background:#f3f4f6;color:#9ca3af;border-color:#e5e7eb}
+
+/* ── Stage 1 LOB Prompt Section ── */
+.l1-prompt-sec{background:#fff;border:2px solid #bfdbfe;border-radius:12px;margin-bottom:16px;overflow:hidden;transition:box-shadow .15s}
+.l1-prompt-sec:hover{box-shadow:0 2px 12px rgba(37,99,235,.1)}
+.l1-prompt-sec__hdr{display:flex;align-items:center;gap:8px;padding:12px 16px;background:linear-gradient(135deg,#eff6ff,#f0f9ff);border-bottom:1px solid #bfdbfe}
+.l1-prompt-sec__badge{background:#1d4ed8;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;letter-spacing:.04em;flex-shrink:0}
+.l1-prompt-sec__title{font-size:13px;font-weight:700;color:#1e40af;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.l1-prompt-sec__body{overflow:hidden}
+.l1-prompt-sec__prompt{padding:18px 20px;display:flex;flex-direction:column;gap:12px}
+.l1-prompt-sec__desc{font-size:12px;color:#4b72b8;line-height:1.5;padding:8px 12px;background:#eff6ff;border-radius:7px;border-left:3px solid #93c5fd;margin-bottom:2px}
+/* Stage 2 label row */
+.stage2-label{display:flex;align-items:center;gap:8px;margin:4px 0 12px}
+.stage2-label__badge{font-size:10px;font-weight:700;color:#fff;background:#374151;padding:2px 8px;border-radius:20px;letter-spacing:.04em;flex-shrink:0}
+.stage2-label__text{font-size:12px;color:#6b7280}
+/* Sidebar nav items (L1-only mode) */
+.sidebar__l1-nav{background:none;border:none;display:flex;align-items:center;gap:7px;width:100%;padding:7px 8px;border-radius:6px;font-size:12px;font-weight:500;color:#374151;cursor:pointer;font-family:inherit;text-align:left;transition:all .12s}
+.sidebar__l1-nav:hover{background:#eff6ff;color:#2563eb}
+.sidebar__l1-nav--active{background:#eff6ff;color:#2563eb;font-weight:600}
+.sidebar__l1-nav__dot{width:7px;height:7px;border-radius:50%;background:#2563eb;flex-shrink:0}
 </style>
 </head>
 <body>
@@ -1207,6 +1346,63 @@ const DOC_NAMES = [
 ];
 const makeDocs=()=>DOC_NAMES.map((name,i)=>({id:i+1,name,status:[0,4,9,14,19,24,29,34].includes(i)?'Tested':'Pending',selected:false}));
 
+/* ──────────────────────────────────────────────────────────────────────────
+   Mock Classification Engine
+   Data-driven: targets = [{id, name}] from l1Items (Stage 1) or cat.types (Stage 2)
+   No hardcoded keyword→class mapping — derives from target names vs doc filename
+────────────────────────────────────────────────────────────────────────── */
+const mockClassify=(docName,targets)=>{
+  if(!targets||targets.length===0)return null;
+
+  // Tokenise filename: split on _ . - space, strip extension
+  const tokens=docName.toLowerCase()
+    .replace(/\.(pdf|jpg|jpeg|png)$/i,'')
+    .replace(/[_.\-]/g,' ')
+    .split(/\s+/).filter(Boolean);
+
+  // Score each target by word-overlap between target name tokens and doc tokens
+  const scored=targets.map(t=>{
+    const tWords=t.name.toLowerCase().split(/[\s\-&\/]+/).filter(Boolean);
+    let score=0;
+    for(const tw of tWords){
+      if(tokens.some(tok=>tok===tw||tok.startsWith(tw)||tw.startsWith(tok))) score+=1;
+    }
+    // Small noise so ties break randomly each run
+    score+=Math.random()*0.35;
+    return{...t,score};
+  });
+
+  scored.sort((a,b)=>b.score-a.score);
+  const winner=scored[0];
+  const runnerUp=scored[1];
+
+  // Confidence: 82–96 if strong keyword match, 63–78 if weak
+  const strong=winner.score>=1;
+  const base=strong?82:63;
+  const conf=Math.min(99,base+Math.floor(Math.random()*14));
+  const confStr=`${conf.toFixed(1)}%`;
+
+  // Runner-up mention
+  const ruConfVal=Math.max(35,conf-13-Math.floor(Math.random()*14));
+  const ruNote=runnerUp&&ruConfVal>=40
+    ?` Next closest: "${runnerUp.name}" (${ruConfVal}%).`:'';
+
+  const reviewNote=conf<75?' Manual review recommended.':'';
+  const REASONS=[
+    `Document filename pattern and content structure align with "${winner.name}" classification criteria.${ruNote}${reviewNote}`,
+    `Keyword analysis and reference number format match "${winner.name}".${ruNote}${reviewNote}`,
+    `Document identifiers — header, reference numbers, and terminology — indicate "${winner.name}".${ruNote}${reviewNote}`,
+  ];
+
+  const processingMs=900+Math.floor(Math.random()*1200);
+
+  return{
+    classification:winner.name,
+    confidence:confStr,
+    reasoning:REASONS[Math.floor(Math.random()*REASONS.length)].trim(),
+    processingMs,
+  };
+};
 
 const NAV_ITEMS = ['Home','Classification','Completion','Validation','Export','Report'];
 
@@ -1689,8 +1885,288 @@ function TypesModal({lob,category,onClose,onManagePrompt,addToast,onAddType}){
   );
 }
 
+/* ── LOB Prompt Section (Stage 1 — L1-only scroll mode) ── */
+/* targets = l1Items passed from App so classifier knows the category targets */
+function LobPromptSection({lobName,prompt,defaultPrompt,meta,saveState,onEdit,onSave,
+  docs,onAddDoc,onToggleSel,onDelDoc,onMarkTested,addToast,onVersion,targets=[]}){
+  const [showResetConfirm,setShowResetConfirm]=useState(false);
+  const [showPreview,setShowPreview]=useState(false);
+  const [showTest,setShowTest]=useState(false);
+  const fileRef=useRef(null);
+  const m=meta||{version:'V.1',score:'N/A',status:'Draft'};
+  const ss=saveState;
+  const missing=!prompt.includes('{{CLASSIFICATION_HIERARCHY}}');
+  const found=[...new Set(prompt.match(/\{\{[^}]+\}\}/g)||[])];
+  const allCount=docs.length;
+  const testedCount=docs.filter(d=>d.status==='Tested').length;
+  const pendingCount=docs.filter(d=>d.status==='Pending').length;
+  const processFiles=files=>{
+    const all=Array.from(files);
+    const valid=all.filter(f=>['image/jpeg','image/png','application/pdf'].includes(f.type)&&f.size<=5*1024*1024);
+    valid.forEach(f=>onAddDoc({id:Date.now()+Math.random(),name:f.name,status:'Pending',selected:false}));
+    if(valid.length>0)addToast(`${valid.length} file(s) uploaded`,'success');
+    if(all.filter(f=>!['image/jpeg','image/png','application/pdf'].includes(f.type)).length>0)addToast('Some files rejected — PDF/JPG/PNG only','error');
+    if(all.filter(f=>f.type&&f.size>5*1024*1024).length>0)addToast('Some files rejected — max 5MB','error');
+  };
+  return(
+    <div className="l1-prompt-sec" id="cat-sec-l1">
+      <div className="l1-prompt-sec__hdr">
+        <span className="l1-prompt-sec__badge">STAGE 1</span>
+        <span className="l1-prompt-sec__title">LOB Classification Prompt — {lobName}</span>
+        <button className="workspace__manage-btn" onClick={onVersion} style={{fontSize:'11px'}}>Manage version</button>
+      </div>
+      <div className="l1-prompt-sec__body">
+        {/* Left: Prompt editor */}
+        <div className="l1-prompt-sec__prompt">
+          <p className="l1-prompt-sec__desc">
+            Stage 1 routes incoming documents into top-level categories.
+            Stage 2 prompts below refine classification within each category.
+          </p>
+          <div className="sec-ver-card">
+            <div className="sec-ver-item"><span className="sec-ver-lbl">Version</span><span className="sec-ver-val">{m.version}</span></div>
+            <div className="sec-ver-div"/>
+            <div className="sec-ver-item"><span className="sec-ver-lbl">Confidence</span><span className="sec-ver-val">{m.score}</span></div>
+            <div className="sec-ver-div"/>
+            <div className="sec-ver-item"><span className="sec-ver-lbl">Status</span><span className={`workspace__status ${m.status.toLowerCase()}`}>{m.status}</span></div>
+          </div>
+          <div>
+            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'6px'}}>
+              <div style={{display:'flex',alignItems:'center',gap:'6px'}}>
+                <span className="prompt-ctx-chip prompt-ctx-chip--l1">L1</span>
+                <span style={{fontSize:'12px',fontWeight:600,color:'#374151'}}>Classification Prompt Template</span>
+                {!missing&&<span style={{fontSize:'11px',background:'#dcfce7',color:'#16a34a',padding:'1px 7px',borderRadius:'10px',fontWeight:500}}>✓ Placeholder detected</span>}
+              </div>
+              <div style={{display:'flex',alignItems:'center',gap:'8px'}}>
+                {ss==='unsaved'&&<span className="save-indicator unsaved">● Unsaved</span>}
+                {ss==='saved'&&<span className="save-indicator saved"><IC.Check/> Saved</span>}
+                <button className="workspace__reset-btn" onClick={()=>setShowResetConfirm(s=>!s)}>Reset</button>
+                <button className="workspace__preview-link" onClick={()=>setShowPreview(true)}>Preview</button>
+              </div>
+            </div>
+            {missing&&<div style={{display:'flex',alignItems:'center',gap:'7px',padding:'7px 10px',background:'#fffbeb',border:'1px solid #fde68a',borderRadius:'6px',marginBottom:'8px',fontSize:'11px',color:'#92400e'}}><IC.Warn/> The <code style={{fontFamily:'monospace',background:'#fef3c7',padding:'1px 4px',borderRadius:'3px'}}>{'{{CLASSIFICATION_HIERARCHY}}'}</code> placeholder is required</div>}
+            <textarea className="workspace__textarea" style={{minHeight:'180px',width:'100%'}} value={prompt}
+              onChange={e=>onEdit(e.target.value)} spellCheck={false}
+              placeholder="Enter LOB-level classification prompt…"/>
+            {showResetConfirm&&<div className="reset-confirm" style={{marginTop:'6px'}}>
+              <span>Reset prompt to default?</span>
+              <div className="reset-confirm__actions">
+                <button className="btn-sm btn-outline" onClick={()=>setShowResetConfirm(false)}>Cancel</button>
+                <button className="btn-sm btn-danger" onClick={()=>{onEdit(defaultPrompt);setShowResetConfirm(false);}}>Reset</button>
+              </div>
+            </div>}
+            <div className="prompt-footer" style={{marginTop:'6px'}}>
+              <div className="placeholder-row">
+                {found.map(p=><span key={p} className="ph-badge found"><IC.Check/> {p}</span>)}
+                {missing&&<span className="ph-badge missing">⚠ {'{{CLASSIFICATION_HIERARCHY}}'}</span>}
+              </div>
+              <span className="char-count">{prompt.length.toLocaleString()} chars</span>
+            </div>
+          </div>
+          <div className="test-action-zone">
+            <input ref={fileRef} type="file" accept=".jpg,.jpeg,.png,.pdf" multiple style={{display:'none'}} onChange={e=>processFiles(e.target.files)}/>
+            <div className="test-action-zone__top">
+              <span className="test-action-zone__title">🧪 Test this prompt</span>
+              <div className="test-action-zone__actions">
+                <button className="test-action-zone__add" onClick={()=>fileRef.current?.click()}>+ Add doc</button>
+                <button className="test-action-zone__btn" onClick={()=>{onSave();setShowTest(true);}}>Open test panel ↗</button>
+              </div>
+            </div>
+            <div className="test-action-zone__bottom">
+              {allCount===0
+                ?<span className="test-chip test-chip--empty">No documents yet</span>
+                :<>
+                  {testedCount>0&&<span className="test-chip test-chip--tested">✓ {testedCount} tested</span>}
+                  {pendingCount>0&&<span className="test-chip test-chip--pending">{pendingCount} pending</span>}
+                  {testedCount===0&&pendingCount===0&&<span className="test-chip test-chip--empty">{allCount} uploaded</span>}
+                </>
+              }
+              <span className="test-action-zone__hint">Pick a document → run → see output</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      {showPreview&&<PreviewModal prompt={prompt} onClose={()=>setShowPreview(false)}/>}
+      {showTest&&<TestModal
+        prompt={prompt}
+        docs={docs}
+        onMarkTested={onMarkTested}
+        onClose={()=>setShowTest(false)}
+        targets={targets}
+        testTitle={`Test Stage 1 — ${lobName} LOB`}
+        expectedPlaceholder={targets.length>0?`e.g. ${targets.slice(0,3).map(t=>t.name).join(', ')}`:undefined}
+        onAddDoc={onAddDoc}
+        addToast={addToast}
+      />}
+    </div>
+  );
+}
+
+/* ── Category Section (L1-only scroll mode) ── */
+function CategorySection({catItem,prompt,defaultPrompt,meta,saveState,onEdit,onSave,docs,onAddDoc,onToggleSel,onDelDoc,onMarkTested,addToast,onVersion}){
+  const [open,setOpen]=useState(true);
+  const [showTest,setShowTest]=useState(false);
+  const [showPreview,setShowPreview]=useState(false);
+  const [showResetConfirm,setShowResetConfirm]=useState(false);
+  const fileRef=useRef(null);
+  const m=meta||{version:'V.1',score:'N/A',status:'Draft'};
+  const allCount=docs.length;
+  const testedCount=docs.filter(d=>d.status==='Tested').length;
+  const pendingCount=docs.filter(d=>d.status==='Pending').length;
+  const missing=!prompt.includes('{{CLASSIFICATION_HIERARCHY}}');
+  const ss=saveState;
+  const processFiles=files=>{
+    const all=Array.from(files);
+    const valid=all.filter(f=>['image/jpeg','image/png','application/pdf'].includes(f.type)&&f.size<=5*1024*1024);
+    valid.forEach(f=>onAddDoc({id:Date.now()+Math.random(),name:f.name,status:'Pending',selected:false}));
+    if(valid.length>0)addToast(`${valid.length} file(s) uploaded`,'success');
+    if(all.filter(f=>!['image/jpeg','image/png','application/pdf'].includes(f.type)).length>0)addToast('Some files rejected — PDF/JPG/PNG only','error');
+    if(all.filter(f=>f.type&&f.size>5*1024*1024).length>0)addToast('Some files rejected — max 5MB','error');
+  };
+  return(
+    <div id={`cat-sec-${catItem.id}`} className={`cat-sec cat-sec--${open?'open':'closed'}`}>
+      {/* Header */}
+      <div className="cat-sec__hdr" onClick={()=>setOpen(o=>!o)}>
+        <span className="cat-sec__chevron"><IC.ChevDown s={13}/></span>
+        <span style={{fontSize:'13px',marginRight:'4px'}}>🗂</span>
+        <span className="cat-sec__name">{catItem.name}</span>
+        <div className="cat-sec__meta">
+          <span className="cat-sec__tag">{catItem.l2.length} type{catItem.l2.length!==1?'s':''}</span>
+          <span className="cat-sec__tag">{allCount} doc{allCount!==1?'s':''}</span>
+          <span className={`cat-sec__tag cat-sec__tag--${m.status.toLowerCase()}`}>{m.status}</span>
+          {m.score&&m.score!=='N/A'&&m.score!=='0%'&&<span className="cat-sec__tag">{m.score}</span>}
+        </div>
+      </div>
+      {/* Body */}
+      {open&&<div className="cat-sec__body">
+        {/* Left: Prompt */}
+        <div className="cat-sec__prompt">
+          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+            <h4 style={{fontSize:'13px',fontWeight:700,color:'#111827'}}>{catItem.name} Prompt</h4>
+            <button className="workspace__manage-btn" onClick={e=>{e.stopPropagation();onVersion();}} style={{fontSize:'11px'}}>Manage version</button>
+          </div>
+          <div className="sec-ver-card">
+            <div className="sec-ver-item"><span className="sec-ver-lbl">Version</span><span className="sec-ver-val">{m.version}</span></div>
+            <div className="sec-ver-div"/>
+            <div className="sec-ver-item"><span className="sec-ver-lbl">Confidence</span><span className="sec-ver-val">{m.score}</span></div>
+            <div className="sec-ver-div"/>
+            <div className="sec-ver-item"><span className="sec-ver-lbl">Status</span><span className={`workspace__status ${m.status.toLowerCase()}`}>{m.status}</span></div>
+          </div>
+          <div>
+            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'6px'}}>
+              <div style={{display:'flex',alignItems:'center',gap:'6px'}}>
+                <span className="prompt-ctx-chip prompt-ctx-chip--l1">L1</span>
+                <span style={{fontSize:'12px',fontWeight:600,color:'#374151'}}>Prompt Template for {catItem.name}</span>
+                {!missing&&<span style={{fontSize:'11px',background:'#dcfce7',color:'#16a34a',padding:'1px 7px',borderRadius:'10px',fontWeight:500}}>✓ Placeholder detected</span>}
+              </div>
+              <div style={{display:'flex',alignItems:'center',gap:'8px'}}>
+                {ss==='unsaved'&&<span className="save-indicator unsaved">● Unsaved</span>}
+                {ss==='saved'&&<span className="save-indicator saved"><IC.Check/> Saved</span>}
+                <button className="workspace__reset-btn" onClick={()=>setShowResetConfirm(s=>!s)}>Reset</button>
+                <button className="workspace__preview-link" onClick={()=>setShowPreview(true)}>Preview</button>
+              </div>
+            </div>
+            {missing&&<div style={{display:'flex',alignItems:'center',gap:'7px',padding:'7px 10px',background:'#fffbeb',border:'1px solid #fde68a',borderRadius:'6px',marginBottom:'8px',fontSize:'11px',color:'#92400e'}}><IC.Warn/> The <code style={{fontFamily:'monospace',background:'#fef3c7',padding:'1px 4px',borderRadius:'3px'}}>{'{{CLASSIFICATION_HIERARCHY}}'}</code> placeholder is required</div>}
+            <textarea className="workspace__textarea" style={{minHeight:'180px',width:'100%'}} value={prompt}
+              onChange={e=>{onEdit(e.target.value);}} spellCheck={false}
+              placeholder={`Enter classification prompt for ${catItem.name}…`}/>
+            {showResetConfirm&&<div className="reset-confirm" style={{marginTop:'6px'}}>
+              <span>Reset prompt to default?</span>
+              <div className="reset-confirm__actions">
+                <button className="btn-sm btn-outline" onClick={()=>setShowResetConfirm(false)}>Cancel</button>
+                <button className="btn-sm btn-danger" onClick={()=>{onEdit(defaultPrompt);setShowResetConfirm(false);}}>Reset</button>
+              </div>
+            </div>}
+            <div className="prompt-footer" style={{marginTop:'6px'}}>
+              {prompt.includes('{{CLASSIFICATION_HIERARCHY}}')&&<span className="ph-badge found"><IC.Check/> {'{{CLASSIFICATION_HIERARCHY}}'}</span>}
+              <span className="char-count">{prompt.length.toLocaleString()} chars</span>
+            </div>
+          </div>
+          <div className="test-action-zone">
+            <input ref={fileRef} type="file" accept=".jpg,.jpeg,.png,.pdf" multiple style={{display:'none'}} onChange={e=>processFiles(e.target.files)}/>
+            <div className="test-action-zone__top">
+              <span className="test-action-zone__title">🧪 Test this prompt</span>
+              <div className="test-action-zone__actions">
+                <button className="test-action-zone__add" onClick={()=>fileRef.current?.click()}>+ Add doc</button>
+                <button className="test-action-zone__btn" onClick={()=>{onSave();setShowTest(true);}}>Open test panel ↗</button>
+              </div>
+            </div>
+            <div className="test-action-zone__bottom">
+              {allCount===0
+                ?<span className="test-chip test-chip--empty">No documents yet</span>
+                :<>
+                  {testedCount>0&&<span className="test-chip test-chip--tested">✓ {testedCount} tested</span>}
+                  {pendingCount>0&&<span className="test-chip test-chip--pending">{pendingCount} pending</span>}
+                  {testedCount===0&&pendingCount===0&&<span className="test-chip test-chip--empty">{allCount} uploaded</span>}
+                </>
+              }
+              <span className="test-action-zone__hint">Pick a document → run → see output</span>
+            </div>
+          </div>
+        </div>
+      </div>}
+      {showPreview&&<PreviewModal prompt={prompt} onClose={()=>setShowPreview(false)}/>}
+      {showTest&&<TestModal
+        prompt={prompt}
+        docs={docs}
+        onMarkTested={onMarkTested}
+        onClose={()=>setShowTest(false)}
+        targets={catItem.l2||[]}
+        testTitle={`Test Stage 2 — ${catItem.name}`}
+        onAddDoc={onAddDoc}
+        addToast={addToast}
+      />}
+    </div>
+  );
+}
+
+/* ── Pipeline Stage Bar ── */
+function PipelineBar(){
+  const STAGES=['Ingestion','Classification','Completion','Validation','Export'];
+  const current=1;
+  return(
+    <div className="stage-bar">
+      {STAGES.map((s,i)=>(
+        <React.Fragment key={s}>
+          {i>0&&<span className="stage-sep">›</span>}
+          <span className={`stage-step${i===current?' stage-step--active':i<current?' stage-step--done':''}`}>
+            {i<current?'✓ ':''}{s}
+          </span>
+        </React.Fragment>
+      ))}
+    </div>
+  );
+}
+
+/* ── Readiness Checklist ── */
+function ReadinessChecklist({l1Items,ofSchemas,docs}){
+  const typesOk=l1Items.some(i=>i.l2.length>0);
+  const fieldsOk=Object.values(ofSchemas||{}).some(fields=>Array.isArray(fields)&&fields.length>0);
+  const testOk=(docs||[]).some(d=>d.status==='Tested');
+  const validationOk=false;
+  const checks=[
+    {label:'Doc types defined',ok:typesOk},
+    {label:'Fields mapped',ok:fieldsOk},
+    {label:'Validation rules',ok:validationOk},
+    {label:'Test run',ok:testOk},
+  ];
+  const doneCount=checks.filter(c=>c.ok).length;
+  return(
+    <div className="readiness">
+      <span className="readiness__title">Ready {doneCount}/{checks.length}</span>
+      {checks.map((c,i)=>(
+        <React.Fragment key={c.label}>
+          {i>0&&<span className="readiness__sep"/>}
+          <span className={`readiness__item readiness__item--${c.ok?'ok':'fail'}`}>
+            {c.ok?'✓':'○'} {c.label}
+          </span>
+        </React.Fragment>
+      ))}
+    </div>
+  );
+}
+
 /* ── Sidebar (Detail) ── */
-function Sidebar({cbLevels,setCbLevels,l0Name,setL0Name,l1Items,setL1Items,showMenu,setShowMenu,addToast,onConfirm}){
+function Sidebar({cbLevels,setCbLevels,l0Name,setL0Name,l1Items,setL1Items,showMenu,setShowMenu,addToast,onConfirm,onScrollTo,activeCatId}){
   const [editingL0,setEditingL0]=useState(false);
   const [l0Draft,setL0Draft]=useState(l0Name);
   const [showAddL2,setShowAddL2]=useState(null);
@@ -1722,9 +2198,35 @@ function Sidebar({cbLevels,setCbLevels,l0Name,setL0Name,l1Items,setL1Items,showM
     <aside className="sidebar">
       <div className="sidebar__header"><h2 className="sidebar__title">Document Classification</h2></div>
       <div className="sidebar__section">
-        <p className="sidebar__section-lbl">Classification level</p>
-        <label className="sidebar__cb-label"><input type="checkbox" checked={cbLevels.l1} onChange={e=>setCbLevels(p=>({...p,l1:e.target.checked}))}/><span>L1 - Document categories</span></label>
-        <label className="sidebar__cb-label"><input type="checkbox" checked={cbLevels.l2} onChange={e=>setCbLevels(p=>({...p,l2:e.target.checked}))}/><span>L2 - Document types</span></label>
+        <p className="sidebar__section-lbl">Classification Levels</p>
+        <label className="cl-card cl-card--required" onClick={e=>e.preventDefault()}>
+          <input type="checkbox" className="cl-card__cb" checked disabled/>
+          <div>
+            <div className="cl-card__name">L1 - Document Categories</div>
+            <div className="cl-card__sub">Main classification categories (Required)</div>
+          </div>
+        </label>
+        <label className={`cl-card${cbLevels.l2?' cl-card--active':''}`}>
+          <input type="checkbox" className="cl-card__cb" checked={cbLevels.l2}
+            onChange={e=>setCbLevels(p=>({...p,l2:e.target.checked}))}/>
+          <div>
+            <div className="cl-card__name">L2 - Document Types</div>
+            <div className="cl-card__sub">Sub-types under each category (Optional)</div>
+          </div>
+        </label>
+        <div className={`cl-mode${cbLevels.l2?' cl-mode--l1l2':''}`}>
+          <span className="cl-mode__icon">{cbLevels.l2?'💡':'📄'}</span>
+          <div>
+            <div className="cl-mode__title">
+              Current Mode: {cbLevels.l2?'Global Classification (L1 + L2)':'L1 Classification only'}
+            </div>
+            <div className="cl-mode__desc">
+              {cbLevels.l2
+                ?'Classify documents across all categories and types.'
+                :'Classify documents into top-level categories only.'}
+            </div>
+          </div>
+        </div>
       </div>
       <div className="sidebar__divider"/>
       <div className="sidebar__level0">
@@ -1742,6 +2244,18 @@ function Sidebar({cbLevels,setCbLevels,l0Name,setL0Name,l1Items,setL1Items,showM
         {l1Items.length>0&&<button className="sidebar__collapse-btn" onClick={toggleAllExpand}>{allExpanded?'⊖ All':'⊕ All'}</button>}
       </div>
       <div className="sidebar__l1-list">
+        {/* Stage 1 nav link — L1-only mode only */}
+        {!cbLevels.l2&&(
+          <div className="sidebar__l1-item">
+            <div className="sidebar__l1-row">
+              <button className={`sidebar__l1-nav${activeCatId==='l1'?' sidebar__l1-nav--active':''}`}
+                onClick={()=>onScrollTo?.('l1')}>
+                <span className="sidebar__l1-nav__dot" style={{background:'#1d4ed8'}}/>
+                LOB Prompt (Stage 1)
+              </button>
+            </div>
+          </div>
+        )}
         {filteredL1.length===0&&l1Items.length>0?<div className="sidebar__no-results">No results for "{sidebarSearch}"</div>:null}
         {l1Items.length===0?<div className="sidebar__empty-l1"><IC.Layers/><p>No level 1 items yet.<br/>Add one below.</p></div>
         :filteredL1.map(item=>(
@@ -1758,7 +2272,8 @@ function Sidebar({cbLevels,setCbLevels,l0Name,setL0Name,l1Items,setL1Items,showM
               </div>
             ):(
             <div className="sidebar__l1-row">
-              <button className="sidebar__l1-toggle" onClick={()=>toggleL1(item.id)}>
+              <button className={`sidebar__l1-toggle${!cbLevels.l2&&activeCatId===item.id?' active':''}`}
+                onClick={()=>{toggleL1(item.id);if(!cbLevels.l2)onScrollTo?.(item.id);}}>
                 <span className="sidebar__l1-name">{item.name}</span>
                 {item.l2.length>0&&<span className="sidebar__l2-count">{item.l2.length}</span>}
                 {item.expanded?<IC.ChevUp/>:<IC.ChevDown/>}
@@ -1815,11 +2330,11 @@ function WorkspaceTabs({l1Items,activeL1Tab,setActiveL1Tab,activeTab,setActiveTa
   const recalcRef=useRef(null);
   const MORE_W=100; // px reserved for "+N more" pill
 
-  const allL1=[
-    {id:'global',label:'Global',l2:[]},
-    ...(cbLevels.l1?[{id:'l1',label:'L1 Classification',l2:[]}]:[]),
-    ...(cbLevels.l2?l1Items.map(i=>({id:i.id,label:i.name,l2:i.l2})):[]),
-  ];
+  // L1 only  → one tab per category (each has its own prompt)
+  // L1+L2    → single unified global prompt, no category tabs
+  const allL1=cbLevels.l2
+    ?[{id:'l1',label:'Global Classification',l2:[]}]
+    :l1Items.map(i=>({id:i.id,label:i.name,l2:[]}));
 
   // Always keep recalcRef current so ResizeObserver closure doesn't go stale
   recalcRef.current=()=>{
@@ -1865,8 +2380,8 @@ function WorkspaceTabs({l1Items,activeL1Tab,setActiveL1Tab,activeTab,setActiveTa
   const hiddenCount=hiddenAll.length;
   const anyHiddenActive=hiddenAll.some(t=>t.id===activeL1Tab);
   const handleL1=id=>{setActiveL1Tab(id);setActiveTab(id);setShowMore(false);setMoreSearch('');};
-  const activeL1Item=l1Items.find(i=>i.id===activeL1Tab);
-  const l2Tabs=activeL1Item?.l2||[];
+  // No L2 sub-tabs in workspace bar — type-level prompts accessed through types modal
+  const l2Tabs=[];
 
   return(
     <div className="workspace__tab-area">
@@ -1913,22 +2428,22 @@ function WorkspaceTabs({l1Items,activeL1Tab,setActiveL1Tab,activeTab,setActiveTa
   );
 }
 
-function Workspace({activeL1Tab,setActiveL1Tab,activeTab,setActiveTab,l1Items,prompts,defaultPrompts,tabMeta,saveStates,onEdit,onSave,onVersion,onPreview,onTest,cbLevels}){
+function Workspace({activeL1Tab,setActiveL1Tab,activeTab,setActiveTab,l1Items,prompts,defaultPrompts,tabMeta,saveStates,onEdit,onSave,onVersion,onPreview,onTest,cbLevels,ofSchemas,docs}){
   const getMeta=tabId=>{
-    if(tabId==='global')return{version:'1.0',score:'N/A',status:'Active',title:'Global Prompt'};
     const base=tabMeta?.[tabId]||DEFAULT_TAB_META;
-    if(tabId==='l1')return{...base,title:'Level 1 : Classification'};
+    // L1+L2 mode → single global prompt tab
+    if(tabId==='l1')return{...base,title:cbLevels.l2?'Global Classification Prompt (L1 + L2)':'L1 Classification Prompt'};
+    // L1 only mode → per-category tabs
     const item=l1Items.find(i=>i.id===tabId);
-    if(item)return{...base,title:`Level 2 : ${item.name}`};
-    for(const l1 of l1Items){const l2=l1.l2.find(x=>x.id===tabId);if(l2)return{...base,title:`${l1.name}  ›  ${l2.name}`};}
+    if(item)return{...base,title:`${item.name} — Classification Prompt`};
     return{...base,title:tabId};
   };
   const getCtx=tabId=>{
-    if(tabId==='global')return{level:'global',chip:'Global',scope:'Base instructions · inherited by all levels'};
-    if(tabId==='l1')return{level:'l1',chip:'L1',scope:'Classifies documents into categories'};
+    if(tabId==='l1')return cbLevels.l2
+      ?{level:'l1l2',chip:'L1+L2',scope:'Unified prompt — classifies into categories and types'}
+      :{level:'l1',chip:'L1',scope:'Classifies documents into top-level categories'};
     const item=l1Items.find(i=>i.id===tabId);
-    if(item)return{level:'l2',chip:'L2',scope:`Within ${item.name}`};
-    for(const l1 of l1Items){const l2=l1.l2.find(x=>x.id===tabId);if(l2)return{level:'l2',chip:'L2',scope:`${l1.name} › ${l2.name}`};}
+    if(item)return{level:'l1',chip:'L1',scope:`Category: ${item.name}`};
     return{level:'l1',chip:'',scope:''};
   };
   const [showResetConfirm,setShowResetConfirm]=useState(false);
@@ -1956,7 +2471,17 @@ function Workspace({activeL1Tab,setActiveL1Tab,activeTab,setActiveTab,l1Items,pr
           <div className="workspace__ver-item"><span className="workspace__ver-lbl">Confidence score</span><span className="workspace__ver-val">{meta.score}</span></div>
           <div className="workspace__ver-div"/>
           <div className="workspace__ver-item"><span className="workspace__ver-lbl">Status</span><span className={`workspace__status ${meta.status.toLowerCase()}`}>{meta.status}</span></div>
+          {(()=>{
+            const fields=ofSchemas?.[activeTab];
+            const count=Array.isArray(fields)?fields.length:0;
+            return(<><div className="workspace__ver-div"/>
+              <div className="workspace__ver-item">
+                <span className="workspace__ver-lbl">Output fields</span>
+                <span className={`schema-badge${count===0?' schema-badge--empty':''}`}>{count===0?'Not mapped':`${count} field${count===1?'':'s'}`}</span>
+              </div></>);
+          })()}
         </div>
+        <ReadinessChecklist l1Items={l1Items} ofSchemas={ofSchemas} docs={docs}/>
         {showWarn&&<div className="workspace__warn"><IC.Warn/><span>The <code>{'{{CLASSIFICATION_HIERARCHY}}'}</code> placeholder is required</span></div>}
         <div className="workspace__prompt-sec">
           <div className="workspace__prompt-hdr">
@@ -2058,7 +2583,7 @@ function DocumentPanel({docs,allDocs,filter,setFilter,search,setSearch,toggleSel
 /* ── Modals ── */
 function VersionModal({lob,onClose}){
   const versions=lob?.versions||[];
-  return(<div className="modal-overlay" onClick={onClose}><div className="modal" onClick={e=>e.stopPropagation()}>
+  return(<div className="modal-overlay" onClick={onClose}><div className="modal xl" onClick={e=>e.stopPropagation()}>
     <div className="modal__header"><h3>Manage Versions — {lob?.name||''}</h3><button className="modal__close" onClick={onClose}>×</button></div>
     <div className="modal__body">
       {versions.length===0
@@ -2080,77 +2605,146 @@ function VersionModal({lob,onClose}){
   </div></div>);
 }
 function PreviewModal({prompt,onClose}){return(<div className="modal-overlay" onClick={onClose}><div className="modal" onClick={e=>e.stopPropagation()}><div className="modal__header"><h3>Prompt Preview</h3><button className="modal__close" onClick={onClose}>×</button></div><div className="modal__body"><div className="preview-box"><pre>{prompt}</pre></div></div><div className="modal__footer"><button className="btn btn-primary" onClick={onClose}>Close</button></div></div></div>);}
-function TestModal({prompt,docs,onMarkTested,onClose}){
-  const pending=(docs||[]).filter(d=>d.status==='Pending');
-  const [selDoc,setSelDoc]=useState(()=>pending[0]?.id||null);
+/* targets = [{id,name}]  — categories for Stage 1, types for Stage 2
+   testTitle  = string shown in modal header
+   expectedPlaceholder = hint text for the expected input */
+function TestModal({prompt,docs,onMarkTested,onClose,targets=[],testTitle='Test Prompt',expectedPlaceholder,onAddDoc,addToast}){
+  const allDocs=docs||[];
+  const [docSearch,setDocSearch]=useState('');
+  const [selDoc,setSelDoc]=useState(()=>allDocs.find(d=>d.status==='Pending')?.id||allDocs[0]?.id||null);
+  const [expectedType,setExpectedType]=useState('');
   const [running,setRunning]=useState(false);
   const [result,setResult]=useState(null);
   const [showPrompt,setShowPrompt]=useState(false);
-  const run=()=>{
-    setRunning(true);setResult(null);
-    const doc=docs.find(d=>d.id===selDoc);
-    const fname=(doc?.name||'').toLowerCase();
-    // Derive mock result from filename keywords
-    const classify=()=>{
-      if(fname.includes('fnol')||fname.includes('claim_notif'))return{c:'FNOL',sc:96,r:'Document contains incident date, vehicle details, and "first notice of loss" form structure.'};
-      if(fname.includes('repair_inv')||fname.includes('repair_invoice'))return{c:'Repair Invoice',sc:94,r:'Garage letterhead, labour hours breakdown, parts list, and total cost with VAT — consistent with a completed repair invoice.'};
-      if(fname.includes('estimate'))return{c:'Estimate',sc:92,r:'Pre-repair cost estimate with "subject to inspection" language. No completion date or authorisation number present.'};
-      if(fname.includes('police_report')||fname.includes('police_rep'))return{c:'Police Report',sc:97,r:'Official police station header, officer badge number, incident CAD reference, and official stamp detected.'};
-      if(fname.includes('quotation')||fname.includes('quote'))return{c:'Quotation',sc:93,r:'Vehicle details, premium calculation breakdown, and validity period found. No policy number assigned — pre-binding stage.'};
-      if(fname.includes('renewal'))return{c:'Renewal Quote',sc:91,r:'Existing policy number present alongside renewal effective date and prior year premium comparison.'};
-      if(fname.includes('complaint'))return{c:'Simple Complaint',sc:88,r:'Customer dissatisfaction language detected. Single grievance, no regulatory escalation or legal references.'};
-      if(fname.includes('schadenmeldung')||fname.includes('kfz'))return{c:'KFZ Schaden',sc:95,r:'German motor damage claim. KFZ-Kennzeichen and Schadennummer detected. Consistent with Schadenmeldung structure.'};
-      if(fname.includes('versicherungsschein')||fname.includes('police'))return{c:'Versicherungsschein',sc:94,r:'German policy document. Versicherungsscheinnummer and Versicherungsnehmer fields present.'};
-      if(fname.includes('eho')||fname.includes('inspection'))return{c:'EHO Inspection Report',sc:90,r:'Local authority header, food hygiene rating scale, and improvement notice section detected.'};
-      if(fname.includes('pre_auth')||fname.includes('preauth'))return{c:'Pre-Authorisation Request',sc:89,r:'Consultant referral language, ICD-10 code field, and proposed treatment plan present. No invoice amount — pre-treatment stage.'};
-      if(fname.includes('survey')||fname.includes('rics'))return{c:'RICS Valuation Survey',sc:91,r:'RICS-accredited surveyor credentials, rebuild cost figure, and property risk features section detected.'};
-      if(fname.includes('cargo')||fname.includes('lading'))return{c:'Cargo Claim',sc:93,r:'Bill of Lading number, outturn report reference, and cargo damage description consistent with marine cargo claim.'};
-      if(fname.includes('hull'))return{c:'Hull Claim',sc:90,r:'IMO vessel number, collision damage description, and repair yard estimate present — consistent with hull insurance claim.'};
-      if(fname.includes('subsidence'))return{c:'Subsidence Claim',sc:87,r:'Structural engineer report, crack mapping reference, and soil investigation findings consistent with subsidence damage claim.'};
-      if(fname.includes('annual')||fname.includes('schedule'))return{c:'Annual Policy Schedule',sc:95,r:'12-month coverage period, policy number, named insured, and insurer stamp detected — consistent with annual policy schedule.'};
-      if(fname.includes('cancel')||fname.includes('kuendigung'))return{c:'Cancellation',sc:93,r:'Effective cancellation date, reason for cancellation, and pro-rata refund calculation present.'};
-      if(fname.includes('endorse')||fname.includes('nachtrag'))return{c:'Endorsement / Nachtrag',sc:92,r:'References original policy number with a specific amendment effective date — consistent with a policy endorsement.'};
-      if(fname.includes('witness'))return{c:'Witness Statement',sc:94,r:'Third-party witness name, contact details, and declaration of truth with dated signature detected.'};
-      if(fname.includes('photo')||fname.includes('.jpg'))return{c:'Accident Photos',sc:85,r:'Multi-angle vehicle damage photographs with embedded timestamps. Scene context visible — consistent with accident evidence submission.'};
-      return{c:'Policy Document',sc:82,r:'Insurance-related document structure detected. Specific sub-type could not be determined with high confidence — recommend manual review.'};
-    };
-    const{c,sc,r}=classify();
-    const jitter=Math.round((Math.random()*3-1.5)*10)/10;
-    setTimeout(()=>{
-      setResult({classification:c,confidence:`${Math.min(99,Math.max(60,sc+jitter)).toFixed(1)}%`,reasoning:r});
-      setRunning(false);
-      if(selDoc)onMarkTested(selDoc);
-    },1800);
+  const fileRef=useRef(null);
+
+  const builtPlaceholder=expectedPlaceholder||(targets.length>0
+    ?`e.g. ${targets.slice(0,3).map(t=>t.name).join(', ')}${targets.length>3?'…':''}`
+    :'e.g. FNOL, Repair Invoice, Policy Schedule…');
+
+  const filteredDocs=allDocs.filter(d=>!docSearch||d.name.toLowerCase().includes(docSearch.toLowerCase()));
+
+  const processFiles=files=>{
+    const all=Array.from(files);
+    const valid=all.filter(f=>['image/jpeg','image/png','application/pdf'].includes(f.type)&&f.size<=5*1024*1024);
+    if(onAddDoc)valid.forEach(f=>onAddDoc({id:Date.now()+Math.random(),name:f.name,status:'Pending',selected:false}));
+    if(valid.length>0&&addToast)addToast(`${valid.length} file(s) added`,'success');
+    if(all.filter(f=>!['image/jpeg','image/png','application/pdf'].includes(f.type)).length>0&&addToast)addToast('Some files rejected — PDF/JPG/PNG only','error');
+    if(all.filter(f=>f.type&&f.size>5*1024*1024).length>0&&addToast)addToast('Some files rejected — max 5MB','error');
   };
+
+  const run=()=>{
+    const doc=allDocs.find(d=>d.id===selDoc);
+    if(!doc)return;
+    setRunning(true);setResult(null);
+    const effectiveTargets=targets.length>0
+      ?targets
+      :[{id:'doc',name:doc.name.replace(/\.(pdf|jpg|jpeg|png)$/i,'').replace(/[_\-]/g,' ')||'Document'}];
+    const r=mockClassify(doc.name,effectiveTargets);
+    const delay=r?.processingMs||1400;
+    setTimeout(()=>{
+      setResult(r);
+      setRunning(false);
+      if(selDoc&&onMarkTested)onMarkTested(selDoc);
+    },delay);
+  };
+
   return(<div className="modal-overlay" onClick={onClose}><div className="modal lg" onClick={e=>e.stopPropagation()}>
-    <div className="modal__header"><h3>Test Prompt</h3><button className="modal__close" onClick={onClose}>×</button></div>
+    <div className="modal__header">
+      <div>
+        <h3>{testTitle}</h3>
+        {targets.length>0&&<div style={{fontSize:'11px',color:'#9ca3af',marginTop:'2px'}}>
+          Classifying into {targets.length} target{targets.length!==1?'s':''}: {targets.slice(0,4).map(t=>t.name).join(', ')}{targets.length>4?`… +${targets.length-4} more`:''}
+        </div>}
+      </div>
+      <button className="modal__close" onClick={onClose}>×</button>
+    </div>
     <div className="modal__body"><div className="test-modal">
       <div className="test-doc-section">
         <h4>Test against</h4>
-        {pending.length===0
-          ?<div className="test-doc-none">No pending documents — upload a file first to test against real content.</div>
-          :<div className="test-doc-list">{pending.map(d=>(
+        <input className="test-doc-search" placeholder="Search documents…" value={docSearch}
+          onChange={e=>setDocSearch(e.target.value)}/>
+        {onAddDoc&&<div className="test-doc-upload-row" onClick={()=>fileRef.current?.click()}>
+          <input ref={fileRef} type="file" accept=".jpg,.jpeg,.png,.pdf" multiple style={{display:'none'}}
+            onChange={e=>processFiles(e.target.files)}/>
+          <span style={{fontSize:'13px',lineHeight:1}}>↑</span> Add a document to test
+        </div>}
+        {filteredDocs.length===0
+          ?<div className="test-doc-none">{allDocs.length===0?'No documents yet — upload a file above.':'No documents match your search.'}</div>
+          :<div className="test-doc-list">{filteredDocs.map(d=>(
             <label key={d.id} className={`test-doc-item${selDoc===d.id?' selected':''}`} onClick={()=>setSelDoc(d.id)}>
               <input type="radio" name="testDoc" checked={selDoc===d.id} onChange={()=>setSelDoc(d.id)}/>
-              <IC.File/><span style={{flex:1,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{d.name}</span>
+              <IC.File/>
+              <span style={{flex:1,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{d.name}</span>
+              <span className={`test-status-badge test-status-badge--${d.status.toLowerCase()}`}>{d.status}</span>
             </label>
           ))}</div>
         }
       </div>
+
+      {!result&&!running&&allDocs.length>0&&(
+        <div className="test-expected">
+          <h4>Expected result <span style={{fontWeight:400,color:'#9ca3af'}}>(optional — for accuracy check)</span></h4>
+          <input className="test-expected__input" placeholder={builtPlaceholder}
+            value={expectedType} onChange={e=>setExpectedType(e.target.value)}/>
+        </div>
+      )}
+
       <button className="test-prompt-toggle" onClick={()=>setShowPrompt(s=>!s)}>
         {showPrompt?'▾':'▸'} {showPrompt?'Hide prompt':'View prompt being tested'}
       </button>
       {showPrompt&&<div className="preview-box" style={{marginBottom:'12px'}}><pre>{prompt}</pre></div>}
-      {running&&<div className="test-running"><div className="test-spinner"/><span>Running classification test…</span></div>}
-      {result&&<div className="test-result-section"><h4>Result</h4><div className="test-result">
-        <div className="test-result__item"><span className="test-result__label">Classification:</span><span className="test-result__value">{result.classification}</span></div>
-        <div className="test-result__item"><span className="test-result__label">Confidence:</span><span className="test-result__value">{result.confidence}</span></div>
-        <div className="test-result__item"><span className="test-result__label">Reasoning:</span><span className="test-result__value">{result.reasoning}</span></div>
-      </div></div>}
+
+      {running&&(
+        <div className="test-running">
+          <div className="test-spinner"/>
+          <span>Running classification engine…</span>
+        </div>
+      )}
+
+      {result&&(()=>{
+        const norm=s=>s.toLowerCase().trim();
+        const isMatch=expectedType.trim()&&norm(result.classification)===norm(expectedType);
+        return(
+          <div className="test-result-section">
+            <h4>Result
+              {result.processingMs&&<span style={{fontWeight:400,color:'#9ca3af',fontSize:'11px',marginLeft:'8px'}}>
+                processed in {result.processingMs}ms
+              </span>}
+            </h4>
+            <div className="test-result">
+              <div className="test-result__item"><span className="test-result__label">Classification:</span><span className="test-result__value" style={{fontWeight:600,color:'#1e40af'}}>{result.classification}</span></div>
+              <div className="test-result__item"><span className="test-result__label">Confidence:</span>
+                <span className="test-result__value">
+                  <span style={{fontWeight:700,color:parseFloat(result.confidence)>=85?'#16a34a':parseFloat(result.confidence)>=70?'#d97706':'#dc2626'}}>{result.confidence}</span>
+                </span>
+              </div>
+              <div className="test-result__item"><span className="test-result__label">Reasoning:</span><span className="test-result__value">{result.reasoning}</span></div>
+            </div>
+            {expectedType.trim()&&(
+              <div className="test-comparison" style={{marginTop:'12px'}}>
+                <h4>Expected vs Predicted</h4>
+                <div className={`test-comparison__row test-comparison__row--${isMatch?'match':'mismatch'}`}>
+                  <span className="test-comparison__lbl">Expected</span>
+                  <span className="test-comparison__val">{expectedType.trim()}</span>
+                  <span style={{color:'#9ca3af',flexShrink:0}}>→</span>
+                  <span className="test-comparison__lbl">Predicted</span>
+                  <span className="test-comparison__val">{result.classification}</span>
+                  <span className={`test-comparison__badge test-comparison__badge--${isMatch?'match':'mismatch'}`}>
+                    {isMatch?'✓ Match':'✗ Mismatch'}
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      })()}
     </div></div>
     <div className="modal__footer">
       <button className="btn btn-outline" onClick={onClose}>Close</button>
-      <button className="btn btn-primary" onClick={run} disabled={running}>{running?'Running…':result?'Run again':'Run Test'}</button>
+      <button className="btn btn-primary" onClick={run} disabled={running||selDoc===null}>
+        {running?'Running…':result?'Run again':'Run Test'}
+      </button>
     </div>
   </div></div>);
 }
@@ -2404,6 +2998,7 @@ function App(){
 
   /* Detail page state — initialized from selected LOB */
   const [selectedLobId,setSelectedLobId]=useState(null);
+  // l1 is always true (Required); only l2 can be toggled
   const [cbLevels,setCbLevels]=useState({l1:true,l2:false});
   const [l1Items,setL1Items]=useState([]);
   const [l0Name,setL0Name]=useState('');
@@ -2416,9 +3011,35 @@ function App(){
   const [showMenu,setShowMenu]=useState(null);
   const [modal,setModal]=useState(null);
   const [confirmState,setConfirmState]=useState(null);
+  // L1+L2 mode: global docs
   const [docs,setDocs]=useState(makeDocs());
   const [filter,setFilter]=useState('pending');
   const [search,setSearch]=useState('');
+  // Stage 1 LOB docs — keyed by LOB id so they persist if you navigate away and back
+  const [lobDocs,setLobDocs]=useState({});
+  const getLobDocs=()=>lobDocs[selectedLobId]||[];
+  const setLobDocsFor=(updater)=>setLobDocs(prev=>({...prev,[selectedLobId]:typeof updater==='function'?updater(prev[selectedLobId]||[]):updater}));
+  const addLobDoc=doc=>setLobDocsFor(prev=>[...prev,doc]);
+  const toggleLobSel=docId=>setLobDocsFor(prev=>prev.map(d=>d.id===docId?{...d,selected:!d.selected}:d));
+  const delLobDoc=docId=>{setLobDocsFor(prev=>prev.filter(d=>d.id!==docId));addToast('Document removed','warning');};
+  const markLobTested=docId=>setLobDocsFor(prev=>prev.map(d=>d.id===docId?{...d,status:'Tested',selected:false}:d));
+
+  // Sidebar active scroll target (L1-only mode)
+  const [activeCatId,setActiveCatId]=useState(null);
+  const scrollToCategory=id=>{
+    setActiveCatId(id);
+    setTimeout(()=>{
+      document.getElementById(`cat-sec-${id}`)?.scrollIntoView({behavior:'smooth',block:'start'});
+    },50);
+  };
+  // L1 only mode: per-category docs {[catId]: [{id,name,status,selected}]}
+  const [catDocs,setCatDocs]=useState({});
+  const getCatDocs=catId=>catDocs[catId]||[];
+  const setCatDocsFor=(catId,updater)=>setCatDocs(prev=>({...prev,[catId]:typeof updater==='function'?updater(prev[catId]||[]):updater}));
+  const addCatDoc=(catId,doc)=>setCatDocsFor(catId,prev=>[...prev,doc]);
+  const toggleCatSel=(catId,docId)=>setCatDocsFor(catId,prev=>prev.map(d=>d.id===docId?{...d,selected:!d.selected}:d));
+  const delCatDoc=(catId,docId)=>{setCatDocsFor(catId,prev=>prev.filter(d=>d.id!==docId));addToast('Document removed','warning');};
+  const markCatTested=(catId,docId)=>setCatDocsFor(catId,prev=>prev.map(d=>d.id===docId?{...d,status:'Tested',selected:false}:d));
 
   const onSelectLob=lob=>{
     setSelectedLob(lob);
@@ -2477,8 +3098,10 @@ function App(){
       meta[c.id]={version:c.activeVersion||'V.1',score:`${c.confidence}%`,status:c.status};
       c.types.forEach(t=>{meta[t.id]={version:c.activeVersion||'V.1',score:`${c.confidence}%`,status:c.status};});
     });
-    const startTab=type?type.id:cat?cat.id:'l1';
-    const startL1Tab=cat?cat.id:'l1';
+    // L1+L2 mode: always land on global 'l1' tab
+    // L1 only:   land on the clicked category, else first category
+    const startTab=cbLevels.l2?'l1':(cat?cat.id:(newL1Items[0]?.id||'l1'));
+    const startL1Tab=startTab;
     setSelectedLobId(lob.id);
     setL1Items(newL1Items);
     setL0Name(lob.name);
@@ -2523,13 +3146,16 @@ function App(){
   };
 
   useEffect(()=>{
-    const validTabs=new Set(['global']);
-    if(cbLevels.l1)validTabs.add('l1');
-    if(cbLevels.l2)l1Items.forEach(i=>{validTabs.add(i.id);i.l2.forEach(l2=>validTabs.add(l2.id));});
-    if(!validTabs.has(activeTab)){
-      // Prefer L1 when coming from L2, else fall back to Global
-      const fallback=(activeTab!=='l1'&&cbLevels.l1)?'l1':'global';
-      setActiveTab(fallback);setActiveL1Tab(fallback);
+    if(cbLevels.l2){
+      // L1+L2 mode: only the global 'l1' tab exists
+      if(activeTab!=='l1'){setActiveTab('l1');setActiveL1Tab('l1');}
+    } else {
+      // L1 only mode: one tab per category — fallback to first category
+      const validIds=new Set(l1Items.map(i=>i.id));
+      if(!validIds.has(activeTab)&&l1Items.length>0){
+        const first=l1Items[0].id;
+        setActiveTab(first);setActiveL1Tab(first);
+      }
     }
   },[l1Items,cbLevels]);
 
@@ -2572,22 +3198,97 @@ function App(){
         </div>
         <div className="app__back-bar">
           <button className="app__back-btn" onClick={onBackToList}><IC.Back/> Back to Categories</button>
+          <PipelineBar/>
         </div>
-        <div className="app__content">
-          <Sidebar cbLevels={cbLevels} setCbLevels={setCbLevels} l0Name={l0Name} setL0Name={setL0Name}
-            l1Items={l1Items} setL1Items={setL1Items} showMenu={showMenu} setShowMenu={setShowMenu}
-            addToast={addToast} onConfirm={setConfirmState}/>
-          <Workspace activeL1Tab={activeL1Tab} setActiveL1Tab={setActiveL1Tab} activeTab={activeTab} setActiveTab={setActiveTab} l1Items={l1Items}
-            prompts={prompts} defaultPrompts={defaultPrompts} tabMeta={tabMeta} saveStates={saveStates}
-            onEdit={handleEdit} onSave={handleSave} cbLevels={cbLevels}
-            onVersion={()=>setModal('version')} onPreview={()=>setModal('preview')} onTest={()=>setModal('test')}/>
-          <DocumentPanel docs={filteredDocs} allDocs={docs} filter={filter} setFilter={setFilter}
-            search={search} setSearch={setSearch} toggleSel={toggleSel} selAll={selAll}
-            delDoc={delDoc} bulkDelete={bulkDelete} handleUpload={handleUpload}/>
-        </div>
+        {cbLevels.l2
+          /* ── L1+L2: single unified prompt + global doc panel ── */
+          ?<div className="app__content">
+            <Sidebar cbLevels={cbLevels} setCbLevels={setCbLevels} l0Name={l0Name} setL0Name={setL0Name}
+              l1Items={l1Items} setL1Items={setL1Items} showMenu={showMenu} setShowMenu={setShowMenu}
+              addToast={addToast} onConfirm={setConfirmState}
+              onScrollTo={scrollToCategory} activeCatId={activeCatId}/>
+            <Workspace activeL1Tab={activeL1Tab} setActiveL1Tab={setActiveL1Tab} activeTab={activeTab} setActiveTab={setActiveTab} l1Items={l1Items}
+              prompts={prompts} defaultPrompts={defaultPrompts} tabMeta={tabMeta} saveStates={saveStates}
+              onEdit={handleEdit} onSave={handleSave} cbLevels={cbLevels}
+              ofSchemas={ofSchemas} docs={docs}
+              onVersion={()=>setModal('version')} onPreview={()=>setModal('preview')} onTest={()=>setModal('test')}/>
+            <DocumentPanel docs={filteredDocs} allDocs={docs} filter={filter} setFilter={setFilter}
+              search={search} setSearch={setSearch} toggleSel={toggleSel} selAll={selAll}
+              delDoc={delDoc} bulkDelete={bulkDelete} handleUpload={handleUpload}/>
+          </div>
+          /* ── L1 only: scroll accordion, per-category docs ── */
+          :<div className="detail-scroll">
+            <Sidebar cbLevels={cbLevels} setCbLevels={setCbLevels} l0Name={l0Name} setL0Name={setL0Name}
+              l1Items={l1Items} setL1Items={setL1Items} showMenu={showMenu} setShowMenu={setShowMenu}
+              addToast={addToast} onConfirm={setConfirmState}
+              onScrollTo={scrollToCategory} activeCatId={activeCatId}/>
+            <div className="detail-scroll__main">
+              <div className="detail-scroll__toolbar">
+                <span className="detail-scroll__count">{l1Items.length} categor{l1Items.length!==1?'ies':'y'}</span>
+              </div>
+              {/* Stage 1: LOB-level prompt */}
+              <LobPromptSection
+                lobName={l0Name}
+                prompt={prompts['l1']||''}
+                defaultPrompt={defaultPrompts['l1']||''}
+                meta={tabMeta['l1']}
+                saveState={saveStates['l1']}
+                onEdit={val=>handleEdit('l1',val)}
+                onSave={()=>handleSave('l1')}
+                docs={getLobDocs()}
+                onAddDoc={addLobDoc}
+                onToggleSel={toggleLobSel}
+                onDelDoc={delLobDoc}
+                onMarkTested={markLobTested}
+                addToast={addToast}
+                onVersion={()=>setModal('version')}
+                targets={l1Items}/>
+              {/* Stage 2: per-category prompts */}
+              {l1Items.length>0&&(
+                <div className="stage2-label">
+                  <span className="stage2-label__badge">STAGE 2</span>
+                  <span className="stage2-label__text">Per-category classification prompts ({l1Items.length} categor{l1Items.length!==1?'ies':'y'})</span>
+                </div>
+              )}
+              {l1Items.length===0
+                ?<div style={{textAlign:'center',padding:'48px',color:'#9ca3af',fontSize:'13px'}}>No categories yet — add one in the sidebar</div>
+                :l1Items.map(item=>(
+                  <CategorySection key={item.id}
+                    catItem={item}
+                    prompt={prompts[item.id]||''}
+                    defaultPrompt={defaultPrompts[item.id]||''}
+                    meta={tabMeta[item.id]}
+                    saveState={saveStates[item.id]}
+                    onEdit={val=>handleEdit(item.id,val)}
+                    onSave={()=>handleSave(item.id)}
+                    docs={getCatDocs(item.id)}
+                    onAddDoc={doc=>addCatDoc(item.id,doc)}
+                    onToggleSel={docId=>toggleCatSel(item.id,docId)}
+                    onDelDoc={docId=>delCatDoc(item.id,docId)}
+                    onMarkTested={docId=>markCatTested(item.id,docId)}
+                    addToast={addToast}
+                    onVersion={()=>setModal('version')}/>
+                ))
+              }
+            </div>
+          </div>
+        }
         {modal==='version'&&<VersionModal lob={selectedLobFromState} onClose={()=>setModal(null)}/>}
         {modal==='preview'&&<PreviewModal prompt={prompts[activeTab]||''} onClose={()=>setModal(null)}/>}
-        {modal==='test'&&<TestModal prompt={prompts[activeTab]||''} docs={docs} onMarkTested={markTested} onClose={()=>setModal(null)}/>}
+        {modal==='test'&&cbLevels.l2&&(()=>{
+          // In L1+L2 mode: if on 'l1' tab targets = categories; if on a category tab targets = its types
+          const testTargets=activeTab==='l1'
+            ?l1Items
+            :(()=>{const cat=l1Items.find(i=>i.id===activeTab);return cat?.l2||[];})();
+          return <TestModal
+            prompt={prompts[activeTab]||''}
+            docs={docs} onMarkTested={markTested}
+            onClose={()=>setModal(null)}
+            targets={testTargets}
+            testTitle={activeTab==='l1'?`Test Global Classification — ${l0Name}`:
+              `Test — ${l1Items.find(i=>i.id===activeTab)?.name||activeTab}`}
+          />;
+        })()}
       </>}
 
       {typesModal&&(()=>{
