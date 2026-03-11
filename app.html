@@ -323,14 +323,18 @@ input,textarea,select{font-family:inherit}
 .doc-panel__status.tested{background:#dcfce7;color:#16a34a}
 .doc-panel__status.pending{background:#fef3c7;color:#92400e}
 .doc-panel__cnt.tested{background:#16a34a}
-.test-doc-section{margin-bottom:4px}
-.test-doc-section h4,.test-result-section h4{font-size:12px;font-weight:600;color:#374151;margin-bottom:8px}
-.test-doc-list{display:flex;flex-direction:column;gap:3px;max-height:130px;overflow-y:auto}
-.test-doc-item{display:flex;align-items:center;gap:8px;padding:6px 10px;border:1px solid #e5e7eb;border-radius:6px;cursor:pointer;font-size:12px;color:#374151;transition:all .1s;user-select:none}
-.test-doc-item:hover{border-color:#bfdbfe;background:#f0f7ff}
-.test-doc-item.selected{border-color:#2563eb;background:#eff6ff;color:#1d4ed8;font-weight:500}
+.test-doc-section{margin-bottom:2px}
+.test-doc-section h4,.test-result-section h4{font-size:12px;font-weight:600;color:#374151;margin-bottom:10px}
+.test-doc-list{display:flex;flex-direction:column;gap:3px;max-height:180px;overflow-y:auto;padding-right:2px}
+.test-doc-list::-webkit-scrollbar{width:3px}.test-doc-list::-webkit-scrollbar-thumb{background:#e5e7eb;border-radius:2px}
+.test-doc-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;border:1.5px solid transparent;background:#f9fafb;cursor:pointer;font-size:12px;color:#374151;transition:all .12s;user-select:none}
+.test-doc-item:hover{border-color:#bfdbfe;background:#f0f7ff;color:#1e40af}
+.test-doc-item.selected{border-color:#2563eb;background:#eff6ff;color:#1d4ed8;font-weight:500;box-shadow:0 0 0 3px rgba(37,99,235,.07)}
 .test-doc-item input[type=radio]{display:none}
-.test-doc-none{font-size:12px;color:#9ca3af;padding:10px 12px;background:#f9fafb;border-radius:6px;text-align:center;margin-bottom:4px}
+.test-status-badge{font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px;flex-shrink:0;white-space:nowrap;line-height:1.4}
+.test-status-badge--tested{background:#dcfce7;color:#15803d}
+.test-status-badge--pending{background:#fef3c7;color:#92400e}
+.test-doc-none{font-size:12px;color:#9ca3af;padding:14px;background:#f9fafb;border-radius:8px;text-align:center;border:1px solid #f3f4f6}
 .test-prompt-toggle{background:none;border:none;font-size:11px;color:#9ca3af;cursor:pointer;padding:4px 0 8px;font-family:inherit;text-align:left;display:flex;align-items:center;gap:4px}
 .test-prompt-toggle:hover{color:#6b7280}
 .workspace__preview-link{background:none;border:none;font-size:11px;color:#9ca3af;cursor:pointer;padding:0;font-family:inherit;text-decoration:underline;text-underline-offset:2px}
@@ -561,32 +565,29 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
 .cat-sec__tag--deployed{background:#dcfce7;color:#16a34a}.cat-sec__tag--failed{background:#fee2e2;color:#dc2626}.cat-sec__tag--draft{background:#f3f4f6;color:#6b7280}
 .cat-sec__body{overflow:hidden}
 .cat-sec__prompt{padding:18px 20px;display:flex;flex-direction:column;gap:12px}
-/* Doc status bar (replaces right column) */
-.doc-status-bar{display:flex;align-items:center;gap:8px;padding:7px 0 0;margin-top:2px}
-.doc-status-bar__counts{flex:1;font-size:11px;color:#9ca3af;display:flex;align-items:center;gap:5px;flex-wrap:wrap}
-.doc-status-bar__dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
-.doc-status-bar__tested{color:#16a34a;font-weight:600}
-.doc-status-bar__pending{color:#d97706;font-weight:600}
-.doc-status-bar__add{background:#fff;border:1px dashed #d1d5db;border-radius:6px;padding:4px 12px;font-size:11px;color:#6b7280;cursor:pointer;font-family:inherit;transition:all .12s;white-space:nowrap;flex-shrink:0}
-.doc-status-bar__add:hover{border-color:#2563eb;color:#2563eb;background:#eff6ff}
-/* TestModal enhanced doc picker */
-.test-doc-search{width:100%;padding:6px 10px;border:1px solid #e5e7eb;border-radius:6px;font-size:12px;outline:none;font-family:inherit;transition:border-color .15s;margin-bottom:6px}
-.test-doc-search:focus{border-color:#2563eb}
-.test-doc-upload-row{display:flex;align-items:center;gap:8px;padding:7px 10px;background:#f9fafb;border:1px dashed #d1d5db;border-radius:6px;cursor:pointer;font-size:12px;color:#6b7280;transition:all .12s;margin-bottom:6px;user-select:none}
-.test-doc-upload-row:hover{border-color:#2563eb;background:#eff6ff;color:#2563eb}
-.test-doc-list{display:flex;flex-direction:column;gap:2px;max-height:180px;overflow-y:auto}
-.test-doc-list::-webkit-scrollbar{width:3px}.test-doc-list::-webkit-scrollbar-thumb{background:#e5e7eb;border-radius:2px}
+/* ── Test action zone (section footer bar) ── */
+.test-action-zone{display:flex;align-items:center;gap:8px;padding:10px 14px;background:#f8faff;border:1px solid #dbeafe;border-radius:10px;margin-top:8px}
+.test-action-zone__status{display:flex;align-items:center;gap:5px;flex:1;flex-wrap:wrap}
+.test-action-zone__actions{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.test-chip{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap;line-height:1.5}
+.test-chip--tested{background:#dcfce7;color:#15803d}
+.test-chip--pending{background:#fef3c7;color:#92400e}
+.test-chip--empty{background:#f3f4f6;color:#9ca3af;font-weight:400}
+.test-action-zone__add{background:#fff;border:1px solid #d1d5db;border-radius:7px;padding:5px 11px;font-size:11px;font-weight:500;color:#6b7280;cursor:pointer;font-family:inherit;transition:all .12s;white-space:nowrap}
+.test-action-zone__add:hover{border-color:#93c5fd;color:#2563eb;background:#f0f7ff}
+.test-action-zone__btn{background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff;border:none;border-radius:8px;padding:7px 16px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap;box-shadow:0 1px 3px rgba(37,99,235,.2);display:inline-flex;align-items:center;gap:5px}
+.test-action-zone__btn:hover{background:linear-gradient(135deg,#1d4ed8,#1e40af);box-shadow:0 2px 8px rgba(37,99,235,.3);transform:translateY(-1px)}
+/* TestModal doc picker */
+.test-doc-search{width:100%;padding:7px 11px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:12px;outline:none;font-family:inherit;transition:border-color .15s,box-shadow .15s;margin-bottom:8px;color:#111827;background:#fff}
+.test-doc-search:focus{border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.07)}
+.test-doc-upload-row{display:flex;align-items:center;justify-content:center;gap:6px;padding:8px 14px;background:#fafafa;border:1.5px dashed #e5e7eb;border-radius:8px;cursor:pointer;font-size:11px;color:#9ca3af;transition:all .12s;margin-bottom:8px;user-select:none;font-family:inherit}
+.test-doc-upload-row:hover{border-color:#93c5fd;background:#f0f7ff;color:#2563eb}
 /* Ver card inside section */
 .sec-ver-card{display:flex;align-items:center;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:8px 14px;gap:0;flex-shrink:0}
 .sec-ver-item{display:flex;flex-direction:column;gap:1px;flex:1}
 .sec-ver-lbl{font-size:10px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.04em}
 .sec-ver-val{font-size:12px;font-weight:600;color:#111827}
 .sec-ver-div{width:1px;background:#e5e7eb;height:26px;margin:0 12px;flex-shrink:0}
-/* Test button */
-.sec-test-btn{width:100%;padding:10px 16px;border:none;border-radius:8px;background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:7px;margin-top:4px}
-.sec-test-btn:hover{background:linear-gradient(135deg,#1d4ed8,#1e40af);transform:translateY(-1px);box-shadow:0 2px 8px rgba(37,99,235,.3)}
-.sec-test-btn:disabled{background:#93c5fd;transform:none;cursor:not-allowed}
-.sec-doc-info{font-size:11px;color:#9ca3af;text-align:center;margin-top:4px}
 /* Section doc panel */
 .sec-docs__title{font-size:11px;font-weight:700;color:#374151;margin-bottom:8px}
 .sec-docs__zone{border:1.5px dashed #d1d5db;border-radius:8px;padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;background:#fff;transition:all .15s}
@@ -1957,22 +1958,21 @@ function LobPromptSection({lobName,prompt,defaultPrompt,meta,saveState,onEdit,on
               <span className="char-count">{prompt.length.toLocaleString()} chars</span>
             </div>
           </div>
-          <div>
-            <button className="sec-test-btn" onClick={()=>{onSave();setShowTest(true);}}>
-              🧪 Test LOB Classification (Stage 1)
-            </button>
-            <div className="doc-status-bar">
-              <div className="doc-status-bar__counts">
-                {allCount>0?<>
-                  <span className="doc-status-bar__dot" style={{background:'#16a34a'}}/>
-                  <span className="doc-status-bar__tested">{testedCount} tested</span>
-                  <span style={{color:'#d1d5db'}}>·</span>
-                  <span className="doc-status-bar__dot" style={{background:'#d97706'}}/>
-                  <span className="doc-status-bar__pending">{pendingCount} pending</span>
-                </>:<span>No test documents</span>}
-              </div>
-              <button className="doc-status-bar__add" onClick={()=>fileRef.current?.click()}>+ Add document</button>
-              <input ref={fileRef} type="file" accept=".jpg,.jpeg,.png,.pdf" multiple style={{display:'none'}} onChange={e=>processFiles(e.target.files)}/>
+          <div className="test-action-zone">
+            <input ref={fileRef} type="file" accept=".jpg,.jpeg,.png,.pdf" multiple style={{display:'none'}} onChange={e=>processFiles(e.target.files)}/>
+            <div className="test-action-zone__status">
+              {allCount===0
+                ?<span className="test-chip test-chip--empty">No documents</span>
+                :<>
+                  {testedCount>0&&<span className="test-chip test-chip--tested">✓ {testedCount} tested</span>}
+                  {pendingCount>0&&<span className="test-chip test-chip--pending">{pendingCount} pending</span>}
+                  {testedCount===0&&pendingCount===0&&<span className="test-chip test-chip--empty">{allCount} uploaded</span>}
+                </>
+              }
+            </div>
+            <div className="test-action-zone__actions">
+              <button className="test-action-zone__add" onClick={()=>fileRef.current?.click()}>+ Add doc</button>
+              <button className="test-action-zone__btn" onClick={()=>{onSave();setShowTest(true);}}>🧪 Run Test</button>
             </div>
           </div>
         </div>
@@ -2073,22 +2073,21 @@ function CategorySection({catItem,prompt,defaultPrompt,meta,saveState,onEdit,onS
               <span className="char-count">{prompt.length.toLocaleString()} chars</span>
             </div>
           </div>
-          <div>
-            <button className="sec-test-btn" onClick={()=>{onSave();setShowTest(true);}}>
-              🧪 Test {catItem.name} Classification
-            </button>
-            <div className="doc-status-bar">
-              <div className="doc-status-bar__counts">
-                {allCount>0?<>
-                  <span className="doc-status-bar__dot" style={{background:'#16a34a'}}/>
-                  <span className="doc-status-bar__tested">{testedCount} tested</span>
-                  <span style={{color:'#d1d5db'}}>·</span>
-                  <span className="doc-status-bar__dot" style={{background:'#d97706'}}/>
-                  <span className="doc-status-bar__pending">{pendingCount} pending</span>
-                </>:<span>No test documents</span>}
-              </div>
-              <button className="doc-status-bar__add" onClick={()=>fileRef.current?.click()}>+ Add document</button>
-              <input ref={fileRef} type="file" accept=".jpg,.jpeg,.png,.pdf" multiple style={{display:'none'}} onChange={e=>processFiles(e.target.files)}/>
+          <div className="test-action-zone">
+            <input ref={fileRef} type="file" accept=".jpg,.jpeg,.png,.pdf" multiple style={{display:'none'}} onChange={e=>processFiles(e.target.files)}/>
+            <div className="test-action-zone__status">
+              {allCount===0
+                ?<span className="test-chip test-chip--empty">No documents</span>
+                :<>
+                  {testedCount>0&&<span className="test-chip test-chip--tested">✓ {testedCount} tested</span>}
+                  {pendingCount>0&&<span className="test-chip test-chip--pending">{pendingCount} pending</span>}
+                  {testedCount===0&&pendingCount===0&&<span className="test-chip test-chip--empty">{allCount} uploaded</span>}
+                </>
+              }
+            </div>
+            <div className="test-action-zone__actions">
+              <button className="test-action-zone__add" onClick={()=>fileRef.current?.click()}>+ Add doc</button>
+              <button className="test-action-zone__btn" onClick={()=>{onSave();setShowTest(true);}}>🧪 Run Test</button>
             </div>
           </div>
         </div>
@@ -2656,7 +2655,7 @@ function TestModal({prompt,docs,onMarkTested,onClose,targets=[],testTitle='Test 
         {onAddDoc&&<div className="test-doc-upload-row" onClick={()=>fileRef.current?.click()}>
           <input ref={fileRef} type="file" accept=".jpg,.jpeg,.png,.pdf" multiple style={{display:'none'}}
             onChange={e=>processFiles(e.target.files)}/>
-          ↑ Upload document (PDF · JPG · PNG · max 5MB)
+          <span style={{fontSize:'13px',lineHeight:1}}>↑</span> Add a document to test
         </div>}
         {filteredDocs.length===0
           ?<div className="test-doc-none">{allDocs.length===0?'No documents yet — upload a file above.':'No documents match your search.'}</div>
@@ -2665,7 +2664,7 @@ function TestModal({prompt,docs,onMarkTested,onClose,targets=[],testTitle='Test 
               <input type="radio" name="testDoc" checked={selDoc===d.id} onChange={()=>setSelDoc(d.id)}/>
               <IC.File/>
               <span style={{flex:1,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{d.name}</span>
-              <span className={`doc-panel__status ${d.status.toLowerCase()}`}>{d.status}</span>
+              <span className={`test-status-badge test-status-badge--${d.status.toLowerCase()}`}>{d.status}</span>
             </label>
           ))}</div>
         }
