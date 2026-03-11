@@ -862,6 +862,10 @@ body{font-family:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI'
 .sec-docs__zone:hover,.sec-docs__zone.drag-over{border-color:var(--a);background:var(--a-lt)}
 .sec-docs__browse{color:var(--a)}
 
+/* ── Classification Setup wrap (shared bar above both layouts) ── */
+.cl-setup-wrap{padding:8px 20px 0;flex-shrink:0;background:var(--bg)}
+.cl-setup-wrap .cl-setup{margin-bottom:0}
+
 /* ── Classification Setup bar (horizontal, top of center panel) ── */
 .cl-setup{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--srf);border:1px solid var(--bdr);border-radius:var(--r-md);margin-bottom:14px;box-shadow:var(--sh-sm);flex-wrap:wrap}
 .cl-setup__label{font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.07em;white-space:nowrap;flex-shrink:0;padding-right:6px;border-right:1px solid var(--bdr)}
@@ -3378,6 +3382,27 @@ function App(){
           <button className="app__back-btn" onClick={onBackToList}><IC.Back/> Back to Categories</button>
           <PipelineBar/>
         </div>
+        <div className="cl-setup-wrap">
+          <div className="cl-setup">
+            <span className="cl-setup__label">Classification Levels</span>
+            <div className="cl-setup__row">
+              <label className="cl-setup__card cl-setup__card--required" onClick={e=>e.preventDefault()}>
+                <input type="checkbox" checked readOnly/>
+                <span className="cl-setup__card-name">L1 · Document Categories</span>
+                <span className="cl-setup__card-tag cl-setup__card-tag--req">Required</span>
+              </label>
+              <label className={`cl-setup__card${cbLevels.l2?' cl-setup__card--active':''}`}>
+                <input type="checkbox" checked={cbLevels.l2} onChange={e=>setCbLevels(p=>({...p,l2:e.target.checked}))}/>
+                <span className="cl-setup__card-name">L2 · Document Types</span>
+                <span className="cl-setup__card-tag cl-setup__card-tag--opt">Optional</span>
+              </label>
+              <div className={`cl-setup__mode${cbLevels.l2?' cl-setup__mode--on':''}`}>
+                <span className="cl-setup__mode-dot"/>
+                {cbLevels.l2?'L1 + L2 active':'L1 only'}
+              </div>
+            </div>
+          </div>
+        </div>
         {cbLevels.l2
           /* ── L1+L2: single unified prompt + global doc panel ── */
           ?<div className="app__content">
@@ -3401,26 +3426,6 @@ function App(){
               addToast={addToast} onConfirm={setConfirmState}
               onScrollTo={scrollToCategory} activeCatId={activeCatId}/>
             <div className="detail-scroll__main">
-              {/* ── Classification Setup ── */}
-              <div className="cl-setup">
-                <span className="cl-setup__label">Classification Levels</span>
-                <div className="cl-setup__row">
-                  <label className="cl-setup__card cl-setup__card--required" onClick={e=>e.preventDefault()}>
-                    <input type="checkbox" checked readOnly/>
-                    <span className="cl-setup__card-name">L1 · Document Categories</span>
-                    <span className="cl-setup__card-tag cl-setup__card-tag--req">Required</span>
-                  </label>
-                  <label className={`cl-setup__card${cbLevels.l2?' cl-setup__card--active':''}`}>
-                    <input type="checkbox" checked={cbLevels.l2} onChange={e=>setCbLevels(p=>({...p,l2:e.target.checked}))}/>
-                    <span className="cl-setup__card-name">L2 · Document Types</span>
-                    <span className="cl-setup__card-tag cl-setup__card-tag--opt">Optional</span>
-                  </label>
-                  <div className={`cl-setup__mode${cbLevels.l2?' cl-setup__mode--on':''}`}>
-                    <span className="cl-setup__mode-dot"/>
-                    {cbLevels.l2?'L1 + L2 active':'L1 only'}
-                  </div>
-                </div>
-              </div>
               <div className="detail-scroll__toolbar">
                 <span className="detail-scroll__count">{l1Items.length} categor{l1Items.length!==1?'ies':'y'}</span>
               </div>
