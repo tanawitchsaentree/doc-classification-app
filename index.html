@@ -862,6 +862,26 @@ body{font-family:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI'
 .sec-docs__zone:hover,.sec-docs__zone.drag-over{border-color:var(--a);background:var(--a-lt)}
 .sec-docs__browse{color:var(--a)}
 
+/* ── Classification Setup bar (horizontal, top of center panel) ── */
+.cl-setup{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--srf);border:1px solid var(--bdr);border-radius:var(--r-md);margin-bottom:14px;box-shadow:var(--sh-sm);flex-wrap:wrap}
+.cl-setup__label{font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.07em;white-space:nowrap;flex-shrink:0;padding-right:6px;border-right:1px solid var(--bdr)}
+.cl-setup__row{display:flex;align-items:center;gap:6px;flex:1}
+.cl-setup__card{display:flex;align-items:center;gap:7px;padding:6px 12px;border-radius:var(--r);border:1.5px solid var(--bdr);background:var(--srf2);cursor:pointer;user-select:none;transition:all var(--tf) var(--smooth);white-space:nowrap}
+.cl-setup__card:not(.cl-setup__card--required):hover{border-color:var(--a-mid);background:var(--a-lt)}
+.cl-setup__card--required{cursor:default;opacity:.6}
+.cl-setup__card--active{border-color:var(--a-mid) !important;background:var(--a-lt) !important}
+.cl-setup__card input[type=checkbox]{accent-color:var(--a);width:13px;height:13px;cursor:pointer;flex-shrink:0}
+.cl-setup__card--required input[type=checkbox]{cursor:default}
+.cl-setup__card-name{font-size:12px;font-weight:600;color:var(--tx1)}
+.cl-setup__card-tag{font-size:10px;font-weight:500;padding:1px 6px;border-radius:20px;white-space:nowrap}
+.cl-setup__card-tag--req{background:#f3f4f6;color:var(--tx3)}
+.cl-setup__card-tag--opt{background:#f3f4f6;color:var(--tx3)}
+.cl-setup__card--active .cl-setup__card-tag--opt{background:var(--a-d4);color:var(--a-h)}
+.cl-setup__mode{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:var(--r-p);font-size:11px;font-weight:600;color:var(--tx2);background:#f3f4f6;margin-left:auto;transition:all var(--tf) var(--smooth);white-space:nowrap;flex-shrink:0}
+.cl-setup__mode--on{background:var(--a-lt);color:var(--a)}
+.cl-setup__mode-dot{width:6px;height:6px;border-radius:50%;background:var(--tx3);flex-shrink:0;transition:background var(--tf) var(--smooth)}
+.cl-setup__mode--on .cl-setup__mode-dot{background:var(--a)}
+
 </style>
 </head>
 <body>
@@ -2386,37 +2406,6 @@ function Sidebar({cbLevels,setCbLevels,l0Name,setL0Name,l1Items,setL1Items,showM
   return(
     <aside className="sidebar">
       <div className="sidebar__header"><h2 className="sidebar__title">Document Classification</h2></div>
-      <div className="sidebar__section">
-        <p className="sidebar__section-lbl">Classification Levels</p>
-        <label className="cl-card cl-card--required" onClick={e=>e.preventDefault()}>
-          <input type="checkbox" className="cl-card__cb" checked disabled/>
-          <div>
-            <div className="cl-card__name">L1 - Document Categories</div>
-            <div className="cl-card__sub">Main classification categories (Required)</div>
-          </div>
-        </label>
-        <label className={`cl-card${cbLevels.l2?' cl-card--active':''}`}>
-          <input type="checkbox" className="cl-card__cb" checked={cbLevels.l2}
-            onChange={e=>setCbLevels(p=>({...p,l2:e.target.checked}))}/>
-          <div>
-            <div className="cl-card__name">L2 - Document Types</div>
-            <div className="cl-card__sub">Sub-types under each category (Optional)</div>
-          </div>
-        </label>
-        <div className={`cl-mode${cbLevels.l2?' cl-mode--l1l2':''}`}>
-          <span className="cl-mode__icon">{cbLevels.l2?'💡':'📄'}</span>
-          <div>
-            <div className="cl-mode__title">
-              Current Mode: {cbLevels.l2?'Global Classification (L1 + L2)':'L1 Classification only'}
-            </div>
-            <div className="cl-mode__desc">
-              {cbLevels.l2
-                ?'Classify documents across all categories and types.'
-                :'Classify documents into top-level categories only.'}
-            </div>
-          </div>
-        </div>
-      </div>
       <div className="sidebar__divider"/>
       <div className="sidebar__level0">
         <span className="sidebar__level-lbl">Level : 0</span>
@@ -3412,6 +3401,26 @@ function App(){
               addToast={addToast} onConfirm={setConfirmState}
               onScrollTo={scrollToCategory} activeCatId={activeCatId}/>
             <div className="detail-scroll__main">
+              {/* ── Classification Setup ── */}
+              <div className="cl-setup">
+                <span className="cl-setup__label">Classification Levels</span>
+                <div className="cl-setup__row">
+                  <label className="cl-setup__card cl-setup__card--required" onClick={e=>e.preventDefault()}>
+                    <input type="checkbox" checked readOnly/>
+                    <span className="cl-setup__card-name">L1 · Document Categories</span>
+                    <span className="cl-setup__card-tag cl-setup__card-tag--req">Required</span>
+                  </label>
+                  <label className={`cl-setup__card${cbLevels.l2?' cl-setup__card--active':''}`}>
+                    <input type="checkbox" checked={cbLevels.l2} onChange={e=>setCbLevels(p=>({...p,l2:e.target.checked}))}/>
+                    <span className="cl-setup__card-name">L2 · Document Types</span>
+                    <span className="cl-setup__card-tag cl-setup__card-tag--opt">Optional</span>
+                  </label>
+                  <div className={`cl-setup__mode${cbLevels.l2?' cl-setup__mode--on':''}`}>
+                    <span className="cl-setup__mode-dot"/>
+                    {cbLevels.l2?'L1 + L2 active':'L1 only'}
+                  </div>
+                </div>
+              </div>
               <div className="detail-scroll__toolbar">
                 <span className="detail-scroll__count">{l1Items.length} categor{l1Items.length!==1?'ies':'y'}</span>
               </div>
