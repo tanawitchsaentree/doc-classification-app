@@ -1,0 +1,2629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Intelligent Document &amp; Automation Solution</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body,#root{height:100%}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:13px;color:#111827;background:#f9fafb;-webkit-font-smoothing:antialiased}
+button{cursor:pointer;font-family:inherit}
+input,textarea,select{font-family:inherit}
+
+.navbar{display:flex;align-items:center;justify-content:space-between;height:52px;background:#fff;border-bottom:1px solid #e5e7eb;padding:0 20px;position:fixed;top:0;left:0;right:0;z-index:100;gap:16px}
+.navbar__left{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.navbar__logo{display:flex;align-items:center}
+.navbar__brand{font-size:12px;font-weight:600;color:#111827;white-space:nowrap}
+.navbar__nav{display:flex;align-items:center;list-style:none;flex:1;justify-content:center}
+.navbar__nav-item{background:none;border:none;padding:0 12px;font-size:13px;color:#6b7280;height:52px;border-bottom:2px solid transparent;cursor:pointer;transition:all .15s;font-family:inherit}
+.navbar__nav-item:hover{color:#111827}
+.navbar__nav-item.active{color:#2563eb;font-weight:500;border-bottom-color:#2563eb}
+.navbar__right{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.navbar__dd{position:relative}
+.navbar__dd-btn{display:flex;align-items:center;gap:6px;background:none;border:1px solid transparent;padding:5px 8px;border-radius:6px;font-size:12px;color:#6b7280;cursor:pointer;transition:background .15s;font-family:inherit}
+.navbar__dd-btn:hover{background:#f9fafb;color:#111827}
+.navbar__dd-menu{position:absolute;top:calc(100% + 6px);right:0;background:#fff;border:1px solid #e5e7eb;border-radius:8px;box-shadow:0 10px 15px rgba(0,0,0,.1);min-width:160px;z-index:200;overflow:hidden;animation:slideDown .12s ease}
+.navbar__dd-item{background:none;border:none;display:block;width:100%;padding:8px 14px;font-size:12px;color:#111827;text-align:left;cursor:pointer;font-family:inherit;transition:background .15s}
+.navbar__dd-item:hover{background:#f9fafb}
+.navbar__dd-item.active{color:#2563eb;background:#eff6ff;font-weight:500}
+.navbar__dd-item.danger{color:#dc2626}
+.navbar__dd-item.danger:hover{background:#fef2f2}
+.navbar__dd-divider{height:1px;background:#e5e7eb;margin:4px 0}
+.navbar__avatar{width:32px;height:32px;border-radius:50%;background:#7c3aed;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;user-select:none;flex-shrink:0;transition:box-shadow .2s}
+.navbar__avatar:hover{box-shadow:0 0 0 3px rgba(124,58,237,.3)}
+
+.app{display:flex;flex-direction:column;height:100vh;overflow:hidden}
+.app__sub-bar{margin-top:52px;height:32px;background:#f3f4f6;border-bottom:1px solid #e5e7eb;padding:0 24px;display:flex;align-items:center;flex-shrink:0}
+.app__breadcrumb{font-size:12px;color:#6b7280}
+.app__back-bar{height:36px;background:#fff;border-bottom:1px solid #e5e7eb;padding:0 20px;display:flex;align-items:center;flex-shrink:0}
+.app__back-btn{display:flex;align-items:center;gap:6px;background:none;border:none;font-size:12px;color:#2563eb;font-weight:500;cursor:pointer;font-family:inherit}
+.app__back-btn:hover{text-decoration:underline}
+.app__content{flex:1;display:flex;overflow:hidden;min-height:0}
+
+/* Page scroll wrapper (Dashboard + Config List) */
+.page-scroll{flex:1;overflow-y:auto;padding:28px 32px;margin-top:52px}
+.page-scroll::-webkit-scrollbar{width:5px}.page-scroll::-webkit-scrollbar-track{background:transparent}.page-scroll::-webkit-scrollbar-thumb{background:#e5e7eb;border-radius:3px}
+.page-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;gap:16px;flex-wrap:wrap}
+.page-hdr__left h1{font-size:22px;font-weight:700;color:#111827}
+.page-hdr__left p{font-size:13px;color:#6b7280;margin-top:3px}
+.page-hdr__actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
+
+/* ── Dashboard ── */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px}
+.stat-card{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:18px 20px;display:flex;flex-direction:column;gap:6px;transition:box-shadow .15s}
+.stat-card:hover{box-shadow:0 4px 12px rgba(0,0,0,.07)}
+.stat-card__label{font-size:11px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em}
+.stat-card__value{font-size:26px;font-weight:700;color:#111827;line-height:1}
+.stat-card__sub{font-size:11px;color:#6b7280;display:flex;align-items:center;gap:4px}
+.stat-card__sub.up{color:#16a34a}
+.stat-card__sub.down{color:#dc2626}
+.stat-card__bar{height:3px;background:#f3f4f6;border-radius:2px;margin-top:4px;overflow:hidden}
+.stat-card__bar-fill{height:100%;border-radius:2px;background:#2563eb}
+
+.section-title{font-size:14px;font-weight:700;color:#111827;margin-bottom:14px}
+
+/* Pipeline */
+.pipeline{display:flex;align-items:center;background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:20px 24px;margin-bottom:28px;overflow-x:auto;gap:0}
+.pipe-step{display:flex;flex-direction:column;align-items:center;gap:8px;flex:1;min-width:90px}
+.pipe-step__icon{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px}
+.pipe-step__label{font-size:11px;font-weight:600;color:#374151;text-align:center;white-space:nowrap}
+.pipe-step__count{font-size:10px;color:#9ca3af;text-align:center}
+.pipe-arrow{color:#d1d5db;font-size:20px;flex-shrink:0;padding:0 4px;margin-bottom:24px}
+
+/* LOB performance */
+.lob-perf{background:#fff;border:1px solid #e5e7eb;border-radius:10px;overflow:hidden;margin-bottom:28px}
+.lob-perf__hdr{display:flex;align-items:center;padding:14px 20px;border-bottom:1px solid #e5e7eb;gap:0}
+.lob-perf__hdr span{font-size:11px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.04em}
+.lob-perf__hdr span:first-child{flex:2}
+.lob-perf__hdr span:not(:first-child){flex:1;text-align:center}
+.lob-perf__row{display:flex;align-items:center;padding:13px 20px;border-bottom:1px solid #f9fafb;transition:background .1s}
+.lob-perf__row:last-child{border-bottom:none}
+.lob-perf__row:hover{background:#f9fafb}
+.lob-perf__name{flex:2;display:flex;align-items:center;gap:10px}
+.lob-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.lob-perf__name-text{font-size:13px;font-weight:600;color:#111827}
+.lob-perf__name-sub{font-size:11px;color:#9ca3af}
+.lob-perf__cell{flex:1;text-align:center;font-size:12px;color:#374151}
+.lob-perf__conf{font-weight:700;color:#111827}
+.conf-bar{width:80px;height:6px;background:#f3f4f6;border-radius:3px;overflow:hidden;margin:0 auto 2px}
+.conf-bar__fill{height:100%;border-radius:3px}
+
+/* Quick links */
+.quick-links{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.quick-link{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:16px 18px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .15s;text-align:left}
+.quick-link:hover{border-color:#2563eb;box-shadow:0 4px 12px rgba(37,99,235,.1)}
+.quick-link__icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.quick-link__label{font-size:13px;font-weight:600;color:#111827}
+.quick-link__sub{font-size:11px;color:#9ca3af;margin-top:1px}
+
+/* ── Buttons ── */
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:6px;font-size:13px;font-weight:500;border:none;cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap}
+.btn-primary{background:#2563eb;color:#fff}.btn-primary:hover{background:#1d4ed8}.btn-primary:disabled{background:#93c5fd;cursor:not-allowed}
+.btn-outline{background:#fff;color:#374151;border:1px solid #d1d5db}.btn-outline:hover{background:#f9fafb;border-color:#9ca3af}
+.btn-danger{background:#dc2626;color:#fff;border:none}.btn-danger:hover{background:#b91c1c}
+.btn-sm{padding:5px 11px;font-size:12px}
+
+/* ── Modals ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:300;display:flex;align-items:center;justify-content:center;animation:fadeIn .15s ease}
+.modal{background:#fff;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.2);max-width:520px;width:92vw;display:flex;flex-direction:column;max-height:90vh;animation:scaleIn .15s ease}
+.modal.lg{max-width:700px}
+.modal__header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid #e5e7eb;flex-shrink:0}
+.modal__header h3{font-size:15px;font-weight:600;color:#111827}
+.modal__close{background:none;border:none;font-size:22px;color:#9ca3af;cursor:pointer;line-height:1;padding:0 4px;border-radius:4px;transition:all .1s}
+.modal__close:hover{color:#111827;background:#f3f4f6}
+.modal__body{padding:20px;overflow-y:auto;flex:1}
+.modal__body::-webkit-scrollbar{width:4px}.modal__body::-webkit-scrollbar-thumb{background:#e5e7eb;border-radius:2px}
+.modal__footer{display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:12px 20px;border-top:1px solid #e5e7eb;flex-shrink:0}
+
+/* ── Version table & badges ── */
+.version-table{width:100%;border-collapse:collapse}
+.version-table th{padding:8px 12px;font-size:12px;font-weight:600;color:#374151;text-align:left;background:#f9fafb;border-bottom:1px solid #e5e7eb}
+.version-table td{padding:10px 12px;border-bottom:1px solid #f3f4f6;font-size:13px;color:#374151}
+.version-table tbody tr:last-child td{border-bottom:none}
+.badge{display:inline-flex;align-items:center;padding:2px 9px;border-radius:10px;font-size:11px;font-weight:500}
+.badge-active{background:#dcfce7;color:#16a34a}.badge-archived{background:#f3f4f6;color:#6b7280}
+
+/* ── Preview / Test modals ── */
+.preview-box{background:#f8fafc;border:1px solid #e5e7eb;border-radius:8px;padding:14px;max-height:320px;overflow-y:auto}
+.preview-box pre{font-family:'Fira Code',monospace,sans-serif;font-size:12px;line-height:1.6;color:#374151;white-space:pre-wrap;word-break:break-word}
+.test-modal{display:flex;flex-direction:column;gap:16px}
+.test-modal h4{font-size:13px;font-weight:600;color:#111827;margin-bottom:8px}
+.test-running{display:flex;align-items:center;gap:10px;padding:12px 14px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;font-size:13px;color:#1e40af}
+.test-spinner{width:16px;height:16px;border:2px solid #bfdbfe;border-top-color:#2563eb;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+.test-result{display:flex;flex-direction:column;gap:8px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:14px}
+.test-result__item{display:flex;gap:8px;font-size:13px}
+.test-result__label{font-weight:600;color:#374151;min-width:110px;flex-shrink:0}
+.test-result__value{color:#111827}
+
+/* ── Confirm dialog ── */
+.confirm-dialog{background:#fff;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.2);max-width:400px;width:90vw;padding:28px 24px;display:flex;flex-direction:column;align-items:center;gap:12px;animation:scaleIn .15s ease}
+.confirm-dialog__icon{font-size:28px}
+.confirm-dialog__title{font-size:16px;font-weight:700;color:#111827;text-align:center}
+.confirm-dialog__msg{font-size:13px;color:#6b7280;text-align:center;line-height:1.5}
+.confirm-dialog__actions{display:flex;gap:10px;margin-top:4px}
+
+/* ── Toasts ── */
+.toast-container{position:fixed;bottom:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.12);font-size:13px;min-width:240px;max-width:360px;pointer-events:all;animation:slideInRight .25s ease;transition:opacity .25s,transform .25s}
+.toast.exiting{opacity:0;transform:translateX(20px)}
+.toast.success{background:#f0fdf4;border:1px solid #bbf7d0;color:#166534}
+.toast.error{background:#fef2f2;border:1px solid #fecaca;color:#991b1b}
+.toast.warning{background:#fffbeb;border:1px solid #fde68a;color:#92400e}
+.toast.info{background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af}
+.toast__icon{font-size:14px;flex-shrink:0}
+.toast__msg{flex:1;line-height:1.4}
+.toast__close{background:none;border:none;font-size:16px;cursor:pointer;opacity:.5;padding:0 2px;line-height:1;color:inherit;margin-left:4px;font-family:inherit;transition:opacity .1s}
+.toast__close:hover{opacity:1}
+
+/* ── Sidebar ── */
+.sidebar{width:220px;min-width:220px;background:#fff;border-right:1px solid #e5e7eb;display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}
+.sidebar__header{padding:14px 16px 10px;border-bottom:1px solid #f3f4f6;flex-shrink:0}
+.sidebar__title{font-size:13px;font-weight:700;color:#111827}
+.sidebar__section{padding:12px 16px;flex-shrink:0}
+.sidebar__section-lbl{font-size:10px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;display:block}
+.sidebar__cb-label{display:flex;align-items:center;gap:7px;font-size:12px;color:#374151;cursor:pointer;padding:2px 0;user-select:none}
+.sidebar__cb-label input{accent-color:#2563eb;cursor:pointer}
+.sidebar__divider{height:1px;background:#f3f4f6;flex-shrink:0}
+.sidebar__level0{padding:10px 16px;flex-shrink:0}
+.sidebar__level-lbl{font-size:10px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px}
+.sidebar__level-lbl.sub{margin:8px 0 4px;padding:0 2px}
+.sidebar__l0-input{width:100%;border:1px solid #2563eb;border-radius:5px;padding:4px 8px;font-size:12px;outline:none;font-family:inherit;color:#111827}
+.sidebar__l0-name{font-size:13px;font-weight:600;color:#111827;cursor:pointer;display:inline-flex;align-items:center;gap:4px}
+.sidebar__l0-name:hover{color:#2563eb}
+.sidebar__l1-header{padding:6px 16px 0;flex-shrink:0}
+.sidebar__list-controls{display:flex;align-items:center;gap:6px;padding:6px 16px 8px;flex-shrink:0}
+.sidebar__search-wrap{position:relative;flex:1;display:flex;align-items:center}
+.sidebar__search-icon{position:absolute;left:7px;color:#9ca3af;display:flex;align-items:center;pointer-events:none}
+.sidebar__search{width:100%;padding:5px 8px 5px 24px;border:1px solid #e5e7eb;border-radius:5px;font-size:11px;outline:none;font-family:inherit;color:#374151;transition:border-color .15s}
+.sidebar__search:focus{border-color:#2563eb}
+.sidebar__collapse-btn{background:none;border:1px solid #e5e7eb;border-radius:5px;padding:4px 7px;font-size:11px;color:#6b7280;cursor:pointer;white-space:nowrap;font-family:inherit;transition:all .1s;flex-shrink:0}
+.sidebar__collapse-btn:hover{color:#111827;border-color:#9ca3af}
+.sidebar__l1-list{flex:1;overflow-y:auto;padding:0 8px 8px}
+.sidebar__l1-list::-webkit-scrollbar{width:3px}.sidebar__l1-list::-webkit-scrollbar-thumb{background:#e5e7eb;border-radius:2px}
+.sidebar__no-results{font-size:12px;color:#9ca3af;padding:8px;font-style:italic}
+.sidebar__empty-l1{display:flex;flex-direction:column;align-items:center;gap:8px;padding:20px 0;color:#9ca3af}
+.sidebar__empty-l1 p{font-size:12px;text-align:center;line-height:1.5}
+.sidebar__l1-item{border-radius:6px;margin-bottom:2px}
+.sidebar__l1-row{display:flex;align-items:center;border-radius:6px;transition:background .1s}
+.sidebar__l1-row:hover{background:#f9fafb}
+.sidebar__l1-toggle{flex:1;display:flex;align-items:center;gap:6px;background:none;border:none;padding:7px 8px;cursor:pointer;font-family:inherit;text-align:left;min-width:0;border-radius:6px 0 0 6px}
+.sidebar__l1-name{font-size:12px;font-weight:500;color:#111827;flex:1;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sidebar__l2-count{font-size:10px;color:#9ca3af;background:#f3f4f6;border-radius:10px;padding:1px 6px;flex-shrink:0}
+.sidebar__menu-wrap{position:relative;flex-shrink:0}
+.sidebar__menu-btn{background:none;border:none;padding:7px 8px;cursor:pointer;color:#9ca3af;display:flex;align-items:center;transition:color .1s;border-radius:0 6px 6px 0}
+.sidebar__menu-btn:hover{color:#374151;background:#f3f4f6}
+.sidebar__ctx-menu{position:absolute;right:0;top:100%;background:#fff;border:1px solid #e5e7eb;border-radius:8px;box-shadow:0 8px 20px rgba(0,0,0,.1);z-index:50;min-width:130px;overflow:hidden;animation:slideDown .1s ease}
+.sidebar__ctx-item{display:block;width:100%;padding:8px 14px;font-size:12px;color:#111827;background:none;border:none;text-align:left;cursor:pointer;font-family:inherit;transition:background .1s}
+.sidebar__ctx-item:hover{background:#f9fafb}.sidebar__ctx-item.danger{color:#dc2626}.sidebar__ctx-item.danger:hover{background:#fef2f2}
+.sidebar__l2-wrap{padding:0 8px 6px 16px}
+.sidebar__empty-l2{font-size:11px;color:#9ca3af;padding:4px;font-style:italic}
+.sidebar__l2-list{list-style:none;display:flex;flex-direction:column;gap:1px}
+.sidebar__l2-item{display:flex;align-items:center;gap:6px;padding:5px 6px;border-radius:5px;font-size:12px;color:#4b5563;transition:background .1s}
+.sidebar__l2-item:hover{background:#f9fafb}
+.sidebar__l2-del{background:none;border:none;cursor:pointer;color:#9ca3af;font-size:15px;line-height:1;padding:0 2px;margin-left:auto;border-radius:3px;transition:color .1s;font-family:inherit}
+.sidebar__l2-del:hover{color:#dc2626}
+.sidebar__add-input-wrap{display:flex;flex-direction:column;gap:5px;padding:4px 0}
+.sidebar__add-input{border:1px solid #2563eb;border-radius:5px;padding:5px 8px;font-size:12px;outline:none;font-family:inherit;color:#111827;width:100%}
+.sidebar__add-actions{display:flex;gap:5px}
+.sidebar__add-confirm{background:#2563eb;color:#fff;border:none;border-radius:5px;padding:4px 10px;font-size:11px;cursor:pointer;font-family:inherit;transition:background .1s}
+.sidebar__add-confirm:hover{background:#1d4ed8}.sidebar__add-confirm:disabled{background:#93c5fd;cursor:not-allowed}
+.sidebar__add-cancel{background:none;border:1px solid #e5e7eb;border-radius:5px;padding:4px 8px;font-size:11px;cursor:pointer;color:#6b7280;font-family:inherit;transition:all .1s}
+.sidebar__add-cancel:hover{border-color:#9ca3af;color:#374151}
+.sidebar__add-btn{background:none;border:1px dashed #d1d5db;border-radius:5px;padding:5px 8px;font-size:11px;color:#9ca3af;cursor:pointer;width:100%;display:flex;align-items:center;gap:4px;font-family:inherit;transition:all .15s;margin-top:2px}
+.sidebar__add-btn:hover{border-color:#2563eb;color:#2563eb;background:#eff6ff}
+.sidebar__add-l1-bar{padding:8px;border-top:1px solid #f3f4f6;flex-shrink:0}
+.sidebar__add-l1-input-wrap{display:flex;gap:5px}
+.sidebar__add-l1-input{flex:1;border:1px solid #2563eb;border-radius:5px;padding:5px 8px;font-size:12px;outline:none;font-family:inherit;color:#111827}
+.sidebar__add-l1-btn{background:none;border:1px dashed #d1d5db;border-radius:6px;padding:7px 10px;font-size:12px;color:#6b7280;cursor:pointer;width:100%;display:flex;align-items:center;justify-content:center;gap:5px;font-family:inherit;transition:all .15s}
+.sidebar__add-l1-btn:hover{border-color:#2563eb;color:#2563eb;background:#eff6ff}
+
+/* ── Workspace ── */
+.workspace{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.workspace__header{padding:12px 20px 0;flex-shrink:0}
+.workspace__title{font-size:13px;font-weight:700;color:#111827}
+.workspace__tab-area{flex-shrink:0}
+.workspace__tabs{display:flex;align-items:center;padding:0 16px;position:relative}
+.workspace__tabs--l1{background:#fff;border-bottom:1px solid #e5e7eb;height:40px}
+.workspace__tabs--l2{background:#f9fafb;border-bottom:1px solid #e5e7eb;height:34px}
+.workspace__tabs-inner{display:flex;align-items:center;flex:1;overflow:hidden;height:100%}
+.workspace__tab{padding:0 14px;height:100%;background:none;border:none;font-size:12px;color:#6b7280;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;font-family:inherit;transition:all .15s;flex-shrink:0}
+.workspace__tab:hover{color:#111827;background:#f9fafb}
+.workspace__tab.active{color:#2563eb;font-weight:500;border-bottom-color:#2563eb;background:#fafcff}
+.workspace__tab--l2{font-size:11px}
+.workspace__tab--hidden{visibility:hidden;pointer-events:none;position:absolute;top:0}
+.workspace__more-wrap{position:relative;flex-shrink:0;padding:0 8px}
+.workspace__more-btn{display:flex;align-items:center;gap:4px;padding:4px 10px;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:5px;font-size:11px;color:#6b7280;cursor:pointer;font-family:inherit;white-space:nowrap;transition:all .12s}
+.workspace__more-btn:hover,.workspace__more-btn.active{background:#eff6ff;border-color:#bfdbfe;color:#2563eb}
+.workspace__more-menu{position:absolute;top:calc(100% + 6px);right:0;background:#fff;border:1px solid #e5e7eb;border-radius:8px;box-shadow:0 10px 25px rgba(0,0,0,.1);z-index:50;min-width:180px;overflow:hidden;animation:slideDown .12s ease}
+.workspace__more-search{width:100%;padding:8px 12px;border:none;border-bottom:1px solid #f3f4f6;font-size:12px;outline:none;font-family:inherit;color:#374151}
+.workspace__more-item{display:block;width:100%;padding:8px 14px;font-size:12px;color:#374151;background:none;border:none;text-align:left;cursor:pointer;font-family:inherit;transition:background .1s}
+.workspace__more-item:hover{background:#f9fafb}.workspace__more-item.active{color:#2563eb;background:#eff6ff;font-weight:500}
+.workspace__body{flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:14px}
+.workspace__body::-webkit-scrollbar{width:4px}.workspace__body::-webkit-scrollbar-thumb{background:#e5e7eb;border-radius:2px}
+.workspace__lv-header{display:flex;align-items:center;justify-content:space-between}
+.workspace__lv-title{font-size:14px;font-weight:600;color:#111827}
+.workspace__manage-btn{background:none;border:1px solid #e5e7eb;border-radius:6px;padding:5px 12px;font-size:12px;color:#374151;cursor:pointer;font-family:inherit;transition:all .12s}
+.workspace__manage-btn:hover{border-color:#9ca3af;background:#f9fafb}
+.workspace__ver-card{display:flex;align-items:center;background:#f9fafb;border:1px solid #f3f4f6;border-radius:8px;padding:10px 16px}
+.workspace__ver-item{display:flex;flex-direction:column;gap:2px;flex:1}
+.workspace__ver-lbl{font-size:10px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.04em}
+.workspace__ver-val{font-size:13px;font-weight:600;color:#111827}
+.workspace__ver-div{width:1px;background:#e5e7eb;height:32px;flex-shrink:0;margin:0 16px}
+.workspace__status{font-size:12px;font-weight:600;padding:2px 8px;border-radius:10px;display:inline-flex;align-items:center}
+.workspace__status.active{background:#dcfce7;color:#16a34a}.workspace__status.draft{background:#f3f4f6;color:#6b7280}.workspace__status.failed{background:#fee2e2;color:#dc2626}
+.workspace__warn{display:flex;align-items:center;gap:8px;padding:9px 12px;background:#fffbeb;border:1px solid #fde68a;border-radius:7px;font-size:12px;color:#92400e}
+.workspace__warn code{background:#fef3c7;border-radius:3px;padding:1px 5px;font-family:monospace;font-size:11px}
+.workspace__prompt-sec{display:flex;flex-direction:column;gap:6px}
+.workspace__prompt-hdr{display:flex;align-items:center;justify-content:space-between}
+.workspace__prompt-lbl{font-size:12px;font-weight:600;color:#374151}
+.workspace__prompt-hdr-right{display:flex;align-items:center;gap:10px}
+.workspace__reset-btn{background:none;border:none;font-size:11px;color:#6b7280;cursor:pointer;font-family:inherit;padding:0;transition:color .1s}
+.workspace__reset-btn:hover{color:#dc2626}
+.workspace__textarea{min-height:220px;border:1px solid #e5e7eb;border-radius:8px;padding:12px;font-size:12px;font-family:'Fira Code',monospace,sans-serif;color:#111827;resize:vertical;outline:none;line-height:1.6;transition:border-color .15s,box-shadow .15s;background:#fff;width:100%}
+.workspace__textarea:focus{border-color:#2563eb;box-shadow:0 0 0 2px rgba(37,99,235,.1)}
+.prompt-footer{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.placeholder-row{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.placeholder-row__lbl{font-size:11px;color:#9ca3af}
+.ph-badge{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:10px;font-size:11px;font-weight:500}
+.ph-badge.found{background:#dcfce7;color:#16a34a}.ph-badge.missing{background:#fef3c7;color:#92400e}
+.char-count{font-size:11px;color:#9ca3af;flex-shrink:0}
+.workspace__actions{display:flex;align-items:center;gap:8px;flex-shrink:0;padding-top:4px}
+.workspace__btn{padding:7px 18px;border-radius:7px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .15s;border:none}
+.workspace__btn.outline{background:#fff;border:1px solid #e5e7eb;color:#374151}.workspace__btn.outline:hover{border-color:#9ca3af;background:#f9fafb}
+.workspace__btn.primary{background:#2563eb;color:#fff}.workspace__btn.primary:hover{background:#1d4ed8}
+.save-indicator{font-size:11px;display:flex;align-items:center;gap:3px}
+.save-indicator.unsaved{color:#d97706}.save-indicator.saved{color:#16a34a}
+
+/* ── Document Panel ── */
+.doc-panel{width:260px;min-width:260px;background:#fff;border-left:1px solid #e5e7eb;display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}
+.doc-panel__upload{padding:14px;border-bottom:1px solid #e5e7eb;flex-shrink:0}
+.doc-panel__sec-title{font-size:12px;font-weight:600;color:#111827;margin-bottom:10px}
+.doc-panel__dropzone{border:1.5px dashed #d1d5db;border-radius:8px;padding:18px 12px;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;transition:all .15s;background:#fff}
+.doc-panel__dropzone:hover,.doc-panel__dropzone.drag-over{border-color:#2563eb;background:#eff6ff}
+.doc-panel__dz-text{font-size:11px;color:#6b7280;text-align:center}
+.doc-panel__browse{color:#2563eb;font-weight:500;cursor:pointer}
+.doc-panel__browse:hover{text-decoration:underline}
+.doc-panel__dz-hint{font-size:10px;color:#9ca3af;text-align:center}
+.doc-panel__docs{flex:1;display:flex;flex-direction:column;overflow:hidden;padding:12px 14px 0}
+.doc-panel__search-wrap{position:relative;display:flex;align-items:center;margin-bottom:8px}
+.doc-panel__search-icon{position:absolute;left:8px;color:#9ca3af;display:flex;align-items:center;pointer-events:none}
+.doc-panel__search{width:100%;padding:6px 8px 6px 26px;border:1px solid #e5e7eb;border-radius:6px;font-size:12px;outline:none;font-family:inherit;transition:border-color .15s}
+.doc-panel__search:focus{border-color:#2563eb}
+.doc-panel__filters{display:flex;align-items:center;gap:5px;margin-bottom:8px;flex-wrap:wrap}
+.doc-panel__filter-btn{display:flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;border:1px solid transparent;font-size:11px;font-weight:500;color:#6b7280;background:#f3f4f6;cursor:pointer;font-family:inherit;transition:all .12s}
+.doc-panel__filter-btn:hover{background:#e5e7eb;color:#374151}
+.doc-panel__filter-btn.active{background:#fff;border-color:#e5e7eb;color:#111827;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.doc-panel__cnt{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:15px;padding:0 4px;border-radius:8px;font-size:10px;font-weight:700;color:#fff}
+.doc-panel__cnt.all{background:#2563eb}.doc-panel__cnt.processed{background:#16a34a}.doc-panel__cnt.pending{background:#d97706}
+.bulk-bar{display:flex;align-items:center;gap:6px;padding:6px 0;flex-shrink:0}
+.bulk-bar__info{font-size:11px;color:#374151;font-weight:500;flex:1}
+.bulk-bar__btn{background:none;border:1px solid #e5e7eb;border-radius:5px;padding:3px 8px;font-size:11px;color:#374151;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:3px;transition:all .1s}
+.bulk-bar__btn:hover{background:#f9fafb;border-color:#9ca3af}
+.bulk-bar__btn.danger{color:#dc2626;border-color:#fecaca}.bulk-bar__btn.danger:hover{background:#fef2f2}
+.doc-panel__list-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;flex-shrink:0}
+.doc-panel__sel-info{font-size:11px;color:#6b7280}
+.doc-panel__sel-all{background:none;border:none;font-size:11px;color:#2563eb;cursor:pointer;font-family:inherit;font-weight:500;padding:0}
+.doc-panel__sel-all:hover{text-decoration:underline}
+.doc-panel__list{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:2px;margin:0 -2px;padding:0 2px}
+.doc-panel__list::-webkit-scrollbar{width:3px}.doc-panel__list::-webkit-scrollbar-thumb{background:#e5e7eb;border-radius:2px}
+.doc-panel__empty{text-align:center;padding:24px;font-size:12px;color:#9ca3af}
+.doc-panel__item{display:flex;align-items:center;gap:7px;padding:6px 7px;border-radius:6px;border:1px solid transparent;transition:all .1s}
+.doc-panel__item:hover{background:#f9fafb;border-color:#f3f4f6}
+.doc-panel__item.selected{background:#eff6ff;border-color:#bfdbfe}
+.doc-panel__cb{width:14px;height:14px;accent-color:#2563eb;cursor:pointer;flex-shrink:0}
+.doc-panel__file-icon{color:#6366f1;flex-shrink:0;display:flex;align-items:center}
+.doc-panel__file-name{flex:1;font-size:11px;color:#374151;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.doc-panel__status{font-size:10px;font-weight:600;padding:2px 6px;border-radius:8px;flex-shrink:0}
+.doc-panel__status.tested{background:#dcfce7;color:#16a34a}
+.doc-panel__status.pending{background:#fef3c7;color:#92400e}
+.doc-panel__cnt.tested{background:#16a34a}
+.test-doc-section{margin-bottom:4px}
+.test-doc-section h4,.test-result-section h4{font-size:12px;font-weight:600;color:#374151;margin-bottom:8px}
+.test-doc-list{display:flex;flex-direction:column;gap:3px;max-height:130px;overflow-y:auto}
+.test-doc-item{display:flex;align-items:center;gap:8px;padding:6px 10px;border:1px solid #e5e7eb;border-radius:6px;cursor:pointer;font-size:12px;color:#374151;transition:all .1s;user-select:none}
+.test-doc-item:hover{border-color:#bfdbfe;background:#f0f7ff}
+.test-doc-item.selected{border-color:#2563eb;background:#eff6ff;color:#1d4ed8;font-weight:500}
+.test-doc-item input[type=radio]{display:none}
+.test-doc-none{font-size:12px;color:#9ca3af;padding:10px 12px;background:#f9fafb;border-radius:6px;text-align:center;margin-bottom:4px}
+.test-prompt-toggle{background:none;border:none;font-size:11px;color:#9ca3af;cursor:pointer;padding:4px 0 8px;font-family:inherit;text-align:left;display:flex;align-items:center;gap:4px}
+.test-prompt-toggle:hover{color:#6b7280}
+.workspace__preview-link{background:none;border:none;font-size:11px;color:#9ca3af;cursor:pointer;padding:0;font-family:inherit;text-decoration:underline;text-underline-offset:2px}
+.workspace__preview-link:hover{color:#6b7280}
+.doc-panel__del{background:none;border:none;cursor:pointer;color:#d1d5db;padding:2px;border-radius:4px;display:flex;align-items:center;transition:all .1s;flex-shrink:0}
+.doc-panel__del:hover{color:#dc2626;background:#fee2e2}
+.doc-panel__footer{padding:8px 0;font-size:11px;color:#9ca3af;border-top:1px solid #f3f4f6;flex-shrink:0}
+.doc-panel__footer strong{color:#6b7280}
+
+/* ── Keyframes ── */
+@keyframes slideDown{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes scaleIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+@keyframes slideInRight{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── Overview table pages ── */
+.ov-page{flex:1;overflow-y:auto;padding:28px 40px;margin-top:52px}
+.ov-page::-webkit-scrollbar{width:5px}.ov-page::-webkit-scrollbar-track{background:transparent}.ov-page::-webkit-scrollbar-thumb{background:#e5e7eb;border-radius:3px}
+.ov-title{font-size:22px;font-weight:700;color:#111827;margin-bottom:24px}
+.ov-breadcrumb{display:flex;align-items:center;gap:6px;font-size:12px;color:#6b7280;margin-bottom:12px}
+.ov-bc-link{background:none;border:none;color:#6b7280;font-size:12px;cursor:pointer;padding:0;font-family:inherit}.ov-bc-link:hover{color:#2563eb;text-decoration:underline}
+.ov-bc-sep{color:#d1d5db}.ov-bc-curr{color:#111827;font-weight:500}
+.ov-filter-row{display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+.ov-search-wrap{position:relative;display:flex;align-items:center}
+.ov-search-wrap svg{position:absolute;left:9px;pointer-events:none;color:#9ca3af}
+.ov-search{padding:7px 10px 7px 30px;border:1px solid #d1d5db;border-radius:6px;font-size:12px;outline:none;font-family:inherit;min-width:200px;transition:border-color .15s,box-shadow .15s}
+.ov-search:focus{border-color:#2563eb;box-shadow:0 0 0 2px rgba(37,99,235,.1)}
+.ov-select{padding:7px 28px 7px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:12px;outline:none;font-family:inherit;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 8px center;cursor:pointer;color:#374151;min-width:90px;appearance:none}
+.ov-table-wrap{background:#fff;border:1px solid #e5e7eb;border-radius:10px;overflow:hidden}
+.ov-table{width:100%;border-collapse:collapse}
+.ov-table thead tr{border-bottom:2px solid #e5e7eb}
+.ov-table th{padding:10px 16px;font-size:12px;font-weight:600;color:#374151;text-align:left;white-space:nowrap;user-select:none}
+.ov-table th.sortable{cursor:pointer}.ov-table th.sortable:hover{color:#111827}
+.ov-table tbody tr{border-bottom:1px solid #f3f4f6;transition:background .1s}
+.ov-table tbody tr:last-child{border-bottom:none}.ov-table tbody tr:hover{background:#f9fafb}
+.ov-table td{padding:11px 16px;font-size:13px;color:#374151;vertical-align:middle}
+.tbl-name-link{color:#2563eb;font-weight:500;cursor:pointer;background:none;border:none;font-family:inherit;font-size:13px;padding:0;text-align:left}
+.tbl-name-link:hover{text-decoration:underline}
+.tbl-actions{display:flex;align-items:center;gap:8px}
+.tbl-view-btn{background:none;border:none;color:#2563eb;font-size:12px;font-weight:500;cursor:pointer;padding:0;font-family:inherit}
+.tbl-view-btn:hover{text-decoration:underline}
+.tbl-icon-btn{background:none;border:none;cursor:pointer;color:#6b7280;padding:4px;border-radius:4px;display:flex;align-items:center;transition:all .12s}
+.tbl-icon-btn:hover{color:#111827;background:#f3f4f6}.tbl-icon-btn.danger:hover{color:#dc2626;background:#fee2e2}
+.tbl-empty{text-align:center;color:#9ca3af;padding:32px;font-size:13px}
+.sort-both{font-size:10px;color:#9ca3af;margin-left:3px}
+.status-chip{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:500;border:1px solid transparent}
+.status-chip--deployed{background:#dcfce7;color:#16a34a;border-color:#bbf7d0}
+.status-chip--failed{background:#fee2e2;color:#dc2626;border-color:#fecaca}
+.ov-pagination{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-top:1px solid #f3f4f6}
+.ov-pagination__left{display:flex;align-items:center;gap:6px;font-size:12px;color:#6b7280}
+.ov-per-page{border:none;font-size:12px;color:#374151;background:transparent;cursor:pointer;outline:none;font-family:inherit}
+.ov-pagination__pages{display:flex;align-items:center;gap:2px}
+.page-btn{background:none;border:none;min-width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#374151;cursor:pointer;border-radius:4px;transition:background .12s;font-family:inherit;padding:0 4px}
+.page-btn:hover:not(:disabled){background:#f3f4f6}.page-btn.active{background:#2563eb;color:#fff}
+.page-btn:disabled{color:#d1d5db;cursor:not-allowed}.page-ellipsis{font-size:12px;color:#9ca3af;padding:0 2px}
+.modal__toolbar{display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:8px 20px;border-bottom:1px solid #f3f4f6;flex-shrink:0}
+.types-modal-body{padding:0!important}.types-table{width:100%;border-collapse:collapse}
+.types-table thead tr{border-bottom:1px solid #e5e7eb}
+.types-table th{padding:10px 20px;font-size:12px;font-weight:600;color:#374151;text-align:left;cursor:pointer;user-select:none}
+.types-table td{padding:10px 20px;border-bottom:1px solid #f3f4f6}
+.types-table tbody tr:last-child td{border-bottom:none}.types-table tbody tr:hover td{background:#f9fafb}
+.type-tag{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;font-size:9px;font-weight:700;color:#fff;margin-left:6px;vertical-align:middle}
+.type-tag--M{background:#ec4899}
+
+/* ── UX Improvements ── */
+/* Clickable table rows */
+.ov-table tbody tr{cursor:pointer}
+.ov-table tbody tr td:last-child{cursor:default}
+/* Prompt status dot in types modal */
+.type-prompt-dot{width:7px;height:7px;border-radius:50%;display:inline-block;flex-shrink:0;margin-right:7px;vertical-align:middle}
+.type-prompt-dot--set{background:#16a34a}
+.type-prompt-dot--empty{background:#d1d5db}
+/* Inline rename input in sidebar */
+.sidebar__rename-wrap{flex:1;display:flex;align-items:center;gap:4px;padding:4px 6px}
+.sidebar__rename-input{flex:1;border:1px solid #2563eb;border-radius:4px;padding:3px 6px;font-size:12px;font-weight:500;color:#111827;outline:none;font-family:inherit;min-width:0}
+.sidebar__rename-ok{background:#2563eb;color:#fff;border:none;border-radius:4px;padding:3px 7px;font-size:11px;cursor:pointer;font-family:inherit;white-space:nowrap}
+.sidebar__rename-ok:disabled{background:#93c5fd;cursor:not-allowed}
+.sidebar__rename-cancel{background:none;border:1px solid #e5e7eb;border-radius:4px;padding:3px 6px;font-size:11px;cursor:pointer;color:#6b7280;font-family:inherit}
+/* Search clear button */
+.search-clear-btn{position:absolute;right:8px;background:none;border:none;color:#9ca3af;cursor:pointer;font-size:14px;line-height:1;padding:0;display:flex;align-items:center;transition:color .1s}
+.search-clear-btn:hover{color:#374151}
+/* Active filter highlight */
+.btn-filter-active{background:#eff6ff!important;border-color:#bfdbfe!important;color:#1d4ed8!important}
+/* Reset prompt inline confirm */
+.reset-confirm{display:flex;align-items:center;gap:8px;padding:8px 12px;background:#fef9c3;border:1px solid #fde047;border-radius:7px;font-size:12px;color:#713f12}
+.reset-confirm__actions{display:flex;gap:6px;margin-left:auto}
+/* Wider types modal */
+.modal.types{max-width:440px}
+/* Improve workspace no-title layout */
+.workspace__header{padding:10px 20px 0}
+.workspace__title{font-size:11px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em}
+
+/* ── Prompt context chip ── */
+.prompt-ctx-chip{display:inline-flex;align-items:center;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;letter-spacing:.03em;flex-shrink:0;line-height:16px}
+.prompt-ctx-chip--global{background:#f3e8ff;color:#7c3aed}
+.prompt-ctx-chip--l1{background:#dbeafe;color:#1d4ed8}
+.prompt-ctx-chip--l2{background:#d1fae5;color:#065f46}
+.prompt-ctx-scope{font-size:11px;color:#9ca3af;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* ── Output Format Modal ── */
+.of-modal{max-width:980px;width:95vw;height:82vh;display:flex;flex-direction:column}
+.of-modal .modal__body{display:flex;flex:1;overflow:hidden;padding:0!important}
+.of-tree{width:230px;min-width:230px;border-right:1px solid #e5e7eb;overflow-y:auto;background:#fafafa;flex-shrink:0}
+.of-tree::-webkit-scrollbar{width:4px}.of-tree::-webkit-scrollbar-thumb{background:#e5e7eb;border-radius:2px}
+.of-tree__lob{border-bottom:1px solid #f0f0f0}
+.of-tree__lob-btn{width:100%;padding:8px 12px;background:none;border:none;display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:#374151;cursor:pointer;text-align:left;font-family:inherit;transition:background .1s}
+.of-tree__lob-btn:hover{background:#f3f4f6}
+.of-tree__cat-btn{width:100%;padding:6px 12px 6px 20px;background:none;border:none;display:flex;align-items:center;gap:5px;font-size:12px;color:#4b5563;cursor:pointer;text-align:left;font-family:inherit;transition:background .1s}
+.of-tree__cat-btn:hover{background:#f3f4f6}
+.of-tree__type-btn{width:100%;padding:5px 10px 5px 34px;background:none;border:none;font-size:12px;color:#6b7280;cursor:pointer;text-align:left;font-family:inherit;border-radius:0;transition:all .1s;display:block}
+.of-tree__type-btn:hover{background:#eff6ff;color:#2563eb}
+.of-tree__type-btn.active{background:#eff6ff;color:#2563eb;font-weight:500;border-right:2px solid #2563eb}
+.of-schema{flex:1;display:flex;flex-direction:column;overflow:hidden;padding:16px 18px}
+.of-schema__hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;flex-shrink:0;flex-wrap:wrap;gap:8px}
+.of-schema__title{font-size:14px;font-weight:600;color:#111827}
+.of-schema__path{font-size:11px;color:#9ca3af;margin-top:2px}
+.of-schema__actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.of-table-wrap{flex:1;overflow-y:auto;border:1px solid #e5e7eb;border-radius:8px}
+.of-table-wrap::-webkit-scrollbar{width:4px}.of-table-wrap::-webkit-scrollbar-thumb{background:#e5e7eb;border-radius:2px}
+.of-table{width:100%;border-collapse:collapse}
+.of-table th{padding:9px 12px;font-size:11px;font-weight:600;color:#374151;text-align:left;background:#f9fafb;border-bottom:1px solid #e5e7eb;white-space:nowrap}
+.of-table td{padding:7px 8px;border-bottom:1px solid #f3f4f6;font-size:12px;vertical-align:middle}
+.of-table tbody tr:last-child td{border-bottom:none}
+.of-table tbody tr:hover td{background:#fafafa}
+.of-field-input{border:1px solid transparent;border-radius:4px;padding:4px 7px;font-size:12px;font-family:inherit;color:#111827;background:transparent;width:100%;outline:none;transition:border-color .15s}
+.of-field-input:focus{border-color:#2563eb;background:#fff;box-shadow:0 0 0 2px rgba(37,99,235,.08)}
+.of-field-input:hover:not(:focus){border-color:#d1d5db;background:#fff}
+.of-type-sel{border:1px solid transparent;border-radius:4px;padding:4px 6px;font-size:12px;font-family:inherit;color:#111827;background:transparent;outline:none;cursor:pointer;transition:border-color .15s;width:100%}
+.of-type-sel:focus,.of-type-sel:hover{border-color:#d1d5db;background:#fff}
+.of-req-cb{width:15px;height:15px;accent-color:#2563eb;cursor:pointer}
+.of-del-btn{background:none;border:none;cursor:pointer;color:#9ca3af;padding:3px;border-radius:4px;display:flex;align-items:center;transition:all .12s}
+.of-del-btn:hover{color:#dc2626;background:#fee2e2}
+.of-empty-row{text-align:center;padding:32px;color:#9ca3af;font-size:13px}
+.of-json{flex:1;overflow:auto;background:#1e1e2e;border-radius:8px;padding:16px;font-family:'Fira Code',monospace,sans-serif;font-size:12px;color:#cdd6f4;line-height:1.6;white-space:pre;margin:0}
+.of-json::-webkit-scrollbar{width:5px}.of-json::-webkit-scrollbar-thumb{background:#45475a;border-radius:2px}
+.of-no-sel{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;color:#9ca3af;font-size:13px;gap:8px;text-align:center}
+.import-dd{position:relative}
+.import-dd__menu{position:absolute;top:calc(100% + 4px);right:0;background:#fff;border:1px solid #e5e7eb;border-radius:8px;box-shadow:0 10px 15px rgba(0,0,0,.1);z-index:20;min-width:140px;overflow:hidden}
+.import-dd__item{display:block;width:100%;padding:8px 14px;font-size:12px;color:#111827;background:none;border:none;text-align:left;cursor:pointer;font-family:inherit;transition:background .1s}
+.import-dd__item:hover{background:#f3f4f6}
+.of-type-badge{display:inline-block;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:600;background:#eff6ff;color:#2563eb;margin-left:4px}
+
+/* ── Theme v2: Modern refinements ── */
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+/* Navbar */
+.navbar{box-shadow:0 1px 0 #e5e7eb,0 2px 12px rgba(0,0,0,.04)}
+.navbar__brand{font-size:13px;font-weight:700;background:linear-gradient(135deg,#1e40af,#7c3aed);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+/* Buttons */
+.btn-primary{background:linear-gradient(135deg,#2563eb,#1d4ed8);box-shadow:0 1px 4px rgba(37,99,235,.25);border:none}
+.btn-primary:hover{background:linear-gradient(135deg,#1d4ed8,#1e40af);box-shadow:0 2px 8px rgba(37,99,235,.35);transform:translateY(-1px)}
+.btn-primary:active{transform:translateY(0)}
+.btn-outline{border:1px solid #d1d5db;transition:all .15s}
+.btn-outline:hover{border-color:#93c5fd;color:#1d4ed8;background:#f0f7ff}
+/* Stat cards accent */
+.stat-card{transition:all .2s;border-radius:12px}
+.stat-card:hover{box-shadow:0 6px 20px rgba(0,0,0,.09);transform:translateY(-2px)}
+.stat-card:nth-child(1){border-top:3px solid #2563eb}
+.stat-card:nth-child(2){border-top:3px solid #7c3aed}
+.stat-card:nth-child(3){border-top:3px solid #0891b2}
+.stat-card:nth-child(4){border-top:3px solid #16a34a}
+.stat-card__value{background:linear-gradient(135deg,#111827,#374151);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+/* Pipeline steps */
+.pipe-step__icon{box-shadow:0 2px 8px rgba(0,0,0,.08);transition:transform .2s}
+.pipe-step:hover .pipe-step__icon{transform:scale(1.08)}
+/* LOB perf table */
+.lob-perf__row:hover{background:linear-gradient(to right,#f0f7ff,#f9fafb)}
+/* Quick links */
+.quick-link{border-radius:12px;transition:all .2s}
+.quick-link:hover{border-color:#93c5fd;box-shadow:0 6px 20px rgba(37,99,235,.12);transform:translateY(-2px)}
+.quick-link__icon{border-radius:10px}
+/* Status chips */
+.status-chip--deployed{background:linear-gradient(135deg,#f0fdf4,#dcfce7);border-color:#86efac}
+.status-chip--failed{background:linear-gradient(135deg,#fff1f2,#fee2e2);border-color:#fca5a5}
+/* Table */
+.ov-table-wrap{border-radius:12px;overflow:hidden;border:1px solid #e5e7eb;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.ov-table tbody tr:hover{background:linear-gradient(to right,#eff6ff 0%,#f8faff 40%,#f9fafb 100%)}
+.ov-table th{background:linear-gradient(to bottom,#fafafa,#f3f4f6)}
+/* Modals */
+.modal{box-shadow:0 25px 60px rgba(0,0,0,.22),0 0 0 1px rgba(0,0,0,.04);border-radius:14px}
+.modal-overlay{backdrop-filter:blur(2px)}
+.confirm-dialog{border-radius:14px}
+/* Workspace */
+.workspace__tab.active{background:linear-gradient(to bottom,#fff,#fafcff);font-weight:600}
+.workspace__textarea{border-radius:10px;font-size:12.5px}
+.workspace__textarea:focus{border-color:#93c5fd;box-shadow:0 0 0 3px rgba(37,99,235,.08)}
+.workspace__ver-card{background:linear-gradient(135deg,#f9fafb,#f3f4f6);border-radius:10px}
+.workspace__btn.primary{background:linear-gradient(135deg,#2563eb,#1d4ed8);box-shadow:0 1px 4px rgba(37,99,235,.25)}
+.workspace__btn.primary:hover{background:linear-gradient(135deg,#1d4ed8,#1e40af);transform:translateY(-1px)}
+/* Doc panel */
+.doc-panel__dropzone{border-radius:10px;transition:all .2s}
+.doc-panel__item{border-radius:8px}
+.doc-panel__item:hover{background:linear-gradient(to right,#f0f7ff,#f9fafb)}
+/* Sidebar */
+.sidebar{background:#fafafa}
+.sidebar__l1-toggle:hover{background:linear-gradient(to right,#eff6ff,#f9fafb)}
+/* Toast polish */
+.toast{border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,.1)}
+/* Add category modal input */
+.add-modal-input{width:100%;padding:8px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:13px;outline:none;font-family:inherit;color:#111827;transition:border-color .15s,box-shadow .15s}
+.add-modal-input:focus{border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.08)}
+.add-modal-label{font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:6px}
+.add-modal-hint{font-size:11px;color:#9ca3af;margin-top:4px}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+
+const { useState, useRef, useEffect, useLayoutEffect, useCallback } = React;
+
+/* ── Data ── */
+
+const GLOBAL_PROMPT =
+`You are an intelligent document classification assistant for an insurance company.
+
+Your task is to analyse incoming documents and classify them accurately.
+
+{{CLASSIFICATION_HIERARCHY}}
+
+For every document:
+1. Identify the primary document type based on content, structure, keywords, and layout
+2. Return a JSON response with:
+   - "classification": the exact document type name
+   - "confidence": a score from 0 to 100
+   - "reasoning": 1–2 concise sentences explaining the decision
+
+Rules:
+- Only classify into the types defined in the hierarchy above
+- If a document spans multiple types, choose the primary intent
+- Poor scan quality or handwriting should reduce confidence by 10–15 points
+- If confidence is below 60, flag for manual review`;
+
+const INIT_LOBS = [
+  {
+    id:'motor', name:'Motor',
+    classLv1Version:'V.3', classLv2Version:'V.2',
+    status:'Deployed', confidence:95, trainedBy:'Arlene Wilson',
+    lobPrompt:
+`You are classifying Motor Insurance documents.
+
+This LOB covers vehicle insurance: claims, policies, quotations, registrations, and legal documentation.
+
+{{CLASSIFICATION_HIERARCHY}}
+
+Key identifiers:
+- Vehicle registration numbers, chassis/VIN numbers
+- Policy numbers starting with "MOT-" or "MTR-"
+- Garage/repairer letterheads and approval numbers
+- FNOL reference numbers (CLM-, FNOL-)
+- Traffic police report numbers and crime reference numbers`,
+    versions:[
+      {v:'V.3',date:'2025-02-18',status:'Active',  score:'95%',note:'Improved FNOL and repair invoice accuracy. Reduced false positives on estimate vs invoice.',createdBy:'Arlene Wilson'},
+      {v:'V.2',date:'2025-01-05',status:'Archived',score:'91%',note:'Added underwriting inspection classifier. Expanded complaint sub-types.',createdBy:'Jennie Cooper'},
+      {v:'V.1',date:'2024-11-20',status:'Archived',score:'87%',note:'Initial Motor LOB release.',createdBy:'Arlene Wilson'},
+    ],
+    categories:[
+      {id:'complaint',name:'Complaint',activeVersion:'V.3',status:'Failed',confidence:81.2,trainedBy:'Evan Flores',
+        prompt:
+`Classify complaint documents for Motor Insurance.
+
+Look for:
+- Customer dissatisfaction language ("I am writing to complain", "unacceptable")
+- Reference to policy numbers and/or claim numbers
+- Escalation language (ombudsman, FCA, regulatory bodies)
+- Board-level vs standard complaints
+
+Types: Simple Complaint, Massive Complaint, Board Complaint, No Complaint`,
+        types:[
+          {id:'simple-complaint',name:'Simple Complaint',tags:['M'],prompt:'A single customer complaint resolvable at first contact. Standard complaint language, no escalation threats or legal references. Usually 1 page, single issue.'},
+          {id:'massive-complaint',name:'Massive Complaint',tags:[],prompt:'Multi-issue or group complaint. Indicators: multiple policy references, group signatures, CC to regulatory bodies, or more than 3 distinct grievances in a single document.'},
+          {id:'board-complaint',name:'Board Complaint',tags:[],prompt:'Formal complaint addressed to or escalated to board level. Look for: "Chief Executive", "Board of Directors", prior unresolved complaint history, FCA/regulatory body references.'},
+          {id:'no-complaint',name:'No Complaint',tags:[],prompt:'Document that appears as a complaint but is actually a general inquiry, service feedback, or compliment. No resolution demand or compensation claim present.'},
+        ]},
+      {id:'quotation',name:'Quotation',activeVersion:'V.1',status:'Deployed',confidence:95,trainedBy:'Arlene Wilson',
+        prompt:
+`Classify Motor Insurance quotation documents.
+
+Key identifiers:
+- Quote reference numbers (QT-, QUOT-)
+- Vehicle details: make, model, year, registration
+- Premium calculations and coverage breakdown
+- Validity period (usually 30–60 days)
+- No policy number yet — pre-binding stage`,
+        types:[
+          {id:'new-vehicle-quote',name:'New Vehicle Quote',tags:[],prompt:'Quote for a brand-new or first-time insured vehicle. Indicators: no prior claim history, new registration mark, dealership letterhead or manufacturer references.'},
+          {id:'renewal-quote',name:'Renewal Quote',tags:[],prompt:'Quote for renewing an existing policy. Must have: existing policy number, renewal effective date, prior year premium for comparison, no-claims discount history.'},
+          {id:'amendment-quote',name:'Amendment Quote',tags:[],prompt:'Mid-term quote for changes to an existing policy (add driver, change vehicle, update address). Contains original policy number plus "amendment" or "endorsement" language.'},
+          {id:'fleet-quote',name:'Fleet Quote',tags:['M'],prompt:'Quote covering 3 or more vehicles. Look for: fleet ID number, list of vehicles/registrations, aggregate premium, fleet discount applied.'},
+          {id:'temp-cover',name:'Temporary Cover',tags:[],prompt:'Short-term cover note (1–30 days). Indicators: specific short-duration start/end dates, cover note number, "temporary" or "short-term" language.'},
+        ]},
+      {id:'policy-app',name:'Policy Application',activeVersion:'V.1',status:'Deployed',confidence:92.1,trainedBy:'Jennie Cooper',
+        prompt:
+`Policy application and proposal forms for Motor Insurance.
+
+Key identifiers:
+- Applicant personal details (full name, DOB, address, driving licence number)
+- Vehicle details and declared usage
+- Driver history declarations (previous claims, convictions)
+- Signature and date fields
+- "Proposal form" or "Application form" header
+- No policy number yet — pre-issuance stage`,
+        types:[
+          {id:'new-app',name:'New Application',tags:[],prompt:'First-time application for a new policy. No existing policy number. Contains all personal, vehicle, and driving history declaration fields.'},
+          {id:'reinstate',name:'Reinstatement',tags:[],prompt:'Application to reinstate a lapsed or cancelled policy. References a prior policy number. Contains arrears payment or lapse reason declaration.'},
+          {id:'transfer',name:'Transfer',tags:[],prompt:'Application to transfer an existing policy to a new vehicle or new policyholder. References original policy number and reason for transfer.'},
+          {id:'joint-app',name:'Joint Application',tags:['M'],prompt:'Application with two or more named applicants (e.g. couple or business partners). Multiple signature fields and declarations for each applicant.'},
+        ]},
+      {id:'vehicle-reg',name:'Vehicle Registration',activeVersion:'V.1',status:'Failed',confidence:90.4,trainedBy:'Philip Steward',
+        prompt:
+`Vehicle registration and ownership documents.
+
+Key identifiers:
+- Official DVLA / government agency header
+- Vehicle Identification Number (VIN / chassis number)
+- Registered keeper name and address
+- Registration mark (number plate)
+- Engine capacity, fuel type, first registration date`,
+        types:[
+          {id:'new-reg',name:'New Registration',tags:[],prompt:'New vehicle registration document (V5C). First registration date is recent. Dealer or manufacturer as previous keeper. New registration mark.'},
+          {id:'trans-own',name:'Transfer of Ownership',tags:[],prompt:'V5C or equivalent showing change of registered keeper. Previous and new keeper details both present. Date of transfer recorded.'},
+        ]},
+      {id:'underwriting',name:'Underwriting Inspection',activeVersion:'V.3',status:'Deployed',confidence:86.4,trainedBy:'John Doe',
+        prompt:
+`Vehicle inspection reports produced for underwriting purposes.
+
+Key identifiers:
+- Inspector name and accreditation number
+- Vehicle photos or photo reference numbers
+- Condition ratings (Excellent / Good / Fair / Poor)
+- Modifications or damage noted
+- Inspection date and location
+- Surveyor stamp or authorised signature`,
+        types:[
+          {id:'std-insp',name:'Standard Inspection',tags:[],prompt:'Standard pre-insurance or post-accident vehicle condition inspection. Single vehicle. Structured condition ratings per section (bodywork, interior, mechanical). Inspector credentials present.'},
+          {id:'fleet-insp',name:'Fleet Inspection',tags:['M'],prompt:'Bulk inspection report covering multiple vehicles in a single document. Fleet registration list, aggregated condition summary, fleet risk rating.'},
+        ]},
+      {id:'policy-sched',name:'Policy Schedule',activeVersion:'V.2',status:'Deployed',confidence:95,trainedBy:'Jane Doe',
+        prompt:
+`Motor Insurance policy schedule documents (the policy certificate).
+
+Key identifiers:
+- Policy number (MOT-XXXX or MTR-XXXX format)
+- Insured name and address
+- Period of insurance: start and end dates
+- Vehicle details and cover level (Comprehensive / TPF&T / TP Only)
+- Premium paid and excess amounts
+- Named drivers list
+- Insurer authorised signature and stamp`,
+        types:[
+          {id:'annual',name:'Annual Schedule',tags:[],prompt:'Standard 12-month policy schedule. Start and end dates exactly 12 months apart. Single annual premium amount. No mid-term changes noted.'},
+          {id:'midterm',name:'Mid-term Schedule',tags:[],prompt:'Policy schedule issued mid-policy following an amendment (e.g. add driver, change vehicle). References original policy number and shows effective change date.'},
+          {id:'cancel',name:'Cancellation',tags:[],prompt:'Policy cancellation notice or confirmation. Contains: effective cancellation date, reason for cancellation, pro-rata refund calculation (if applicable), return premium amount.'},
+          {id:'endorse',name:'Endorsement',tags:[],prompt:'Policy endorsement document adding or amending specific terms. References parent policy number. Clearly states the endorsed change (e.g. "Young Driver", "Business Use", "Named Driver Only").'},
+          {id:'cert',name:'Certificate of Insurance',tags:[],prompt:'Statutory insurance certificate (required for road use). Compact document: policy number, insured name, vehicle registration, period, class of use. Usually separate from full schedule.'},
+        ]},
+      {id:'claim-notif',name:'Claim Notification',activeVersion:'V.2',status:'Deployed',confidence:93,trainedBy:'Jorge Black',
+        prompt:
+`First notice of loss and claim notification documents.
+
+Key identifiers:
+- Claim reference number (CLM-, FNOL-)
+- Date and time of incident
+- Description of loss / damage
+- Third party details if applicable
+- Witness information
+- Vehicle damage description
+- "I wish to make a claim" or equivalent language`,
+        types:[
+          {id:'fnol',name:'FNOL',tags:[],prompt:'First Notice of Loss. Must contain: incident date and time, policyholder details, vehicle involved, brief incident description. May be handwritten or a structured form.'},
+          {id:'claim-update',name:'Claim Update',tags:[],prompt:'Subsequent correspondence on an existing claim. References existing claim number. Contains status update, additional evidence, or revised repair estimate.'},
+          {id:'claim-settlement',name:'Settlement Letter',tags:[],prompt:'Final settlement document for a closed claim. States agreed settlement amount, deductions (excess, depreciation), payment method, and claimant acceptance signature.'},
+        ]},
+      {id:'accident-ev',name:'Accident Evidence',activeVersion:'V.1',status:'Failed',confidence:87.5,trainedBy:'Mariya Baesldina',
+        prompt:
+`Evidence documents submitted with Motor claims.
+
+Covers: police reports, photographs, witness statements, dashcam references, medical reports for personal injury claims.`,
+        types:[
+          {id:'police-rep',name:'Police Report',tags:[],prompt:'Official police accident or incident report. Look for: police station header, officer badge/shoulder number, incident CAD reference, official stamp, date and time logged.'},
+          {id:'ev-photos',name:'Photos',tags:['M'],prompt:'Photographic evidence submission. Printed photos with timestamps, or a photo submission form referencing image files. Vehicle damage visible, scene context, multiple angles.'},
+          {id:'witness-stmt',name:'Witness Statement',tags:[],prompt:'Written statement from a third-party witness. Contains: witness name, contact details, declaration of truth ("I confirm the above is true"), dated signature.'},
+          {id:'medical-rep',name:'Medical Report',tags:[],prompt:'Medical evidence for personal injury element of a claim. Includes: doctor or hospital letterhead, injury description, treatment received, prognosis, and reference to road traffic incident.'},
+        ]},
+      {id:'repair-garage',name:'Repair & Garage',activeVersion:'V.2',status:'Deployed',confidence:92,trainedBy:'Clark Rai',
+        prompt:
+`Repair and garage documents for Motor claims.
+
+Key identifiers:
+- Garage/workshop name and approved repairer number
+- Vehicle registration and VIN
+- Labour hours breakdown and parts list
+- VAT registration number
+- Repair authorisation number from insurer`,
+        types:[
+          {id:'repair-inv',name:'Repair Invoice',tags:[],prompt:'Final invoice from approved garage. Contains: completed work description, parts replaced with OEM/aftermarket designation, total cost, VAT breakdown, payment terms. Repair is complete.'},
+          {id:'estimate',name:'Estimate',tags:[],prompt:'Pre-repair cost estimate. Not yet authorised. Contains: proposed parts, labour estimate hours, "subject to inspection" or "estimate only" language. No repair completion date.'},
+          {id:'garage-cert',name:'Approved Garage Certificate',tags:[],prompt:'Certificate confirming a garage is an approved repairer on the insurer\'s network. Contains: garage trading name, approval number, validity period, insurer logo.'},
+          {id:'parts-rec',name:'Parts Receipt',tags:[],prompt:'Receipt for parts purchased separately from main repair. Contains: parts supplier name, part numbers, prices. Usually accompanies a repair invoice as supplementary evidence.'},
+        ]},
+    ]
+  },
+  {
+    id:'property', name:'Property',
+    classLv1Version:'V.3', classLv2Version:'V.2',
+    status:'Failed', confidence:81.2, trainedBy:'Evan Flores',
+    lobPrompt:
+`You are classifying Property Insurance documents.
+
+This LOB covers residential and commercial property insurance including claims, surveys, contractor invoices, and policy documents.
+
+{{CLASSIFICATION_HIERARCHY}}
+
+Key identifiers:
+- Property address (street, city, postcode)
+- Policy numbers starting with "PROP-" or "HME-"
+- Loss adjuster reference numbers
+- Building or contents claim references
+- Surveyor / assessor RICS credentials`,
+    versions:[
+      {v:'V.3',date:'2025-02-01',status:'Active',  score:'81%',note:'Retraining for water damage sub-type accuracy. Storm damage added as new type.',createdBy:'Evan Flores'},
+      {v:'V.2',date:'2024-12-10',status:'Archived',score:'78%',note:'Added contractor invoice classifier. Improved survey report detection.',createdBy:'Evan Flores'},
+      {v:'V.1',date:'2024-09-15',status:'Archived',score:'74%',note:'Initial Property LOB release.',createdBy:'Philip Steward'},
+    ],
+    categories:[
+      {id:'prop-claim',name:'Property Claim',activeVersion:'V.2',status:'Failed',confidence:78,trainedBy:'Evan Flores',
+        prompt:
+`Property damage claim documents.
+
+Look for:
+- Type of damage (fire, water, storm, theft, subsidence)
+- Property address affected
+- Loss adjuster appointment references
+- Damage assessment reports
+- Emergency repair authorisation`,
+        types:[
+          {id:'fire-dmg',name:'Fire Damage',tags:[],prompt:'Fire and smoke damage claim. Indicators: fire brigade reference number, fire investigation report, smoke damage assessment, total loss / partial loss determination, soot and structural damage description.'},
+          {id:'water-dmg',name:'Water Damage',tags:[],prompt:'Water ingress, flood, or burst pipe claim. Look for: plumber report, damp meter readings, restoration company invoice, dehumidification equipment references, drying timeline.'},
+          {id:'theft',name:'Theft',tags:['M'],prompt:'Theft and burglary claim. Must have: police crime reference number, itemised list of stolen goods with approximate values, evidence of forced entry, inventory or proof of ownership.'},
+          {id:'storm-dmg',name:'Storm Damage',tags:[],prompt:'Storm, wind, or hail damage claim. Look for: Met Office weather report reference, roofing contractor estimate, aerial/satellite dish damage, fallen tree or structural damage from wind.'},
+          {id:'subsidence',name:'Subsidence',tags:[],prompt:'Ground movement and subsidence claim. Indicators: structural engineer report, soil survey results, crack mapping photographs, NHBC warranty references, drainage investigation.'},
+        ]},
+      {id:'prop-survey',name:'Survey Report',activeVersion:'V.3',status:'Deployed',confidence:88,trainedBy:'Evan Flores',
+        prompt:
+`Property survey and valuation reports for underwriting.
+
+Key identifiers:
+- RICS (Royal Institution of Chartered Surveyors) accreditation number
+- Property address and full description
+- Sum insured recommendations
+- Risk features noted (flat roof, subsidence history, listed building status, flood zone)`,
+        types:[
+          {id:'rics-survey',name:'RICS Valuation',tags:[],prompt:'Full RICS-accredited rebuild cost valuation. Contains: surveyor RICS number, rebuild cost figure, methodology, property description, date of inspection.'},
+          {id:'drone-survey',name:'Drone Survey Report',tags:[],prompt:'Aerial inspection report using drone/UAV. Contains: drone operator certification, aerial images, roof condition assessment, inaccessible area findings.'},
+          {id:'rebuild-val',name:'Rebuild Valuation',tags:[],prompt:'Standalone rebuild cost calculation document. May be produced by BCIS or similar service. Contains: total rebuild cost, regional adjustment factor, professional fees estimate.'},
+        ]},
+      {id:'prop-invoice',name:'Contractor Invoice',activeVersion:'V.2',status:'Failed',confidence:77.6,trainedBy:'Evan Flores',
+        prompt:
+`Contractor and repair invoices for Property claims.
+
+Key identifiers:
+- Contractor VAT registration and company number
+- Works completed description
+- Insurer authorisation reference
+- Materials and labour cost breakdown
+- Completion certificate or sign-off`,
+        types:[
+          {id:'builder-inv',name:'Builder Invoice',tags:[],prompt:'General building and construction invoice. Contains: schedule of works completed, materials list, day-rate or fixed-price labour, site address, builder\'s company registration number.'},
+          {id:'electrician-inv',name:'Electrician Invoice',tags:[],prompt:'Electrical repair or rewiring invoice. Contains: NICEIC or NAPIT registration number, circuit description, Part P certification, test certificate reference.'},
+          {id:'plumber-inv',name:'Plumber Invoice',tags:[],prompt:'Plumbing repair invoice. Contains: Gas Safe registration (if gas work), work description (e.g. pipe repair, re-routing), material costs, call-out charge.'},
+          {id:'restoration-inv',name:'Restoration Invoice',tags:[],prompt:'Specialist restoration and drying invoice. Contains: equipment hire (dehumidifiers, air movers), monitoring visit log, drying completion certificate, restoration company accreditation.'},
+        ]},
+      {id:'prop-policy',name:'Property Policy',activeVersion:'V.1',status:'Deployed',confidence:90,trainedBy:'Jane Doe',
+        prompt:
+`Property insurance policy documents.
+
+Key identifiers:
+- Policy number (PROP- or HME- prefix)
+- Property address as the insured location
+- Buildings sum insured and/or contents sum insured
+- Policy excess amounts
+- Listed perils or All Risks coverage statement
+- Renewal date`,
+        types:[
+          {id:'buildings-pol',name:'Buildings Policy',tags:[],prompt:'Buildings-only property insurance policy. Sum insured relates to rebuild cost. Covers structure, fixtures, and fittings. Contents sum insured is absent or zero.'},
+          {id:'contents-pol',name:'Contents Policy',tags:[],prompt:'Contents-only insurance policy. Sum insured relates to personal possessions, furniture, and valuables. No buildings sum insured. May include high-value items schedule.'},
+          {id:'combined-pol',name:'Combined Buildings & Contents',tags:[],prompt:'Combined policy covering both buildings and contents in a single document. Two separate sum insured figures present. Usually single policy number.'},
+          {id:'landlord-pol',name:'Landlord Policy',tags:[],prompt:'Property policy for a rented-out premises. Key indicators: "landlord" or "let property" language, loss of rent cover, tenant liability references, rental income protection.'},
+        ]},
+    ]
+  },
+  {
+    id:'health', name:'Health',
+    classLv1Version:'V.2', classLv2Version:'V.1',
+    status:'Deployed', confidence:89, trainedBy:'Jennie Cooper',
+    lobPrompt:
+`You are classifying Health Insurance documents.
+
+This LOB covers private medical insurance, dental, optical, and critical illness claims and policies.
+
+{{CLASSIFICATION_HIERARCHY}}
+
+Key identifiers:
+- Patient name and date of birth
+- GP or consultant referral letters
+- Hospital / clinic letterheads
+- ICD-10 diagnosis codes
+- Pre-authorisation reference numbers (PA-)
+- Policy numbers starting with "HLT-" or "PMI-"`,
+    versions:[
+      {v:'V.2',date:'2025-01-20',status:'Active',  score:'89%',note:'Improved pre-auth vs in-progress claim distinction. Added physiotherapy sub-type.',createdBy:'Jennie Cooper'},
+      {v:'V.1',date:'2024-10-01',status:'Archived',score:'83%',note:'Initial Health LOB release.',createdBy:'Jennie Cooper'},
+    ],
+    categories:[
+      {id:'health-claim',name:'Medical Claim',activeVersion:'V.2',status:'Deployed',confidence:91,trainedBy:'Jennie Cooper',
+        prompt:
+`Medical treatment claim documents.
+
+Look for:
+- Treatment date(s) and provider details
+- ICD-10 or CPT procedure codes
+- Invoice or receipt from hospital or clinic
+- Pre-authorisation reference (if applicable)
+- Patient policy number
+- Diagnosis and treatment description`,
+        types:[
+          {id:'inpatient-claim',name:'Inpatient Claim',tags:[],prompt:'Overnight hospital stay claim. Must show: admission and discharge dates, ward/room details, surgeon and anaesthetist fees, hospital accommodation charges, discharge summary.'},
+          {id:'outpatient-claim',name:'Outpatient Claim',tags:[],prompt:'Day case or outpatient consultation claim. No overnight stay. Contains: consultation fee, diagnostic test fees, prescription costs. Single visit date.'},
+          {id:'dental-claim',name:'Dental Claim',tags:[],prompt:'Dental treatment claim. Contains: GDC (General Dental Council) registration number, tooth reference numbers (FDI or Palmer notation), procedure codes, dental practice letterhead.'},
+          {id:'optical-claim',name:'Optical Claim',tags:[],prompt:'Optical / vision care claim. Contains: optometrist name and GOC registration, prescription values (sphere, cylinder, axis), frame and lens costs, sight test fee.'},
+          {id:'physio-claim',name:'Physiotherapy Claim',tags:[],prompt:'Physiotherapy treatment claim. Contains: physiotherapist HCPC registration number, session count and dates, treatment description (e.g. shoulder mobilisation), discharge note or ongoing plan.'},
+        ]},
+      {id:'health-preauth',name:'Pre-Authorisation',activeVersion:'V.1',status:'Deployed',confidence:88,trainedBy:'Jennie Cooper',
+        prompt:
+`Pre-authorisation request documents for planned medical treatment.
+
+Key identifiers:
+- "Prior Authorisation" or "Pre-auth" language
+- Consultant referral letter from GP
+- Proposed treatment plan (not yet performed)
+- ICD-10 diagnosis code
+- No invoice amount yet — treatment not yet performed`,
+        types:[
+          {id:'preauth-request',name:'Pre-auth Request',tags:[],prompt:'Initial pre-authorisation request. Contains: consultant name and specialty, proposed procedure, ICD-10 code, expected cost estimate, hospital to be used. PA reference not yet assigned.'},
+          {id:'preauth-approval',name:'Pre-auth Approval',tags:[],prompt:'Insurer-issued pre-authorisation approval. Contains: PA reference number, approved procedure, approved facility, monetary limit approved, validity period for the approval.'},
+          {id:'referral-letter',name:'GP Referral Letter',tags:[],prompt:'GP referral letter to a specialist or hospital. Contains: GP letterhead and GMC number, patient name and DOB, reason for referral, relevant medical history, referral destination.'},
+        ]},
+      {id:'health-policy',name:'Health Policy',activeVersion:'V.1',status:'Deployed',confidence:92,trainedBy:'Philip Steward',
+        prompt:
+`Health insurance policy documents.
+
+Key identifiers:
+- Policy number (HLT- or PMI- prefix)
+- Member names and listed dependants
+- Benefit schedule (inpatient limit, outpatient limit, dental/optical add-ons)
+- Exclusions list
+- Approved hospital network or provider list`,
+        types:[
+          {id:'individual-health',name:'Individual Plan',tags:[],prompt:'Single-member health policy. One insured name. No dependant schedule. Premium based on single-person rate.'},
+          {id:'family-health',name:'Family Plan',tags:[],prompt:'Family health policy covering policyholder plus dependants. Named dependants listed with ages. Family premium or composite rate applied.'},
+          {id:'group-health',name:'Group / Corporate Plan',tags:['M'],prompt:'Employer-sponsored group health policy. Company name as policyholder. Member schedule listing employees. Premium per head or aggregate. HR/benefits manager named as contact.'},
+        ]},
+      {id:'health-critical',name:'Critical Illness',activeVersion:'V.1',status:'Draft',confidence:74,trainedBy:'',
+        prompt:
+`Critical illness claim and policy documents.
+
+Look for:
+- Listed critical conditions (cancer, heart attack, stroke, major organ failure)
+- Medical diagnosis confirmation from specialist
+- Lump-sum payment request
+- Survival period declaration (usually 14–30 days post-diagnosis)
+- Policy number starting with "CI-"`,
+        types:[
+          {id:'ci-claim',name:'CI Claim',tags:[],prompt:'Critical illness claim submission. Contains: specialist diagnosis letter, ICD-10 code for covered condition, survival period confirmation, claim form signed by claimant.'},
+          {id:'ci-policy',name:'CI Policy',tags:[],prompt:'Critical illness policy schedule. Contains: CI- policy number, covered conditions list, sum assured (lump sum), exclusions, waiting period clause.'},
+        ]},
+    ]
+  },
+  {
+    id:'marine', name:'Marine',
+    classLv1Version:'V.2', classLv2Version:'V.1',
+    status:'Deployed', confidence:88, trainedBy:'Jorge Black',
+    lobPrompt:
+`You are classifying Marine Insurance documents.
+
+This LOB covers cargo, hull, and marine liability insurance for shipping and freight operations.
+
+{{CLASSIFICATION_HIERARCHY}}
+
+Key identifiers:
+- Bill of Lading number (B/L) or Airway Bill (AWB)
+- Vessel name and IMO number
+- Port of loading and port of discharge
+- Commodity description and HS tariff code
+- Classification society references (Lloyd's Register, Bureau Veritas, DNV)
+- Policy numbers starting with "MAR-" or "CARGO-"`,
+    versions:[
+      {v:'V.2',date:'2025-02-10',status:'Active',  score:'88%',note:'Added pollution liability sub-type. Improved cargo vs hull distinction.',createdBy:'Jorge Black'},
+      {v:'V.1',date:'2025-01-10',status:'Archived',score:'82%',note:'Initial Marine LOB release.',createdBy:'Jorge Black'},
+    ],
+    categories:[
+      {id:'cargo',name:'Cargo',activeVersion:'V.2',status:'Deployed',confidence:90,trainedBy:'Jorge Black',
+        prompt:
+`Cargo insurance documents.
+
+Key identifiers:
+- Bill of Lading or Airway Bill number
+- Commodity type and packing details
+- Voyage route (port-to-port)
+- Packing list and commercial invoice references
+- Institute Cargo Clauses (A, B, or C) reference`,
+        types:[
+          {id:'cargo-claim',name:'Cargo Claim',tags:[],prompt:'Cargo damage or loss claim. Contains: B/L number, surveyor\'s damage report, shortage certificate, commercial invoice value, packing list, outturn report from receiver.'},
+          {id:'cargo-cert',name:'Cargo Certificate',tags:[],prompt:'Open cover cargo insurance certificate for a specific shipment. Contains: CARGO- policy number, commodity, value, vessel name, voyage, Institute Cargo Clauses reference.'},
+          {id:'survey-report',name:'Marine Survey Report',tags:[],prompt:'Independent marine surveyor\'s report. Contains: surveyor\'s IIMS accreditation, vessel or cargo details, condition assessment, cause of loss determination, recommended action.'},
+        ]},
+      {id:'hull',name:'Hull & Machinery',activeVersion:'V.1',status:'Deployed',confidence:85,trainedBy:'Jorge Black',
+        prompt:
+`Hull and machinery insurance documents for vessel owners.
+
+Key identifiers:
+- IMO number and vessel classification society
+- Classification certificate references
+- Dry dock inspection reports
+- Machinery damage assessment from marine engineer`,
+        types:[
+          {id:'hull-policy',name:'Hull Policy',tags:[],prompt:'Hull and machinery insurance policy. Contains: vessel name and IMO number, agreed value or market value, classification society, Institute Time Clauses — Hulls reference, coverage period.'},
+          {id:'hull-claim',name:'Hull Claim',tags:[],prompt:'Hull damage or total loss claim. Contains: incident description (collision, grounding, fire), damage survey report, repair yard estimate, class notation implications.'},
+        ]},
+      {id:'marine-liability',name:'Marine Liability',activeVersion:'V.1',status:'Draft',confidence:79,trainedBy:'',
+        prompt:
+`Marine liability insurance documents covering P&I, pollution, and third-party claims.
+
+Look for:
+- P&I Club (Protection & Indemnity) references
+- Third-party bodily injury or property damage
+- Pollution incident reports and clean-up cost estimates
+- Crew injury or death claims`,
+        types:[
+          {id:'pi-club',name:'P&I Club Notice',tags:[],prompt:'Protection and Indemnity club correspondence. Contains: club name (e.g. Britannia, West of England), call reference, vessel name, incident description, club instructions.'},
+          {id:'pollution-claim',name:'Pollution Claim',tags:[],prompt:'Marine pollution incident claim. Contains: type of pollutant (bunkers, cargo), quantity spilled, clean-up authority (coast guard, port authority), MARPOL reference.'},
+        ]},
+    ]
+  },
+  {
+    id:'cafes', name:'Cafes',
+    classLv1Version:'V.2', classLv2Version:'V.1',
+    status:'Deployed', confidence:92.1, trainedBy:'Jennie Cooper',
+    lobPrompt:
+`You are classifying documents for the Cafes & Food Service business line.
+
+This covers small food business insurance: public liability, employers liability, stock, equipment, and premises.
+
+{{CLASSIFICATION_HIERARCHY}}
+
+Key identifiers:
+- Food business registration number (local authority)
+- Environmental Health Officer (EHO) inspection references
+- Food hygiene rating certificate
+- Public liability policy references (PLI-)
+- Food Safety and Hygiene (England) Regulations 2013 compliance references`,
+    versions:[
+      {v:'V.2',date:'2025-02-20',status:'Active',  score:'92%',note:'Added food hygiene and compliance document types. Improved liability sub-type accuracy.',createdBy:'Jennie Cooper'},
+      {v:'V.1',date:'2025-01-08',status:'Archived',score:'87%',note:'Initial Cafes LOB release.',createdBy:'Clark Rai'},
+    ],
+    categories:[
+      {id:'cafe-liability',name:'Liability',activeVersion:'V.1',status:'Deployed',confidence:93,trainedBy:'Clark Rai',
+        prompt:
+`Liability claims for cafe and food service businesses.
+
+Look for:
+- Customer injury incidents (slips, trips, food poisoning, allergic reaction)
+- Third-party property damage (e.g. customer belongings)
+- Employers liability (staff injury at work)
+- Product liability (food product causing harm)`,
+        types:[
+          {id:'public-liab',name:'Public Liability Claim',tags:[],prompt:'Customer or third-party injury claim against the cafe. Contains: incident description, injured person details, date and location of incident, witness names, medical attention sought.'},
+          {id:'employers-liab',name:'Employers Liability Claim',tags:[],prompt:'Staff injury claim. Contains: employee name and job role, incident date and description, RIDDOR reference (if applicable), medical report, lost earnings calculation.'},
+          {id:'product-liab',name:'Product Liability Claim',tags:[],prompt:'Claim arising from a food product causing illness or injury. Contains: product description, lot/batch number, date consumed, medical evidence of harm, allergen declaration references.'},
+        ]},
+      {id:'cafe-property',name:'Premises & Equipment',activeVersion:'V.1',status:'Deployed',confidence:91,trainedBy:'Clark Rai',
+        prompt:
+`Property and equipment claims for cafe businesses.
+
+Covers commercial kitchen equipment, fixtures, furniture, and premises damage.`,
+        types:[
+          {id:'equipment-claim',name:'Equipment Breakdown',tags:[],prompt:'Commercial kitchen equipment failure claim. Contains: equipment make/model/serial number, failure description, engineer\'s diagnostic report, repair or replacement cost.'},
+          {id:'contents-claim',name:'Contents Claim',tags:[],prompt:'Cafe contents and stock claim (theft, fire, flood). Contains: itemised contents list with purchase values, evidence of loss, police report reference (if theft).'},
+          {id:'premises-damage',name:'Premises Damage',tags:[],prompt:'Physical damage to the cafe premises. Contains: damage description, contractor estimate, landlord notification (if leasehold), business interruption period.'},
+        ]},
+      {id:'cafe-compliance',name:'Compliance Documents',activeVersion:'V.1',status:'Deployed',confidence:94,trainedBy:'Jennie Cooper',
+        prompt:
+`Compliance and regulatory documents for food service businesses.
+
+Covers EHO inspections, food hygiene certificates, allergen declarations, and fire safety certificates.`,
+        types:[
+          {id:'eho-report',name:'EHO Inspection Report',tags:[],prompt:'Environmental Health Officer inspection report. Contains: local authority header, food hygiene rating (1–5), improvement notices, critical/major/minor non-conformances.'},
+          {id:'food-hygiene',name:'Food Hygiene Certificate',tags:[],prompt:'Individual food hygiene training certificate. Contains: trainee name, RSPH/CIEH awarding body, qualification level (Level 2 or 3), date of award, certificate number.'},
+          {id:'fire-safety',name:'Fire Safety Certificate',tags:[],prompt:'Premises fire safety assessment. Contains: responsible person named, fire risk assessment date, fire detection equipment listed, means of escape confirmed.'},
+          {id:'allergen-decl',name:'Allergen Declaration',tags:[],prompt:'Allergen information document for food products. Contains: the 14 major allergens (EU Regulation 1169/2011), "may contain" cross-contamination notices, product name.'},
+        ]},
+      {id:'cafe-license',name:'Licensing',activeVersion:'V.1',status:'Deployed',confidence:94,trainedBy:'Jennie Cooper',
+        prompt:
+`Licensing documents for food and drink service premises.
+
+Key identifiers:
+- Premises licence number (issued by local authority)
+- Designated Premises Supervisor (DPS) name
+- Licensable activities listed
+- Trading hours
+- Licensing Act 2003 references`,
+        types:[
+          {id:'premises-licence',name:'Premises Licence',tags:[],prompt:''},
+          {id:'food-reg',name:'Food Business Registration',tags:[],prompt:''},
+        ]},
+    ]
+  },
+  {
+    id:'media', name:'Media & Entertainment',
+    classLv1Version:'V.2', classLv2Version:'V.1',
+    status:'Failed', confidence:83.4, trainedBy:'Philip Steward',
+    lobPrompt:
+`You are classifying Media and Entertainment industry documents.
+
+This LOB covers production insurance, errors & omissions, intellectual property, and rights licensing.
+
+{{CLASSIFICATION_HIERARCHY}}
+
+Key identifiers:
+- Production company name and registered number
+- Production title and production code
+- Rights clearance references (MCPS, PRS, MPAA)
+- Completion bond references
+- Distribution agreement references`,
+    versions:[
+      {v:'V.2',date:'2025-01-15',status:'Active',  score:'83%',note:'Added errors & omissions sub-types.',createdBy:'Philip Steward'},
+      {v:'V.1',date:'2024-10-20',status:'Archived',score:'77%',note:'Initial Media LOB release.',createdBy:'Philip Steward'},
+    ],
+    categories:[
+      {id:'media-prod',name:'Production Insurance',activeVersion:'V.2',status:'Failed',confidence:82,trainedBy:'Philip Steward',
+        prompt:
+`Production insurance documents covering film, TV, and media production risks.
+
+Look for: production title, shooting schedule, cast/crew list, production budget, completion guarantee, equipment schedule.`,
+        types:[
+          {id:'prod-policy',name:'Production Policy',tags:[],prompt:''},
+          {id:'prod-claim',name:'Production Claim',tags:[],prompt:''},
+          {id:'cast-insurance',name:'Cast Insurance',tags:[],prompt:''},
+          {id:'equip-claim',name:'Equipment Claim',tags:[],prompt:''},
+        ]},
+      {id:'media-eo',name:'Errors & Omissions',activeVersion:'V.1',status:'Failed',confidence:79,trainedBy:'Philip Steward',
+        prompt:
+`Errors and Omissions (E&O) documents for media companies.
+
+Look for: copyright clearance certificates, rights chain documentation, E&O policy number, distribution deal references.`,
+        types:[
+          {id:'eo-policy',name:'E&O Policy',tags:[],prompt:''},
+          {id:'eo-claim',name:'E&O Claim',tags:[],prompt:''},
+          {id:'rights-chain',name:'Rights Chain Document',tags:[],prompt:''},
+        ]},
+      {id:'media-lic',name:'Rights & Licensing',activeVersion:'V.1',status:'Deployed',confidence:91.8,trainedBy:'Philip Steward',
+        prompt:`Rights licensing and clearance documents. Look for: rights territory, duration of licence, exclusivity clause, royalty rate, MCPS/PRS licence reference.`,
+        types:[
+          {id:'music-lic',name:'Music Licence',tags:[],prompt:''},
+          {id:'sync-lic',name:'Sync Licence',tags:[],prompt:''},
+          {id:'distrib-agree',name:'Distribution Agreement',tags:[],prompt:''},
+        ]},
+    ]
+  },
+  {
+    id:'ins-ger', name:'Germany',
+    classLv1Version:'V.2', classLv2Version:'V.1',
+    status:'Deployed', confidence:92, trainedBy:'Clark Rai',
+    lobPrompt:
+`Sie sind ein Klassifizierungsassistent für deutsche Versicherungsdokumente.
+
+You are classifying insurance documents for the German market (primarily German-language documents).
+
+{{CLASSIFICATION_HIERARCHY}}
+
+Key identifiers:
+- Versicherungsscheinnummer (policy number)
+- Aktenzeichen (file/case reference number)
+- German insurer letterhead (Allianz, AXA, Zurich Deutschland, HUK-Coburg)
+- GDV (Gesamtverband der Deutschen Versicherungswirtschaft) format compliance
+- German regulatory references (BaFin, VVG — Versicherungsvertragsgesetz)`,
+    versions:[
+      {v:'V.2',date:'2025-02-05',status:'Active',  score:'92%',note:'Improved German OCR handling for umlauts and ß. Added BaFin escalation sub-type.',createdBy:'Clark Rai'},
+      {v:'V.1',date:'2024-12-01',status:'Archived',score:'87%',note:'Initial Germany LOB release.',createdBy:'Clark Rai'},
+    ],
+    categories:[
+      {id:'ger-schaden',name:'Schaden',activeVersion:'V.2',status:'Deployed',confidence:93,trainedBy:'Clark Rai',
+        prompt:
+`German damage and loss claim documents (Schadenmeldung).
+
+Key identifiers:
+- "Schadenmeldung" or "Schadenformular" header
+- Schadennummer (claim reference number)
+- Schadendatum (date of loss)
+- KFZ-Kennzeichen (vehicle registration for motor claims)`,
+        types:[
+          {id:'ger-kfz',name:'KFZ Schaden',tags:[],prompt:'German motor vehicle damage claim. Look for: KFZ-Kennzeichen, Fahrzeugschein (vehicle registration document) references, TÜV or DEKRA assessment, Werkstatt (garage) invoice.'},
+          {id:'ger-haft',name:'Haftpflicht',tags:['M'],prompt:'German liability claim (Haftpflichtschaden). Third-party damage or personal injury under liability coverage. Look for: Schadensersatzforderung (compensation demand), Haftpflichtversicherung references.'},
+          {id:'ger-gebaeude',name:'Gebäudeschaden',tags:[],prompt:'German building damage claim. Look for: property address, Gebäudeversicherung references, damage description in German (Wasserschaden, Brandschaden, Sturmschaden).'},
+        ]},
+      {id:'ger-beschwerde',name:'Beschwerde',activeVersion:'V.1',status:'Deployed',confidence:91,trainedBy:'Clark Rai',
+        prompt:
+`German customer complaint documents (Beschwerden).
+
+Look for: formal complaint language ("Ich möchte Beschwerde einlegen", "unzufrieden"), BaFin references, Ombudsmann mentions, prior correspondence references.`,
+        types:[
+          {id:'ger-beschwerde-std',name:'Standard Beschwerde',tags:[],prompt:'Standard written complaint to insurer. Contains: policyholder name, Versicherungsscheinnummer, specific grievance, desired resolution.'},
+          {id:'ger-bafin',name:'BaFin Eskalation',tags:[],prompt:'Complaint escalated to BaFin (Federal Financial Supervisory Authority). Contains: BaFin letterhead or reference, prior insurer complaint reference, regulatory escalation language.'},
+          {id:'ger-ombudsmann',name:'Ombudsmann',tags:[],prompt:'Complaint referred to the Versicherungsombudsmann. Contains: Ombudsmann reference number, previously unresolved complaint history, case summary.'},
+        ]},
+      {id:'ger-vertrag',name:'Vertragsänderung',activeVersion:'V.1',status:'Deployed',confidence:92.5,trainedBy:'Clark Rai',
+        prompt:
+`German policy change and amendment documents.
+
+Look for: "Nachtrag", "Änderung", "Vertragsänderung", original Versicherungsscheinnummer, new effective date (Änderungsdatum).`,
+        types:[
+          {id:'ger-nachtrag',name:'Nachtrag',tags:[],prompt:'German policy endorsement/addendum. Contains: Nachtrag number, reference to original Versicherungsschein, specific change described (Fahrzeugwechsel, Fahrerwechsel).'},
+          {id:'ger-kuendigung',name:'Kündigung',tags:[],prompt:'German policy cancellation notice. Contains: Kündigungsschreiben language, reason for cancellation, effective cancellation date, confirmation of receipt required.'},
+        ]},
+      {id:'ger-police',name:'Police (Versicherungsschein)',activeVersion:'V.1',status:'Deployed',confidence:91.5,trainedBy:'Clark Rai',
+        prompt:
+`German insurance policy documents (Versicherungspolice / Versicherungsschein).
+
+Key identifiers:
+- "Versicherungsschein" or "Police" header
+- Versicherungsscheinnummer
+- Versicherungsnehmer (policyholder name)
+- Versicherungsbeginn (policy start date)
+- Beitrag (premium amount)`,
+        types:[
+          {id:'ger-kfz-police',name:'KFZ Versicherungsschein',tags:[],prompt:'German motor vehicle policy document. Contains: KFZ-Kennzeichen, Fahrzeugidentifikationsnummer (VIN), Deckungsart (coverage type: Haftpflicht, Teilkasko, Vollkasko).'},
+          {id:'ger-haft-police',name:'Haftpflicht Versicherungsschein',tags:[],prompt:'German personal or commercial liability policy. Contains: insured activities description, Deckungssumme (coverage limit), deductible (Selbstbehalt).'},
+          {id:'ger-wohngebaeude',name:'Wohngebäude Police',tags:[],prompt:'German residential buildings insurance policy. Contains: property address, Versicherungswert (insured value), Elementarschadendeckung (natural hazards coverage), Wohnfläche (floor area).'},
+        ]},
+    ]
+  },
+];
+
+const DOC_NAMES = [
+  /* Motor */
+  'Motor_Claim_FNOL_CLM-00392.pdf','Policy_Schedule_MOT-8821-Annual.pdf','Repair_Invoice_AutoFix_Garage.pdf',
+  'Quotation_NewVehicle_Renault_2025.pdf','Police_Report_RTC_CAD-4421.pdf','Renewal_Quote_MOT-2291-2025.pdf',
+  'Complaint_Letter_ClaimDelay_MOT.pdf','Vehicle_Registration_V5C_New.pdf','Underwriting_Inspection_Fleet_A7.pdf',
+  'Accident_Photos_03Feb_4angles.jpg','Endorsement_AddDriver_MOT-8821.pdf','Fleet_Quote_22Vehicles_LogisticsCo.pdf',
+  'FNOL_Form_ClaimRef_CLM-00921.pdf','Estimate_BumperRepair_GarageB.pdf','Mid_Term_Adjustment_MOT-1102.pdf',
+  'Certificate_of_Insurance_MTR-3310.pdf','Witness_Statement_RTC-4421.pdf','Parts_Receipt_OEM_BumperKit.pdf',
+  'Cancellation_Notice_MOT-7712.pdf','Transfer_Ownership_V5C_MOT.pdf',
+  /* Property */
+  'Property_Survey_RICS_12OakLane.pdf','Fire_Damage_Claim_PROP-0391.pdf','Contractor_Invoice_Roofer_StormDmg.pdf',
+  'Water_Damage_Assessment_BurstPipe.pdf','Burglary_Claim_CrimeRef_2024PD4421.pdf','Buildings_Policy_PROP-8812-Annual.pdf',
+  'Rebuild_Valuation_2025_BCIS.pdf','Plumber_Invoice_LeakRepair.pdf','Landlord_Policy_HME-2210-Annual.pdf',
+  'Storm_Damage_Photos_Roof.jpg','Subsidence_Report_StructuralEng.pdf','Restoration_Invoice_DryingService.pdf',
+  'Electrician_Invoice_Rewire_Part P.pdf','Contents_Claim_Theft_PROP-4451.pdf',
+  /* Health */
+  'Inpatient_Claim_StThomas_Hospital.pdf','Pre_Auth_Request_MRI_Scan_PA-2201.pdf','GP_Referral_Orthopaedics_Consultant.pdf',
+  'Dental_Claim_CrownReplacement_PMI.pdf','Health_Policy_PMI-4431-Family.pdf','Physio_Invoice_6Sessions_HCPC.pdf',
+  'Outpatient_Claim_Dermatology.pdf','Critical_Illness_Claim_CI-0021.pdf','Pre_Auth_Approval_PA-2201.pdf',
+  'Optical_Claim_NewGlasses_GOC.pdf','Group_Health_Policy_Corporate_HLT.pdf',
+  /* Marine */
+  'Bill_of_Lading_HLCU3920441B.pdf','Cargo_Claim_Container_MAEU8821.pdf','Marine_Survey_MV_Pacific_Star.pdf',
+  'Hull_Claim_Collision_IMO9234561.pdf','Cargo_Certificate_CARGO-0391.pdf','PI_Club_Notice_Britannia_Ref.pdf',
+  /* Cafes */
+  'EHO_Inspection_CafeDeluxe_2025.pdf','Public_Liability_Claim_CustomerSlip.pdf','Food_Hygiene_Cert_Level2_RSPH.pdf',
+  'Equipment_Breakdown_CoffeeMachine.pdf','Employers_Liability_StaffInjury.pdf','Allergen_Declaration_Menu2025.pdf',
+  'Fire_Safety_Assessment_Cafe.pdf','Premises_Licence_CafeDeluxe.pdf',
+  /* Germany */
+  'Schadenmeldung_KFZ_B-MN3421.pdf','Versicherungsschein_Haftpflicht_2025.pdf','Beschwerde_Regulierungsverzoegerung.pdf',
+  'Nachtrag_Fahrerwechsel_Police-8821.pdf','Kuendigung_KFZ_Versicherung.pdf','Wohngebaeude_Police_DE-4421.pdf',
+];
+const makeDocs=()=>DOC_NAMES.map((name,i)=>({id:i+1,name,status:[0,4,9,14,19,24,29,34].includes(i)?'Tested':'Pending',selected:false}));
+
+
+const NAV_ITEMS = ['Home','Classification','Completion','Validation','Export','Report'];
+
+/* ── Icons ── */
+const IC = {
+  ChevDown:({s=14})=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M6 9l6 6 6-6"/></svg>,
+  ChevUp:  ({s=14})=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 15l-6-6-6 6"/></svg>,
+  Dots:    ()=><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>,
+  Plus:    ({s=12})=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 5v14M5 12h14"/></svg>,
+  Globe:   ()=><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>,
+  File:    ()=><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>,
+  Trash:   ()=><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>,
+  Upload:  ()=><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>,
+  Logo:    ()=><svg width="28" height="28" viewBox="0 0 28 28"><circle cx="14" cy="14" r="14" fill="#1e40af"/><rect x="7" y="9" width="14" height="2" rx="1" fill="white"/><rect x="7" y="13" width="10" height="2" rx="1" fill="white"/><rect x="7" y="17" width="12" height="2" rx="1" fill="white"/></svg>,
+  Warn:    ()=><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>,
+  Back:    ()=><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>,
+  Search:  ()=><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>,
+  Check:   ()=><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>,
+  Layers:  ()=><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>,
+  Edit:    ()=><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>,
+  Settings:()=><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>,
+  Grid:    ()=><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>,
+};
+
+/* ── Toast ── */
+function ToastContainer({toasts,removeToast}){
+  return <div className="toast-container">{toasts.map(t=>(
+    <div key={t.id} className={`toast ${t.type}${t.exiting?' exiting':''}`}>
+      <span className="toast__icon">{t.type==='success'?'✓':t.type==='error'?'✕':t.type==='warning'?'⚠':'ℹ'}</span>
+      <span className="toast__msg">{t.msg}</span>
+      <button className="toast__close" onClick={()=>removeToast(t.id)}>×</button>
+    </div>
+  ))}</div>;
+}
+function useToast(){
+  const [toasts,setToasts]=useState([]);
+  const addToast=useCallback((msg,type='success')=>{
+    const id=Date.now()+Math.random();
+    setToasts(t=>[...t,{id,msg,type,exiting:false}]);
+    setTimeout(()=>{
+      setToasts(t=>t.map(x=>x.id===id?{...x,exiting:true}:x));
+      setTimeout(()=>setToasts(t=>t.filter(x=>x.id!==id)),300);
+    },3000);
+  },[]);
+  const removeToast=useCallback(id=>{
+    setToasts(t=>t.map(x=>x.id===id?{...x,exiting:true}:x));
+    setTimeout(()=>setToasts(t=>t.filter(x=>x.id!==id)),300);
+  },[]);
+  return{toasts,addToast,removeToast};
+}
+
+/* ── NavBar ── */
+function NavBar({activeNav,onNav,menus,setMenu}){
+  const toggle=(e,key)=>{e.stopPropagation();setMenu(menus[key]?null:key);};
+  return(
+    <nav className="navbar">
+      <div className="navbar__left">
+        <div className="navbar__logo"><IC.Logo/></div>
+        <span className="navbar__brand">Intelligent Document &amp; Automation Solution</span>
+      </div>
+      <ul className="navbar__nav">
+        {NAV_ITEMS.map(n=>(
+          <li key={n}><button className={`navbar__nav-item${activeNav===n.toLowerCase()?' active':''}`} onClick={()=>onNav(n.toLowerCase())}>{n}</button></li>
+        ))}
+      </ul>
+      <div className="navbar__right">
+        <div className="navbar__dd">
+          <button className="navbar__dd-btn" onClick={e=>toggle(e,'tenant')}><span>All Tenants</span><IC.ChevDown/></button>
+          {menus.tenant&&<div className="navbar__dd-menu" onClick={e=>e.stopPropagation()}>
+            <button className="navbar__dd-item active">All Tenants</button>
+            <button className="navbar__dd-item">Tenant Alpha</button>
+          </div>}
+        </div>
+        <div className="navbar__dd">
+          <button className="navbar__dd-btn" onClick={e=>toggle(e,'lang')}><IC.Globe/><span>EN</span><IC.ChevDown/></button>
+          {menus.lang&&<div className="navbar__dd-menu" onClick={e=>e.stopPropagation()}>
+            <button className="navbar__dd-item active">English</button>
+            <button className="navbar__dd-item">Deutsch</button>
+          </div>}
+        </div>
+        <div className="navbar__avatar" title="MD" onClick={e=>{e.stopPropagation();toggle(e,'user');}}>MD
+          {menus.user&&<div className="navbar__dd-menu" style={{right:0,top:'calc(100% + 6px)'}} onClick={e=>e.stopPropagation()}>
+            <button className="navbar__dd-item">Profile</button>
+            <div className="navbar__dd-divider"/>
+            <button className="navbar__dd-item danger">Sign out</button>
+          </div>}
+        </div>
+      </div>
+    </nav>
+  );
+}
+
+/* ── Dashboard ── */
+function Dashboard({lobs,onNavigate}){
+  const totalCats=lobs.reduce((a,l)=>a+l.categories.length,0);
+  const totalTypes=lobs.reduce((a,l)=>a+l.categories.reduce((b,c)=>b+c.types.length,0),0);
+  const avgConf=Math.round(lobs.reduce((a,l)=>a+l.confidence,0)/lobs.length);
+  const deployed=lobs.filter(l=>l.status==='Deployed').length;
+  // Pipeline counts derived from deployed lob/type stats
+  const deployedTypes=lobs.reduce((a,l)=>a+l.categories.filter(c=>c.status==='Deployed').reduce((b,c)=>b+c.types.length,0),0);
+  const totalDocs=deployedTypes*18+47;
+  const classified=Math.round(totalDocs*0.938);
+  const review=totalDocs-classified;
+  const completed=Math.round(classified*0.941);
+  const PIPE=[
+    {icon:'📥',label:'Ingestion',       count:`${totalDocs.toLocaleString()} docs`,  color:'#eff6ff'},
+    {icon:'⚙️', label:'Pre-processing',  count:`${(totalDocs-3).toLocaleString()} docs`, color:'#f0fdf4'},
+    {icon:'🧠',label:'Auto Classify',   count:`${classified.toLocaleString()} docs`,  color:'#faf5ff'},
+    {icon:'👁️', label:'Manual Review',   count:`${review} pending`,                   color:'#fffbeb'},
+    {icon:'✅',label:'Completed',       count:`${completed.toLocaleString()} docs`,  color:'#f0fdf4'},
+  ];
+  return(
+    <div className="page-scroll">
+      <div className="page-hdr">
+        <div className="page-hdr__left"><h1>Dashboard</h1><p>System overview and quick actions</p></div>
+      </div>
+      <div className="stats-grid">
+        {[
+          {lbl:'Lines of Business',val:lobs.length,     sub:`${deployed} deployed`},
+          {lbl:'Total Categories', val:totalCats,       sub:`across all LOBs`},
+          {lbl:'Document Types',   val:totalTypes,      sub:`leaf-level config`},
+          {lbl:'Avg Confidence',   val:`${avgConf}%`,   sub:'classification score'},
+        ].map(s=>(
+          <div key={s.lbl} className="stat-card">
+            <div className="stat-card__label">{s.lbl}</div>
+            <div className="stat-card__value">{s.val}</div>
+            <div className="stat-card__sub">{s.sub}</div>
+            <div className="stat-card__bar"><div className="stat-card__bar-fill" style={{width:`${Math.min(100,avgConf)}%`}}/></div>
+          </div>
+        ))}
+      </div>
+      <div className="section-title">Processing Pipeline</div>
+      <div className="pipeline">
+        {PIPE.map((p,i)=><React.Fragment key={p.label}>
+          {i>0&&<div className="pipe-arrow">→</div>}
+          <div className="pipe-step">
+            <div className="pipe-step__icon" style={{background:p.color}}>{p.icon}</div>
+            <div className="pipe-step__label">{p.label}</div>
+            <div className="pipe-step__count">{p.count}</div>
+          </div>
+        </React.Fragment>)}
+      </div>
+      <div className="section-title">LOB Performance</div>
+      <div className="lob-perf">
+        <div className="lob-perf__hdr">
+          <span>Line of Business</span><span>Categories</span><span>Types</span><span>Confidence</span><span>Status</span>
+        </div>
+        {lobs.map(l=>(
+          <div key={l.id} className="lob-perf__row" onClick={()=>onNavigate('lob-overview')}>
+            <div className="lob-perf__name">
+              <div className="lob-dot" style={{background:l.status==='Deployed'?'#16a34a':'#dc2626'}}/>
+              <div><div className="lob-perf__name-text">{l.name}</div><div className="lob-perf__name-sub">{l.categories.length} categories</div></div>
+            </div>
+            <div className="lob-perf__cell">{l.categories.length}</div>
+            <div className="lob-perf__cell">{l.categories.reduce((a,c)=>a+c.types.length,0)}</div>
+            <div className="lob-perf__cell">
+              <div className="lob-perf__conf">{l.confidence}%</div>
+              <div className="conf-bar"><div className="conf-bar__fill" style={{width:`${l.confidence}%`,background:l.confidence>=90?'#16a34a':l.confidence>=80?'#d97706':'#dc2626'}}/></div>
+            </div>
+            <div className="lob-perf__cell"><span className={`status-chip status-chip--${l.status.toLowerCase()}`}>{l.status}</span></div>
+          </div>
+        ))}
+      </div>
+      <div className="section-title">Quick Actions</div>
+      <div className="quick-links">
+        {[
+          {icon:'⚙️',color:'#eff6ff',label:'Configure Classification',sub:'Manage LOBs, categories, types & prompts',action:'lob-overview'},
+          {icon:'📋',color:'#f0fdf4',label:'Manual Review Queue',      sub:'72 documents pending review',           action:'queue'},
+          {icon:'📊',color:'#faf5ff',label:'Audit Log',               sub:'View classification history',            action:'audit'},
+        ].map(q=>(
+          <div key={q.label} className="quick-link" onClick={()=>onNavigate(q.action)}>
+            <div className="quick-link__icon" style={{background:q.color}}>{q.icon}</div>
+            <div><div className="quick-link__label">{q.label}</div><div className="quick-link__sub">{q.sub}</div></div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+
+
+/* ── Shared Pagination ── */
+function Pagination({page,totalPages,perPage,setPage,setPerPage,showPerPage=true}){
+  const pages=[...new Set([1,2,...(page>3?['…']:[]),(page-1>2?page-1:null),(page>2?page:null),page,(page<totalPages-1?page+1:null),(page<totalPages-2?page+2:null),...(page<totalPages-2?['…']:[]),totalPages-1,totalPages].filter(x=>x!==null&&(typeof x==='string'||x>=1&&x<=totalPages)))];
+  // Simpler approach:
+  const makePages=()=>{
+    if(totalPages<=7)return Array.from({length:totalPages},(_,i)=>i+1);
+    const arr=[];
+    arr.push(1);
+    if(page>3)arr.push('…');
+    for(let i=Math.max(2,page-1);i<=Math.min(totalPages-1,page+1);i++)arr.push(i);
+    if(page<totalPages-2)arr.push('…');
+    if(totalPages>1)arr.push(totalPages);
+    return arr;
+  };
+  return(
+    <div className="ov-pagination">
+      {showPerPage&&<div className="ov-pagination__left">
+        Items per page:
+        <select className="ov-per-page" value={perPage} onChange={e=>{setPerPage&&setPerPage(Number(e.target.value));setPage(1);}}>
+          {[10,20,50].map(n=><option key={n} value={n}>{n}</option>)}
+        </select>
+      </div>}
+      <div className="ov-pagination__pages">
+        <button className="page-btn" disabled={page===1} onClick={()=>setPage(1)}>⟨⟨</button>
+        <button className="page-btn" disabled={page===1} onClick={()=>setPage(p=>p-1)}>⟨</button>
+        {makePages().map((p,i)=>
+          p==='…'
+            ?<span key={'e'+i} className="page-ellipsis">…</span>
+            :<button key={p} className={`page-btn${page===p?' active':''}`} onClick={()=>setPage(p)}>{p}</button>
+        )}
+        <button className="page-btn" disabled={page>=totalPages||totalPages===0} onClick={()=>setPage(p=>p+1)}>⟩</button>
+        <button className="page-btn" disabled={page>=totalPages||totalPages===0} onClick={()=>setPage(totalPages)}>⟩⟩</button>
+      </div>
+    </div>
+  );
+}
+
+/* ── LOB Overview (L0 page) ── */
+function LobOverview({lobs,onSelectLob,addToast,onOpenOutputFormat,onConfirm,onDeleteLob}){
+  const [search,setSearch]=useState('');
+  const [statusFilter,setStatusFilter]=useState('All');
+  const [sortKey,setSortKey]=useState(null);
+  const [sortDir,setSortDir]=useState('asc');
+  const [page,setPage]=useState(1);
+  const [perPage,setPerPage]=useState(10);
+
+  const handleSort=key=>{
+    if(sortKey===key)setSortDir(d=>d==='asc'?'desc':'asc');
+    else{setSortKey(key);setSortDir('asc');}
+  };
+  const SortIco=({col})=><span className="sort-both">{sortKey===col?(sortDir==='asc'?'↑':'↓'):'⇅'}</span>;
+
+  const filtered=lobs
+    .filter(l=>statusFilter==='All'||l.status===statusFilter)
+    .filter(l=>!search||l.name.toLowerCase().includes(search.toLowerCase()));
+  const sorted=sortKey?[...filtered].sort((a,b)=>{
+    let av=a[sortKey],bv=b[sortKey];
+    if(typeof av==='string')av=av.toLowerCase();
+    if(typeof bv==='string')bv=bv.toLowerCase();
+    return sortDir==='asc'?(av>bv?1:-1):(av<bv?1:-1);
+  }):filtered;
+  const totalPages=Math.max(1,Math.ceil(sorted.length/perPage));
+  const rows=sorted.slice((page-1)*perPage,page*perPage);
+
+  const filtersActive = search || statusFilter !== 'All';
+  return(
+    <div className="ov-page">
+      <h1 className="ov-title">Classification Overview</h1>
+      <div className="ov-filter-row">
+        <div className="ov-search-wrap">
+          <IC.Search/>
+          <input className="ov-search" placeholder="Search LOB name…" value={search}
+            onChange={e=>{setSearch(e.target.value);setPage(1);}}/>
+          {search&&<button className="search-clear-btn" onClick={()=>{setSearch('');setPage(1);}}>×</button>}
+        </div>
+        <select className="ov-select" value={statusFilter}
+          onChange={e=>{setStatusFilter(e.target.value);setPage(1);}}>
+          <option>All</option><option>Deployed</option><option>Failed</option>
+        </select>
+        {filtersActive&&<button className="btn btn-outline btn-sm btn-filter-active"
+          onClick={()=>{setSearch('');setStatusFilter('All');setPage(1);}}>✕ Clear filters</button>}
+        <div style={{flex:1}}/>
+        {filtersActive&&<span style={{fontSize:'12px',color:'#6b7280'}}>{sorted.length} result{sorted.length!==1?'s':''}</span>}
+        <button className="btn btn-outline btn-sm"
+          onClick={onOpenOutputFormat}>Output format</button>
+      </div>
+      <div className="ov-table-wrap">
+        <table className="ov-table">
+          <thead><tr>
+            <th className="sortable" onClick={()=>handleSort('name')}>Line of Business <SortIco col="name"/></th>
+            <th className="sortable" onClick={()=>handleSort('categories')}>Categories <SortIco col="categories"/></th>
+            <th>Lv.1 version</th>
+            <th>Lv.2 version</th>
+            <th className="sortable" onClick={()=>handleSort('status')}>Status <SortIco col="status"/></th>
+            <th className="sortable" onClick={()=>handleSort('confidence')}>Confidence <SortIco col="confidence"/></th>
+            <th className="sortable" onClick={()=>handleSort('trainedBy')}>Trained by <SortIco col="trainedBy"/></th>
+            <th>Action</th>
+          </tr></thead>
+          <tbody>
+            {rows.map(lob=>(
+              <tr key={lob.id} onClick={()=>onSelectLob(lob)}>
+                <td><button className="tbl-name-link" onClick={e=>{e.stopPropagation();onSelectLob(lob);}}>{lob.name}</button></td>
+                <td>{lob.categories.length}</td>
+                <td>{lob.classLv1Version||'—'}</td>
+                <td>{lob.classLv2Version||'—'}</td>
+                <td><span className={`status-chip status-chip--${lob.status.toLowerCase()}`}>{lob.status}</span></td>
+                <td>{lob.confidence}%</td>
+                <td>{lob.trainedBy}</td>
+                <td><div className="tbl-actions" onClick={e=>e.stopPropagation()}>
+                  <button className="tbl-icon-btn" title="Edit" onClick={()=>onSelectLob(lob)}><IC.Edit/></button>
+                  <button className="tbl-icon-btn danger" title="Delete" onClick={()=>onConfirm({title:`Delete "${lob.name}"?`,message:'This will permanently remove this LOB and all its categories.',confirmLabel:'Delete LOB',onConfirm:()=>onDeleteLob(lob.id)})}><IC.Trash/></button>
+                </div></td>
+              </tr>
+            ))}
+            {rows.length===0&&<tr><td colSpan={8} className="tbl-empty">{filtersActive?'No LOBs match your filters':'No LOBs found'}</td></tr>}
+          </tbody>
+        </table>
+        <Pagination page={page} totalPages={totalPages} perPage={perPage} setPage={setPage} setPerPage={p=>{setPerPage(p);setPage(1);}}/>
+      </div>
+    </div>
+  );
+}
+
+/* ── Category Overview (L1 page) ── */
+function CategoryOverview({lob,onBack,onSelectCategory,onManagePrompt,addToast,onOpenOutputFormat,onConfirm,onAddCategory,onDeleteCategory}){
+  const [search,setSearch]=useState('');
+  const [statusFilter,setStatusFilter]=useState('All');
+  const [showAddCat,setShowAddCat]=useState(false);
+  const [newCatName,setNewCatName]=useState('');
+  const submitAddCat=()=>{if(!newCatName.trim())return;onAddCategory(lob.id,newCatName.trim());setNewCatName('');setShowAddCat(false);};
+  const [sortKey,setSortKey]=useState(null);
+  const [sortDir,setSortDir]=useState('asc');
+  const [page,setPage]=useState(1);
+  const [perPage,setPerPage]=useState(10);
+
+  const handleSort=key=>{
+    if(sortKey===key)setSortDir(d=>d==='asc'?'desc':'asc');
+    else{setSortKey(key);setSortDir('asc');}
+  };
+  const SortIco=({col})=><span className="sort-both">{sortKey===col?(sortDir==='asc'?'↑':'↓'):'⇅'}</span>;
+
+  const filtered=lob.categories
+    .filter(c=>statusFilter==='All'||c.status===statusFilter)
+    .filter(c=>!search||c.name.toLowerCase().includes(search.toLowerCase()));
+  const sorted=sortKey?[...filtered].sort((a,b)=>{
+    let av=a[sortKey],bv=b[sortKey];
+    if(typeof av==='string')av=av.toLowerCase();
+    if(typeof bv==='string')bv=bv.toLowerCase();
+    return sortDir==='asc'?(av>bv?1:-1):(av<bv?1:-1);
+  }):filtered;
+  const totalPages=Math.max(1,Math.ceil(sorted.length/perPage));
+  const rows=sorted.slice((page-1)*perPage,page*perPage);
+
+  const filtersActive = search || statusFilter !== 'All';
+  return(<>
+    <div className="ov-page">
+      <div className="ov-breadcrumb">
+        <button className="ov-bc-link" onClick={onBack}>Classification</button>
+        <span className="ov-bc-sep">›</span>
+        <span className="ov-bc-curr">{lob.name}</span>
+      </div>
+      <h1 className="ov-title">Categories</h1>
+      <div className="ov-filter-row">
+        <div className="ov-search-wrap">
+          <IC.Search/>
+          <input className="ov-search" placeholder="Search category…" value={search}
+            onChange={e=>{setSearch(e.target.value);setPage(1);}}/>
+          {search&&<button className="search-clear-btn" onClick={()=>{setSearch('');setPage(1);}}>×</button>}
+        </div>
+        <select className="ov-select" value={statusFilter}
+          onChange={e=>{setStatusFilter(e.target.value);setPage(1);}}>
+          <option>All</option><option>Deployed</option><option>Failed</option>
+        </select>
+        {filtersActive&&<button className="btn btn-outline btn-sm btn-filter-active"
+          onClick={()=>{setSearch('');setStatusFilter('All');setPage(1);}}>✕ Clear filters</button>}
+        <div style={{flex:1}}/>
+        {filtersActive&&<span style={{fontSize:'12px',color:'#6b7280'}}>{sorted.length} result{sorted.length!==1?'s':''}</span>}
+        <button className="btn btn-outline btn-sm" onClick={onOpenOutputFormat}>Output format</button>
+        <button className="btn btn-outline btn-sm" onClick={()=>onManagePrompt(lob,null,null)}>Edit LOB prompt</button>
+        <button className="btn btn-primary btn-sm" onClick={()=>setShowAddCat(true)}><IC.Plus s={11}/> Add category</button>
+      </div>
+      <div className="ov-table-wrap">
+        <table className="ov-table">
+          <thead><tr>
+            <th className="sortable" onClick={()=>handleSort('name')}>Category <SortIco col="name"/></th>
+            <th className="sortable" onClick={()=>handleSort('types')}>Types <SortIco col="types"/></th>
+            <th className="sortable" onClick={()=>handleSort('activeVersion')}>Active version <SortIco col="activeVersion"/></th>
+            <th className="sortable" onClick={()=>handleSort('status')}>Status <SortIco col="status"/></th>
+            <th className="sortable" onClick={()=>handleSort('confidence')}>Confidence <SortIco col="confidence"/></th>
+            <th className="sortable" onClick={()=>handleSort('trainedBy')}>Trained by <SortIco col="trainedBy"/></th>
+            <th>Action</th>
+          </tr></thead>
+          <tbody>
+            {rows.map(cat=>(
+              <tr key={cat.id} onClick={()=>onSelectCategory(lob,cat)}>
+                <td><button className="tbl-name-link" onClick={e=>{e.stopPropagation();onSelectCategory(lob,cat);}}>{cat.name}</button></td>
+                <td>{cat.types.length||<span style={{color:'#9ca3af'}}>—</span>}</td>
+                <td>{cat.activeVersion}</td>
+                <td><span className={`status-chip status-chip--${cat.status.toLowerCase()}`}>{cat.status}</span></td>
+                <td>{cat.confidence}%</td>
+                <td>{cat.trainedBy}</td>
+                <td><div className="tbl-actions" onClick={e=>e.stopPropagation()}>
+                  <button className="tbl-icon-btn" title="Edit" onClick={()=>onManagePrompt(lob,cat,null)}><IC.Edit/></button>
+                  <button className="tbl-icon-btn danger" title="Delete" onClick={()=>onConfirm({title:`Delete "${cat.name}"?`,message:'This will permanently remove this category and all its types.',confirmLabel:'Delete',onConfirm:()=>onDeleteCategory(lob.id,cat.id)})}><IC.Trash/></button>
+                </div></td>
+              </tr>
+            ))}
+            {rows.length===0&&<tr><td colSpan={7} className="tbl-empty">{filtersActive?'No categories match your filters':'No categories found'}</td></tr>}
+          </tbody>
+        </table>
+        <Pagination page={page} totalPages={totalPages} perPage={perPage} setPage={setPage} setPerPage={p=>{setPerPage(p);setPage(1);}}/>
+      </div>
+    </div>
+    {showAddCat&&<div className="modal-overlay" onClick={()=>setShowAddCat(false)}>
+      <div className="modal" onClick={e=>e.stopPropagation()}>
+        <div className="modal__header"><h3>Add Category</h3><button className="modal__close" onClick={()=>setShowAddCat(false)}>×</button></div>
+        <div className="modal__body">
+          <label className="add-modal-label">Category name</label>
+          <input autoFocus className="add-modal-input" value={newCatName} onChange={e=>setNewCatName(e.target.value)}
+            onKeyDown={e=>{if(e.key==='Enter')submitAddCat();if(e.key==='Escape')setShowAddCat(false);}}
+            placeholder="e.g. Claim Notification"/>
+          <p className="add-modal-hint">This will be added to {lob.name} as a new Draft category.</p>
+        </div>
+        <div className="modal__footer">
+          <button className="btn btn-outline" onClick={()=>setShowAddCat(false)}>Cancel</button>
+          <button className="btn btn-primary" onClick={submitAddCat} disabled={!newCatName.trim()}>Add Category</button>
+        </div>
+      </div>
+    </div>}
+  </>);
+}
+
+/* ── Types Modal (L2) ── */
+function TypesModal({lob,category,onClose,onManagePrompt,addToast,onAddType}){
+  const [showAddType,setShowAddType]=useState(false);
+  const [newTypeName,setNewTypeName]=useState('');
+  const withPrompt=category.types.filter(t=>t.prompt&&t.prompt.trim()).length;
+  const submitAddType=()=>{if(!newTypeName.trim())return;onAddType(lob.id,category.id,newTypeName.trim());setNewTypeName('');setShowAddType(false);};
+  return(
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal types" onClick={e=>e.stopPropagation()}>
+        <div className="modal__header">
+          <div>
+            <h3>Document types — {category.name}</h3>
+            <div style={{fontSize:'11px',color:'#9ca3af',marginTop:'2px'}}>
+              {withPrompt}/{category.types.length} prompts configured
+            </div>
+          </div>
+          <button className="modal__close" onClick={onClose}>×</button>
+        </div>
+        <div className="modal__toolbar">
+          <button className="btn btn-outline btn-sm"
+            onClick={()=>{onClose();onManagePrompt(lob,category,null);}}>Edit category prompt</button>
+          <button className="btn btn-primary btn-sm" onClick={()=>setShowAddType(s=>!s)}><IC.Plus s={11}/> Add type</button>
+        </div>
+        {showAddType&&<div style={{padding:'10px 16px',borderBottom:'1px solid #f3f4f6',display:'flex',gap:'8px',alignItems:'center'}}>
+          <input autoFocus className="add-modal-input" style={{flex:1}} value={newTypeName}
+            onChange={e=>setNewTypeName(e.target.value)}
+            onKeyDown={e=>{if(e.key==='Enter')submitAddType();if(e.key==='Escape')setShowAddType(false);}}
+            placeholder="Type name, e.g. FNOL Report"/>
+          <button className="btn btn-primary btn-sm" onClick={submitAddType} disabled={!newTypeName.trim()}>Add</button>
+          <button className="btn btn-outline btn-sm" onClick={()=>{setShowAddType(false);setNewTypeName('');}}>Cancel</button>
+        </div>}
+        <div className="modal__body types-modal-body">
+          <table className="types-table">
+            <thead><tr>
+              <th>Document Type</th>
+              <th style={{width:'90px',textAlign:'center'}}>Prompt</th>
+            </tr></thead>
+            <tbody>
+              {category.types.map(t=>(
+                <tr key={t.id}>
+                  <td>
+                    <span className={`type-prompt-dot${t.prompt&&t.prompt.trim()?' type-prompt-dot--set':' type-prompt-dot--empty'}`} title={t.prompt&&t.prompt.trim()?'Prompt configured':'No prompt set'}/>
+                    <button className="tbl-name-link"
+                      onClick={()=>{onClose();onManagePrompt(lob,category,t);}}>
+                      {t.name}
+                    </button>
+                    {t.tags.map(tag=>(
+                      <span key={tag} className={`type-tag type-tag--${tag}`}>{tag}</span>
+                    ))}
+                  </td>
+                  <td style={{textAlign:'center'}}>
+                    {t.prompt&&t.prompt.trim()
+                      ?<span style={{fontSize:'11px',color:'#16a34a',fontWeight:500}}>Configured</span>
+                      :<button className="tbl-name-link" style={{fontSize:'11px',color:'#9ca3af'}}
+                          onClick={()=>{onClose();onManagePrompt(lob,category,t);}}>Set up →</button>
+                    }
+                  </td>
+                </tr>
+              ))}
+              {category.types.length===0&&<tr><td colSpan={2} className="tbl-empty">No types defined for this category</td></tr>}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Sidebar (Detail) ── */
+function Sidebar({cbLevels,setCbLevels,l0Name,setL0Name,l1Items,setL1Items,showMenu,setShowMenu,addToast,onConfirm}){
+  const [editingL0,setEditingL0]=useState(false);
+  const [l0Draft,setL0Draft]=useState(l0Name);
+  const [showAddL2,setShowAddL2]=useState(null);
+  const [addL2Name,setAddL2Name]=useState('');
+  const [showAddL1,setShowAddL1]=useState(false);
+  const [addL1Name,setAddL1Name]=useState('');
+  const [renamingId,setRenamingId]=useState(null);
+  const [renameDraft,setRenameDraft]=useState('');
+  const [sidebarSearch,setSidebarSearch]=useState('');
+  const addL2Ref=useRef(null);
+  const addL1Ref=useRef(null);
+  useEffect(()=>{if(showAddL2&&addL2Ref.current)addL2Ref.current.focus();},[showAddL2]);
+  useEffect(()=>{if(showAddL1&&addL1Ref.current)addL1Ref.current.focus();},[showAddL1]);
+  const filteredL1=sidebarSearch.trim()
+    ?l1Items.filter(i=>i.name.toLowerCase().includes(sidebarSearch.toLowerCase())||i.l2.some(l2=>l2.name.toLowerCase().includes(sidebarSearch.toLowerCase())))
+    :l1Items;
+  const allExpanded=l1Items.length>0&&l1Items.every(i=>i.expanded);
+  const toggleAllExpand=()=>setL1Items(items=>items.map(i=>({...i,expanded:!allExpanded})));
+  const commitL0=()=>{const v=l0Draft.trim();if(v&&v!==l0Name){setL0Name(v);addToast(`Root renamed to "${v}"`);}setEditingL0(false);};
+  const toggleL1=id=>setL1Items(items=>items.map(i=>i.id===id?{...i,expanded:!i.expanded}:i));
+  const addL2=id=>{if(!addL2Name.trim())return;setL1Items(items=>items.map(i=>i.id===id?{...i,l2:[...i.l2,{id:Date.now().toString(),name:addL2Name.trim()}]}:i));addToast(`"${addL2Name.trim()}" added`);setAddL2Name('');setShowAddL2(null);};
+  const delL2=(l1id,l2id,n)=>{setL1Items(items=>items.map(i=>i.id===l1id?{...i,l2:i.l2.filter(x=>x.id!==l2id)}:i));addToast(`"${n}" removed`,'warning');};
+  const startRenameL1=id=>{const item=l1Items.find(i=>i.id===id);setRenameDraft(item?.name||'');setRenamingId(id);setShowMenu(null);};
+  const commitRename=()=>{if(renameDraft.trim()&&renamingId){const item=l1Items.find(i=>i.id===renamingId);if(renameDraft.trim()!==item?.name){setL1Items(items=>items.map(i=>i.id===renamingId?{...i,name:renameDraft.trim()}:i));addToast(`Renamed to "${renameDraft.trim()}"`);}setRenamingId(null);setRenameDraft('');}else{setRenamingId(null);}};
+  const cancelRename=()=>{setRenamingId(null);setRenameDraft('');};
+  const requestDelL1=id=>{const item=l1Items.find(i=>i.id===id);setShowMenu(null);onConfirm({title:'Delete Level 1 item',message:`Delete "${item?.name}"? This will remove its workspace tab.`,confirmLabel:'Delete',onConfirm:()=>{setL1Items(items=>items.filter(i=>i.id!==id));addToast(`"${item?.name}" deleted`,'warning');}});};
+  const addL1=()=>{if(!addL1Name.trim())return;const id=addL1Name.toLowerCase().replace(/\s+/g,'-')+'-'+Date.now();setL1Items(items=>[...items,{id,name:addL1Name.trim(),expanded:false,l2:[]}]);addToast(`"${addL1Name.trim()}" added`);setAddL1Name('');setShowAddL1(false);};
+  return(
+    <aside className="sidebar">
+      <div className="sidebar__header"><h2 className="sidebar__title">Document Classification</h2></div>
+      <div className="sidebar__section">
+        <p className="sidebar__section-lbl">Classification level</p>
+        <label className="sidebar__cb-label"><input type="checkbox" checked={cbLevels.l1} onChange={e=>setCbLevels(p=>({...p,l1:e.target.checked}))}/><span>L1 - Document categories</span></label>
+        <label className="sidebar__cb-label"><input type="checkbox" checked={cbLevels.l2} onChange={e=>setCbLevels(p=>({...p,l2:e.target.checked}))}/><span>L2 - Document types</span></label>
+      </div>
+      <div className="sidebar__divider"/>
+      <div className="sidebar__level0">
+        <span className="sidebar__level-lbl">Level : 0</span>
+        {editingL0?<input className="sidebar__l0-input" value={l0Draft} onChange={e=>setL0Draft(e.target.value)} onBlur={commitL0} onKeyDown={e=>{if(e.key==='Enter')commitL0();if(e.key==='Escape'){setL0Draft(l0Name);setEditingL0(false);}}} autoFocus/>
+        :<span className="sidebar__l0-name" title="Click to rename" onClick={()=>{setL0Draft(l0Name);setEditingL0(true);}}>{l0Name} <IC.Edit/></span>}
+      </div>
+      <div className="sidebar__divider"/>
+      <div className="sidebar__l1-header"><span className="sidebar__level-lbl">Level : 1</span></div>
+      <div className="sidebar__list-controls">
+        <div className="sidebar__search-wrap">
+          <span className="sidebar__search-icon"><IC.Search/></span>
+          <input className="sidebar__search" placeholder="Search…" value={sidebarSearch} onChange={e=>setSidebarSearch(e.target.value)}/>
+        </div>
+        {l1Items.length>0&&<button className="sidebar__collapse-btn" onClick={toggleAllExpand}>{allExpanded?'⊖ All':'⊕ All'}</button>}
+      </div>
+      <div className="sidebar__l1-list">
+        {filteredL1.length===0&&l1Items.length>0?<div className="sidebar__no-results">No results for "{sidebarSearch}"</div>:null}
+        {l1Items.length===0?<div className="sidebar__empty-l1"><IC.Layers/><p>No level 1 items yet.<br/>Add one below.</p></div>
+        :filteredL1.map(item=>(
+          <div key={item.id} className="sidebar__l1-item">
+            {renamingId===item.id?(
+              <div className="sidebar__rename-wrap" onClick={e=>e.stopPropagation()}>
+                <input className="sidebar__rename-input" value={renameDraft}
+                  onChange={e=>setRenameDraft(e.target.value)}
+                  onBlur={commitRename}
+                  onKeyDown={e=>{if(e.key==='Enter')commitRename();if(e.key==='Escape')cancelRename();}}
+                  autoFocus/>
+                <button className="sidebar__rename-ok" onClick={commitRename} disabled={!renameDraft.trim()}>✓</button>
+                <button className="sidebar__rename-cancel" onClick={cancelRename}>✕</button>
+              </div>
+            ):(
+            <div className="sidebar__l1-row">
+              <button className="sidebar__l1-toggle" onClick={()=>toggleL1(item.id)}>
+                <span className="sidebar__l1-name">{item.name}</span>
+                {item.l2.length>0&&<span className="sidebar__l2-count">{item.l2.length}</span>}
+                {item.expanded?<IC.ChevUp/>:<IC.ChevDown/>}
+              </button>
+              <div className="sidebar__menu-wrap">
+                <button className="sidebar__menu-btn" onClick={e=>{e.stopPropagation();setShowMenu(showMenu===item.id?null:item.id);}}><IC.Dots/></button>
+                {showMenu===item.id&&<div className="sidebar__ctx-menu" onClick={e=>e.stopPropagation()}>
+                  <button className="sidebar__ctx-item" onClick={()=>startRenameL1(item.id)}>Rename</button>
+                  <button className="sidebar__ctx-item danger" onClick={()=>requestDelL1(item.id)}>Delete</button>
+                </div>}
+              </div>
+            </div>
+            )}
+            {item.expanded&&<div className="sidebar__l2-wrap">
+              <span className="sidebar__level-lbl sub">Level : 2</span>
+              {item.l2.length===0?<p className="sidebar__empty-l2">There's no document type</p>
+              :<ul className="sidebar__l2-list">{item.l2.map(l2=>(
+                <li key={l2.id} className="sidebar__l2-item"><IC.Grid/><span>{l2.name}</span>
+                  <button className="sidebar__l2-del" onClick={()=>delL2(item.id,l2.id,l2.name)}>×</button>
+                </li>
+              ))}</ul>}
+              {showAddL2===item.id?<div className="sidebar__add-input-wrap">
+                <input ref={addL2Ref} className="sidebar__add-input" value={addL2Name} onChange={e=>setAddL2Name(e.target.value)} onKeyDown={e=>{if(e.key==='Enter')addL2(item.id);if(e.key==='Escape'){setShowAddL2(null);setAddL2Name('');}}} placeholder="Type name…"/>
+                <div className="sidebar__add-actions">
+                  <button className="sidebar__add-confirm" onClick={()=>addL2(item.id)} disabled={!addL2Name.trim()}>Add</button>
+                  <button className="sidebar__add-cancel" onClick={()=>{setShowAddL2(null);setAddL2Name('');}}>Cancel</button>
+                </div>
+              </div>:<button className="sidebar__add-btn" onClick={()=>setShowAddL2(item.id)}><IC.Plus/> Add level 2</button>}
+            </div>}
+          </div>
+        ))}
+      </div>
+      <div className="sidebar__add-l1-bar">
+        {showAddL1?<div className="sidebar__add-l1-input-wrap">
+          <input ref={addL1Ref} className="sidebar__add-l1-input" value={addL1Name} onChange={e=>setAddL1Name(e.target.value)} onKeyDown={e=>{if(e.key==='Enter')addL1();if(e.key==='Escape'){setShowAddL1(false);setAddL1Name('');}}} placeholder="Level 1 name…"/>
+          <button className="sidebar__add-confirm" onClick={addL1} disabled={!addL1Name.trim()}>Add</button>
+          <button className="sidebar__add-cancel" onClick={()=>{setShowAddL1(false);setAddL1Name('');}}>✕</button>
+        </div>:<button className="sidebar__add-l1-btn" onClick={()=>setShowAddL1(true)}><IC.Plus s={13}/> Add level 1</button>}
+      </div>
+    </aside>
+  );
+}
+
+/* ── Workspace (Detail) ── */
+const DEFAULT_TAB_META={version:'V.1',score:'N/A',status:'Draft'};
+
+function WorkspaceTabs({l1Items,activeL1Tab,setActiveL1Tab,activeTab,setActiveTab,cbLevels}){
+  const [showMore,setShowMore]=useState(false);
+  const [moreSearch,setMoreSearch]=useState('');
+  const [visibleCount,setVisibleCount]=useState(999);
+  const outerRef=useRef(null);
+  const tabRefs=useRef([]);
+  const cachedW=useRef([]);
+  const recalcRef=useRef(null);
+  const MORE_W=100; // px reserved for "+N more" pill
+
+  const allL1=[
+    {id:'global',label:'Global',l2:[]},
+    ...(cbLevels.l1?[{id:'l1',label:'L1 Classification',l2:[]}]:[]),
+    ...(cbLevels.l2?l1Items.map(i=>({id:i.id,label:i.name,l2:i.l2})):[]),
+  ];
+
+  // Always keep recalcRef current so ResizeObserver closure doesn't go stale
+  recalcRef.current=()=>{
+    const outer=outerRef.current;
+    if(!outer||cachedW.current.length===0)return;
+    const avail=outer.offsetWidth-40; // 40px = 20px left + 20px right padding
+    let used=0,count=0;
+    for(let i=0;i<cachedW.current.length;i++){
+      const w=cachedW.current[i]||80;
+      const wouldHaveMore=count<cachedW.current.length-1;
+      if(count>0&&used+w+(wouldHaveMore?MORE_W:0)>avail)break;
+      used+=w;count++;
+    }
+    const n=Math.max(1,count);
+    setVisibleCount(prev=>prev===n?prev:n);
+  };
+
+  // When tab count changes, reset so all tabs render visible for measurement
+  useEffect(()=>{
+    cachedW.current=[];
+    setVisibleCount(999);
+  },[allL1.length]);
+
+  // After every render: cache widths of currently-visible tabs, then recalc
+  useLayoutEffect(()=>{
+    tabRefs.current.forEach((el,i)=>{
+      if(el&&el.offsetWidth>0)cachedW.current[i]=el.offsetWidth;
+    });
+    recalcRef.current();
+  });
+
+  // Watch container resize
+  useEffect(()=>{
+    const outer=outerRef.current;
+    if(!outer)return;
+    const ro=new ResizeObserver(()=>recalcRef.current?.());
+    ro.observe(outer);
+    return()=>ro.disconnect();
+  },[]);
+
+  const hiddenAll=allL1.slice(visibleCount);
+  const filtered=moreSearch?hiddenAll.filter(t=>t.label.toLowerCase().includes(moreSearch.toLowerCase())):hiddenAll;
+  const hiddenCount=hiddenAll.length;
+  const anyHiddenActive=hiddenAll.some(t=>t.id===activeL1Tab);
+  const handleL1=id=>{setActiveL1Tab(id);setActiveTab(id);setShowMore(false);setMoreSearch('');};
+  const activeL1Item=l1Items.find(i=>i.id===activeL1Tab);
+  const l2Tabs=activeL1Item?.l2||[];
+
+  return(
+    <div className="workspace__tab-area">
+      <div className="workspace__tabs workspace__tabs--l1" ref={outerRef}>
+        {/* Inner div clips overflow; more-wrap sits outside so dropdown is never clipped */}
+        <div className="workspace__tabs-inner">
+          {allL1.map((t,i)=>(
+            <button key={t.id} ref={el=>{tabRefs.current[i]=el;}}
+              className={`workspace__tab${activeL1Tab===t.id?' active':''}${i>=visibleCount?' workspace__tab--hidden':''}`}
+              onClick={()=>handleL1(t.id)}>{t.label}</button>
+          ))}
+        </div>
+        {hiddenCount>0&&(
+          <div className="workspace__more-wrap">
+            <button className={`workspace__more-btn${anyHiddenActive?' active':''}`}
+              onClick={e=>{e.stopPropagation();setShowMore(s=>!s);}}>
+              +{hiddenCount} more <IC.ChevDown s={11}/>
+            </button>
+            {showMore&&(
+              <div className="workspace__more-menu" onClick={e=>e.stopPropagation()}>
+                <input className="workspace__more-search" placeholder="Search tabs…"
+                  value={moreSearch} onChange={e=>setMoreSearch(e.target.value)} autoFocus/>
+                <div style={{maxHeight:'220px',overflowY:'auto'}}>
+                  {filtered.map(t=>(
+                    <button key={t.id} className={`workspace__more-item${activeL1Tab===t.id?' active':''}`}
+                      onClick={()=>handleL1(t.id)}>{t.label}</button>
+                  ))}
+                  {filtered.length===0&&<div style={{padding:'8px 14px',fontSize:'12px',color:'#9ca3af'}}>No results</div>}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+      {l2Tabs.length>0&&(
+        <div className="workspace__tabs workspace__tabs--l2">
+          {l2Tabs.map(l2=>(
+            <button key={l2.id} className={`workspace__tab workspace__tab--l2${activeTab===l2.id?' active':''}`}
+              onClick={()=>setActiveTab(l2.id)}>{l2.name}</button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Workspace({activeL1Tab,setActiveL1Tab,activeTab,setActiveTab,l1Items,prompts,defaultPrompts,tabMeta,saveStates,onEdit,onSave,onVersion,onPreview,onTest,cbLevels}){
+  const getMeta=tabId=>{
+    if(tabId==='global')return{version:'1.0',score:'N/A',status:'Active',title:'Global Prompt'};
+    const base=tabMeta?.[tabId]||DEFAULT_TAB_META;
+    if(tabId==='l1')return{...base,title:'Level 1 : Classification'};
+    const item=l1Items.find(i=>i.id===tabId);
+    if(item)return{...base,title:`Level 2 : ${item.name}`};
+    for(const l1 of l1Items){const l2=l1.l2.find(x=>x.id===tabId);if(l2)return{...base,title:`${l1.name}  ›  ${l2.name}`};}
+    return{...base,title:tabId};
+  };
+  const getCtx=tabId=>{
+    if(tabId==='global')return{level:'global',chip:'Global',scope:'Base instructions · inherited by all levels'};
+    if(tabId==='l1')return{level:'l1',chip:'L1',scope:'Classifies documents into categories'};
+    const item=l1Items.find(i=>i.id===tabId);
+    if(item)return{level:'l2',chip:'L2',scope:`Within ${item.name}`};
+    for(const l1 of l1Items){const l2=l1.l2.find(x=>x.id===tabId);if(l2)return{level:'l2',chip:'L2',scope:`${l1.name} › ${l2.name}`};}
+    return{level:'l1',chip:'',scope:''};
+  };
+  const [showResetConfirm,setShowResetConfirm]=useState(false);
+  useEffect(()=>setShowResetConfirm(false),[activeTab]);
+  const meta=getMeta(activeTab);
+  const ctx=getCtx(activeTab);
+  const prompt=prompts[activeTab]||'';
+  const ss=saveStates[activeTab];
+  const showWarn=activeTab==='l1'&&!prompt.includes('{{CLASSIFICATION_HIERARCHY}}');
+  const found=[...new Set(prompt.match(/\{\{[^}]+\}\}/g)||[])];
+  const missing=['{{CLASSIFICATION_HIERARCHY}}'].filter(p=>!prompt.includes(p));
+  const doReset=()=>{onEdit(activeTab,defaultPrompts?.[activeTab]||'');setShowResetConfirm(false);};
+  return(
+    <main className="workspace">
+      <div className="workspace__header"><span className="workspace__title">Classification Prompts</span></div>
+      <WorkspaceTabs l1Items={l1Items} activeL1Tab={activeL1Tab} setActiveL1Tab={setActiveL1Tab} activeTab={activeTab} setActiveTab={setActiveTab} cbLevels={cbLevels}/>
+      <div className="workspace__body">
+        <div className="workspace__lv-header">
+          <h3 className="workspace__lv-title">{meta.title}</h3>
+          <button className="workspace__manage-btn" onClick={onVersion}>Manage version</button>
+        </div>
+        <div className="workspace__ver-card">
+          <div className="workspace__ver-item"><span className="workspace__ver-lbl">Version</span><span className="workspace__ver-val">{meta.version}</span></div>
+          <div className="workspace__ver-div"/>
+          <div className="workspace__ver-item"><span className="workspace__ver-lbl">Confidence score</span><span className="workspace__ver-val">{meta.score}</span></div>
+          <div className="workspace__ver-div"/>
+          <div className="workspace__ver-item"><span className="workspace__ver-lbl">Status</span><span className={`workspace__status ${meta.status.toLowerCase()}`}>{meta.status}</span></div>
+        </div>
+        {showWarn&&<div className="workspace__warn"><IC.Warn/><span>The <code>{'{{CLASSIFICATION_HIERARCHY}}'}</code> placeholder is required</span></div>}
+        <div className="workspace__prompt-sec">
+          <div className="workspace__prompt-hdr">
+            <div style={{display:'flex',alignItems:'center',gap:'6px',minWidth:0,overflow:'hidden'}}>
+              <span className={`prompt-ctx-chip prompt-ctx-chip--${ctx.level}`}>{ctx.chip}</span>
+              <span className="workspace__prompt-lbl">Classification prompt</span>
+              {ctx.scope&&<span className="prompt-ctx-scope">· {ctx.scope}</span>}
+            </div>
+            <div className="workspace__prompt-hdr-right">
+              {ss==='unsaved'&&<span className="save-indicator unsaved">● Unsaved changes</span>}
+              {ss==='saved'&&<span className="save-indicator saved"><IC.Check/> Saved</span>}
+              <button className="workspace__reset-btn" onClick={()=>setShowResetConfirm(true)}>Reset</button>
+            </div>
+          </div>
+          <textarea className="workspace__textarea" value={prompt} onChange={e=>onEdit(activeTab,e.target.value)} spellCheck={false}/>
+          {showResetConfirm&&<div className="reset-confirm">
+            <span>Reset prompt to default? This will discard all changes.</span>
+            <div className="reset-confirm__actions">
+              <button className="btn-sm btn-outline" onClick={()=>setShowResetConfirm(false)}>Cancel</button>
+              <button className="btn-sm btn-danger" onClick={doReset}>Reset</button>
+            </div>
+          </div>}
+          <div className="prompt-footer">
+            <div className="placeholder-row">
+              {(found.length>0||missing.length>0)&&<span className="placeholder-row__lbl">Placeholders:</span>}
+              {found.map(p=><span key={p} className="ph-badge found"><IC.Check/> {p}</span>)}
+              {missing.map(p=><span key={p} className="ph-badge missing">⚠ {p}</span>)}
+            </div>
+            <span className="char-count">{prompt.length.toLocaleString()} chars</span>
+          </div>
+        </div>
+        <div className="workspace__actions">
+          <button className="workspace__preview-link" onClick={onPreview}>View full prompt</button>
+          <button className="workspace__btn primary" onClick={()=>{onSave(activeTab);onTest();}}>Test prompt</button>
+        </div>
+      </div>
+    </main>
+  );
+}
+
+/* ── Document Panel ── */
+function DocumentPanel({docs,allDocs,filter,setFilter,search,setSearch,toggleSel,selAll,delDoc,bulkDelete,handleUpload}){
+  const [dragOver,setDragOver]=useState(false);
+  const fileRef=useRef(null);
+  const allCount=allDocs.length,testedCount=allDocs.filter(d=>d.status==='Tested').length,pendCount=allDocs.filter(d=>d.status==='Pending').length;
+  const selCount=allDocs.filter(d=>d.selected).length,allSel=docs.length>0&&docs.every(d=>d.selected);
+  return(
+    <aside className="doc-panel">
+      <div className="doc-panel__upload">
+        <p className="doc-panel__sec-title">Upload test document</p>
+        <div className={`doc-panel__dropzone${dragOver?' drag-over':''}`}
+          onDragOver={e=>{e.preventDefault();setDragOver(true);}} onDragLeave={()=>setDragOver(false)}
+          onDrop={e=>{e.preventDefault();setDragOver(false);handleUpload(e.dataTransfer.files);}}
+          onClick={()=>fileRef.current?.click()}>
+          <input ref={fileRef} type="file" accept=".jpg,.jpeg,.png,.pdf" multiple style={{display:'none'}} onChange={e=>handleUpload(e.target.files)}/>
+          <IC.Upload/>
+          <p className="doc-panel__dz-text">Drag your file here or <span className="doc-panel__browse">browse</span></p>
+          <p className="doc-panel__dz-hint">JPG, PNG or PDF · less than 5MB · up to 5 files</p>
+        </div>
+      </div>
+      <div className="doc-panel__docs">
+        <p className="doc-panel__sec-title">Documents</p>
+        <div className="doc-panel__search-wrap"><span className="doc-panel__search-icon"><IC.Search/></span>
+          <input className="doc-panel__search" placeholder="Search documents…" value={search} onChange={e=>setSearch(e.target.value)}/>
+          {search&&<button className="search-clear-btn" onClick={()=>setSearch('')}>×</button>}</div>
+        <div className="doc-panel__filters">
+          {[['all','All',allCount],['tested','Tested',testedCount],['pending','Pending',pendCount]].map(([id,lbl,cnt])=>(
+            <button key={id} className={`doc-panel__filter-btn${filter===id?' active':''}`} onClick={()=>setFilter(id)}>
+              <span className={`doc-panel__cnt ${id}`}>{cnt}</span>{lbl}
+            </button>
+          ))}
+        </div>
+        {selCount>=2&&<div className="bulk-bar">
+          <span className="bulk-bar__info">{selCount} selected</span>
+          <button className="bulk-bar__btn danger" onClick={bulkDelete}><IC.Trash/> Delete</button>
+        </div>}
+        <div className="doc-panel__list-hdr">
+          <span className="doc-panel__sel-info">{selCount>0?`${selCount} of ${allCount} selected`:`0 of ${allCount}`}</span>
+          <button className="doc-panel__sel-all" onClick={selAll}>{allSel&&docs.length>0?'Deselect all':'Select all'}</button>
+        </div>
+        <div className="doc-panel__list">
+          {docs.length===0?<div className="doc-panel__empty">{search?'No results found':'No documents found'}</div>
+          :docs.map(doc=>(
+            <div key={doc.id} className={`doc-panel__item${doc.selected?' selected':''}`}>
+              <input type="checkbox" className="doc-panel__cb" checked={doc.selected} onChange={()=>toggleSel(doc.id)}/>
+              <span className="doc-panel__file-icon"><IC.File/></span>
+              <span className="doc-panel__file-name" title={doc.name}>{doc.name}</span>
+              <span className={`doc-panel__status ${doc.status.toLowerCase()}`}>{doc.status}</span>
+              <button className="doc-panel__del" onClick={()=>delDoc(doc.id)} title="Delete"><IC.Trash/></button>
+            </div>
+          ))}
+        </div>
+        <div className="doc-panel__footer">Showing <strong>{docs.length}</strong> of <strong>{allCount}</strong></div>
+      </div>
+    </aside>
+  );
+}
+
+/* ── Modals ── */
+function VersionModal({lob,onClose}){
+  const versions=lob?.versions||[];
+  return(<div className="modal-overlay" onClick={onClose}><div className="modal" onClick={e=>e.stopPropagation()}>
+    <div className="modal__header"><h3>Manage Versions — {lob?.name||''}</h3><button className="modal__close" onClick={onClose}>×</button></div>
+    <div className="modal__body">
+      {versions.length===0
+        ?<p style={{padding:'16px',color:'#6b7280',fontSize:'13px'}}>No version history available.</p>
+        :<table className="version-table"><thead><tr><th>Version</th><th>Date</th><th>Confidence</th><th>Status</th><th>Note</th><th>Created by</th><th>Action</th></tr></thead><tbody>
+          {versions.map(v=><tr key={v.v}>
+            <td><strong>{v.v}</strong></td>
+            <td>{v.date}</td>
+            <td>{v.score}</td>
+            <td><span className={`badge badge-${v.status.toLowerCase()}`}>{v.status}</span></td>
+            <td style={{fontSize:'11px',color:'#6b7280',maxWidth:'220px'}}>{v.note}</td>
+            <td>{v.createdBy}</td>
+            <td><button className="btn btn-outline btn-sm">{v.status==='Active'?'Current':'Restore'}</button></td>
+          </tr>)}
+        </tbody></table>
+      }
+    </div>
+    <div className="modal__footer"><button className="btn btn-outline" onClick={onClose}>Close</button><button className="btn btn-primary">Create new version</button></div>
+  </div></div>);
+}
+function PreviewModal({prompt,onClose}){return(<div className="modal-overlay" onClick={onClose}><div className="modal" onClick={e=>e.stopPropagation()}><div className="modal__header"><h3>Prompt Preview</h3><button className="modal__close" onClick={onClose}>×</button></div><div className="modal__body"><div className="preview-box"><pre>{prompt}</pre></div></div><div className="modal__footer"><button className="btn btn-primary" onClick={onClose}>Close</button></div></div></div>);}
+function TestModal({prompt,docs,onMarkTested,onClose}){
+  const pending=(docs||[]).filter(d=>d.status==='Pending');
+  const [selDoc,setSelDoc]=useState(()=>pending[0]?.id||null);
+  const [running,setRunning]=useState(false);
+  const [result,setResult]=useState(null);
+  const [showPrompt,setShowPrompt]=useState(false);
+  const run=()=>{
+    setRunning(true);setResult(null);
+    const doc=docs.find(d=>d.id===selDoc);
+    const fname=(doc?.name||'').toLowerCase();
+    // Derive mock result from filename keywords
+    const classify=()=>{
+      if(fname.includes('fnol')||fname.includes('claim_notif'))return{c:'FNOL',sc:96,r:'Document contains incident date, vehicle details, and "first notice of loss" form structure.'};
+      if(fname.includes('repair_inv')||fname.includes('repair_invoice'))return{c:'Repair Invoice',sc:94,r:'Garage letterhead, labour hours breakdown, parts list, and total cost with VAT — consistent with a completed repair invoice.'};
+      if(fname.includes('estimate'))return{c:'Estimate',sc:92,r:'Pre-repair cost estimate with "subject to inspection" language. No completion date or authorisation number present.'};
+      if(fname.includes('police_report')||fname.includes('police_rep'))return{c:'Police Report',sc:97,r:'Official police station header, officer badge number, incident CAD reference, and official stamp detected.'};
+      if(fname.includes('quotation')||fname.includes('quote'))return{c:'Quotation',sc:93,r:'Vehicle details, premium calculation breakdown, and validity period found. No policy number assigned — pre-binding stage.'};
+      if(fname.includes('renewal'))return{c:'Renewal Quote',sc:91,r:'Existing policy number present alongside renewal effective date and prior year premium comparison.'};
+      if(fname.includes('complaint'))return{c:'Simple Complaint',sc:88,r:'Customer dissatisfaction language detected. Single grievance, no regulatory escalation or legal references.'};
+      if(fname.includes('schadenmeldung')||fname.includes('kfz'))return{c:'KFZ Schaden',sc:95,r:'German motor damage claim. KFZ-Kennzeichen and Schadennummer detected. Consistent with Schadenmeldung structure.'};
+      if(fname.includes('versicherungsschein')||fname.includes('police'))return{c:'Versicherungsschein',sc:94,r:'German policy document. Versicherungsscheinnummer and Versicherungsnehmer fields present.'};
+      if(fname.includes('eho')||fname.includes('inspection'))return{c:'EHO Inspection Report',sc:90,r:'Local authority header, food hygiene rating scale, and improvement notice section detected.'};
+      if(fname.includes('pre_auth')||fname.includes('preauth'))return{c:'Pre-Authorisation Request',sc:89,r:'Consultant referral language, ICD-10 code field, and proposed treatment plan present. No invoice amount — pre-treatment stage.'};
+      if(fname.includes('survey')||fname.includes('rics'))return{c:'RICS Valuation Survey',sc:91,r:'RICS-accredited surveyor credentials, rebuild cost figure, and property risk features section detected.'};
+      if(fname.includes('cargo')||fname.includes('lading'))return{c:'Cargo Claim',sc:93,r:'Bill of Lading number, outturn report reference, and cargo damage description consistent with marine cargo claim.'};
+      if(fname.includes('hull'))return{c:'Hull Claim',sc:90,r:'IMO vessel number, collision damage description, and repair yard estimate present — consistent with hull insurance claim.'};
+      if(fname.includes('subsidence'))return{c:'Subsidence Claim',sc:87,r:'Structural engineer report, crack mapping reference, and soil investigation findings consistent with subsidence damage claim.'};
+      if(fname.includes('annual')||fname.includes('schedule'))return{c:'Annual Policy Schedule',sc:95,r:'12-month coverage period, policy number, named insured, and insurer stamp detected — consistent with annual policy schedule.'};
+      if(fname.includes('cancel')||fname.includes('kuendigung'))return{c:'Cancellation',sc:93,r:'Effective cancellation date, reason for cancellation, and pro-rata refund calculation present.'};
+      if(fname.includes('endorse')||fname.includes('nachtrag'))return{c:'Endorsement / Nachtrag',sc:92,r:'References original policy number with a specific amendment effective date — consistent with a policy endorsement.'};
+      if(fname.includes('witness'))return{c:'Witness Statement',sc:94,r:'Third-party witness name, contact details, and declaration of truth with dated signature detected.'};
+      if(fname.includes('photo')||fname.includes('.jpg'))return{c:'Accident Photos',sc:85,r:'Multi-angle vehicle damage photographs with embedded timestamps. Scene context visible — consistent with accident evidence submission.'};
+      return{c:'Policy Document',sc:82,r:'Insurance-related document structure detected. Specific sub-type could not be determined with high confidence — recommend manual review.'};
+    };
+    const{c,sc,r}=classify();
+    const jitter=Math.round((Math.random()*3-1.5)*10)/10;
+    setTimeout(()=>{
+      setResult({classification:c,confidence:`${Math.min(99,Math.max(60,sc+jitter)).toFixed(1)}%`,reasoning:r});
+      setRunning(false);
+      if(selDoc)onMarkTested(selDoc);
+    },1800);
+  };
+  return(<div className="modal-overlay" onClick={onClose}><div className="modal lg" onClick={e=>e.stopPropagation()}>
+    <div className="modal__header"><h3>Test Prompt</h3><button className="modal__close" onClick={onClose}>×</button></div>
+    <div className="modal__body"><div className="test-modal">
+      <div className="test-doc-section">
+        <h4>Test against</h4>
+        {pending.length===0
+          ?<div className="test-doc-none">No pending documents — upload a file first to test against real content.</div>
+          :<div className="test-doc-list">{pending.map(d=>(
+            <label key={d.id} className={`test-doc-item${selDoc===d.id?' selected':''}`} onClick={()=>setSelDoc(d.id)}>
+              <input type="radio" name="testDoc" checked={selDoc===d.id} onChange={()=>setSelDoc(d.id)}/>
+              <IC.File/><span style={{flex:1,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{d.name}</span>
+            </label>
+          ))}</div>
+        }
+      </div>
+      <button className="test-prompt-toggle" onClick={()=>setShowPrompt(s=>!s)}>
+        {showPrompt?'▾':'▸'} {showPrompt?'Hide prompt':'View prompt being tested'}
+      </button>
+      {showPrompt&&<div className="preview-box" style={{marginBottom:'12px'}}><pre>{prompt}</pre></div>}
+      {running&&<div className="test-running"><div className="test-spinner"/><span>Running classification test…</span></div>}
+      {result&&<div className="test-result-section"><h4>Result</h4><div className="test-result">
+        <div className="test-result__item"><span className="test-result__label">Classification:</span><span className="test-result__value">{result.classification}</span></div>
+        <div className="test-result__item"><span className="test-result__label">Confidence:</span><span className="test-result__value">{result.confidence}</span></div>
+        <div className="test-result__item"><span className="test-result__label">Reasoning:</span><span className="test-result__value">{result.reasoning}</span></div>
+      </div></div>}
+    </div></div>
+    <div className="modal__footer">
+      <button className="btn btn-outline" onClick={onClose}>Close</button>
+      <button className="btn btn-primary" onClick={run} disabled={running}>{running?'Running…':result?'Run again':'Run Test'}</button>
+    </div>
+  </div></div>);
+}
+
+/* ── Output Format Modal ── */
+const OF_FIELD_TYPES=['string','number','boolean','date','array','object'];
+const OF_TEMPLATES={
+  Invoice:[
+    {name:'invoice_number',type:'string',required:true, description:'Unique invoice identifier'},
+    {name:'date',          type:'date',  required:true, description:'Invoice date'},
+    {name:'vendor_name',   type:'string',required:false,description:'Vendor or supplier name'},
+    {name:'total_amount',  type:'number',required:true, description:'Total invoice amount'},
+    {name:'line_items',    type:'array', required:false,description:'List of individual line items'},
+  ],
+  Claim:[
+    {name:'claim_number',  type:'string',required:true, description:'Claim identifier'},
+    {name:'policy_number', type:'string',required:true, description:'Related policy number'},
+    {name:'date_of_loss',  type:'date',  required:true, description:'Date when loss occurred'},
+    {name:'claim_type',    type:'string',required:false,description:'Type of claim'},
+    {name:'amount',        type:'number',required:false,description:'Claimed amount'},
+  ],
+  Contract:[
+    {name:'contract_id',   type:'string',required:true, description:'Contract identifier'},
+    {name:'parties',       type:'array', required:true, description:'Contracting parties'},
+    {name:'effective_date',type:'date',  required:false,description:'Contract start date'},
+    {name:'expiry_date',   type:'date',  required:false,description:'Contract end date'},
+    {name:'value',         type:'number',required:false,description:'Contract monetary value'},
+  ],
+  Policy:[
+    {name:'policy_number', type:'string',required:true, description:'Policy identifier'},
+    {name:'insured_name',  type:'string',required:true, description:'Name of insured party'},
+    {name:'coverage_type', type:'string',required:false,description:'Type of coverage'},
+    {name:'premium',       type:'number',required:true, description:'Premium amount'},
+    {name:'effective_date',type:'date',  required:false,description:'Policy effective date'},
+  ],
+};
+
+function OutputFormatModal({lobs,schemas:initSchemas,onSave,activeLobId,onClose}){
+  // Auto-expand: use activeLobId if provided, else first LOB that has types
+  const [expandedLobs,setExpandedLobs]=useState(()=>{
+    const e={};
+    const target=activeLobId
+      ?lobs.find(l=>l.id===activeLobId)
+      :lobs.find(l=>l.categories.some(c=>c.types.length>0));
+    if(target)e[target.id]=true;
+    return e;
+  });
+  const [expandedCats,setExpandedCats]=useState(()=>{
+    // Auto-expand first category with types in the target LOB
+    const e={};
+    const target=activeLobId?lobs.find(l=>l.id===activeLobId):lobs.find(l=>l.categories.some(c=>c.types.length>0));
+    if(target){const cat=target.categories.find(c=>c.types.length>0);if(cat)e[cat.id+target.id]=true;}
+    return e;
+  });
+  const [sel,setSel]=useState(null); // {lobId,catId,typeId,lobName,catName,typeName}
+  const [schemas,setSchemas]=useState(initSchemas||{});  // initialized from persisted state
+  const [jsonMode,setJsonMode]=useState(false);
+  const [showImport,setShowImport]=useState(false);
+
+  const toggleLob=id=>setExpandedLobs(e=>({...e,[id]:!e[id]}));
+  const toggleCat=id=>setExpandedCats(e=>({...e,[id]:!e[id]}));
+  const getSchema=tid=>schemas[tid]||[];
+  const setSchema=(tid,fields)=>setSchemas(s=>({...s,[tid]:fields}));
+
+  const selectType=(lob,cat,type)=>{
+    setSel({lobId:lob.id,catId:cat.id,typeId:type.id,lobName:lob.name,catName:cat.name,typeName:type.name});
+    setJsonMode(false);setShowImport(false);
+  };
+
+  const addField=()=>{
+    if(!sel)return;
+    setSchema(sel.typeId,[...getSchema(sel.typeId),{id:Date.now().toString(),name:'',type:'string',required:false,description:''}]);
+  };
+  const updateField=(tid,fid,key,val)=>setSchema(tid,getSchema(tid).map(f=>f.id===fid?{...f,[key]:val}:f));
+  const deleteField=(tid,fid)=>setSchema(tid,getSchema(tid).filter(f=>f.id!==fid));
+  const importTemplate=name=>{
+    if(!sel)return;
+    setSchema(sel.typeId,OF_TEMPLATES[name].map(f=>({...f,id:Date.now().toString()+Math.random()})));
+    setShowImport(false);
+  };
+
+  const toJson=()=>{
+    if(!sel)return '// Select a document type from the tree';
+    const fields=getSchema(sel.typeId);
+    if(!fields.length)return '// No fields defined yet\n// Click "+ Add field" or import a template';
+    const schema=Object.fromEntries(fields.filter(f=>f.name).map(f=>[f.name,{
+      type:f.type,...(f.required?{required:true}:{}),...(f.description?{description:f.description}:{})
+    }]));
+    return JSON.stringify({document_type:sel.typeName,schema},null,2);
+  };
+
+  const fields=sel?getSchema(sel.typeId):[];
+  // Scope tree: if opened from a specific LOB, show only that LOB; otherwise show all
+  const scopedLobs=activeLobId
+    ?lobs.filter(l=>l.id===activeLobId)
+    :lobs.filter(l=>l.categories.some(c=>c.types.length>0));
+
+  return(
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal of-modal" onClick={e=>e.stopPropagation()}>
+        <div className="modal__header">
+          <h3>Output Format{activeLobId&&scopedLobs[0]?` — ${scopedLobs[0].name}`:''}</h3>
+          <button className="modal__close" onClick={onClose}>×</button>
+        </div>
+        <div className="modal__body">
+          {/* ── Left tree ── */}
+          <div className="of-tree">
+            {scopedLobs.length===0&&<div style={{padding:'12px',fontSize:'12px',color:'#9ca3af'}}>No document types defined</div>}
+            {scopedLobs.map(lob=>(
+              <div key={lob.id} className="of-tree__lob">
+                <button className="of-tree__lob-btn" onClick={()=>toggleLob(lob.id)}
+                  style={activeLobId?{cursor:'default',fontWeight:600}:{}}>
+                  {!activeLobId&&<span style={{fontSize:'10px',opacity:.7}}>{expandedLobs[lob.id]?'▾':'▸'}</span>}
+                  {lob.name}
+                </button>
+                {expandedLobs[lob.id]&&lob.categories.filter(c=>c.types.length>0).map(cat=>(
+                  <div key={cat.id}>
+                    <button className="of-tree__cat-btn" onClick={()=>toggleCat(cat.id+lob.id)}>
+                      <span style={{fontSize:'10px',opacity:.7}}>{expandedCats[cat.id+lob.id]?'▾':'▸'}</span>
+                      {cat.name}
+                    </button>
+                    {expandedCats[cat.id+lob.id]&&cat.types.map(type=>(
+                      <button key={type.id}
+                        className={`of-tree__type-btn${sel?.typeId===type.id?' active':''}`}
+                        onClick={()=>selectType(lob,cat,type)}>
+                        {type.name}
+                        {schemas[type.id]?.length>0&&<span className="of-type-badge">{schemas[type.id].length}</span>}
+                      </button>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+
+          {/* ── Right schema panel ── */}
+          <div className="of-schema" onClick={()=>setShowImport(false)}>
+            {!sel?(
+              <div className="of-no-sel">
+                <span style={{fontSize:'32px'}}>🗂️</span>
+                <span>Select a document type from the tree<br/>to define its extraction schema</span>
+              </div>
+            ):(
+              <>
+                <div className="of-schema__hdr">
+                  <div>
+                    <div className="of-schema__title">{sel.typeName}</div>
+                    <div className="of-schema__path">{sel.lobName} › {sel.catName} › {sel.typeName}</div>
+                  </div>
+                  <div className="of-schema__actions">
+                    <button className={`btn btn-sm${jsonMode?' btn-primary':' btn-outline'}`}
+                      onClick={()=>setJsonMode(m=>!m)}>
+                      {jsonMode?'Field view':'JSON view'}
+                    </button>
+                    {!jsonMode&&<>
+                      <div className="import-dd" onClick={e=>e.stopPropagation()}>
+                        <button className="btn btn-outline btn-sm"
+                          onClick={()=>setShowImport(s=>!s)}>
+                          Import template ▾
+                        </button>
+                        {showImport&&(
+                          <div className="import-dd__menu">
+                            {Object.keys(OF_TEMPLATES).map(t=>(
+                              <button key={t} className="import-dd__item" onClick={()=>importTemplate(t)}>{t}</button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                      <button className="btn btn-primary btn-sm" onClick={addField}><IC.Plus s={11}/> Add field</button>
+                    </>}
+                  </div>
+                </div>
+                {jsonMode?(
+                  <pre className="of-json">{toJson()}</pre>
+                ):(
+                  <div className="of-table-wrap">
+                    <table className="of-table">
+                      <thead><tr>
+                        <th style={{width:'22%'}}>Field name</th>
+                        <th style={{width:'15%'}}>Data type</th>
+                        <th style={{width:'9%',textAlign:'center'}}>Required</th>
+                        <th>Description</th>
+                        <th style={{width:'36px'}}></th>
+                      </tr></thead>
+                      <tbody>
+                        {fields.length===0?(
+                          <tr><td colSpan={5} className="of-empty-row">
+                            No fields yet — click "+ Add field" or import a template
+                          </td></tr>
+                        ):fields.map(f=>(
+                          <tr key={f.id}>
+                            <td><input className="of-field-input" placeholder="field_name" value={f.name}
+                              onChange={e=>updateField(sel.typeId,f.id,'name',e.target.value)}/></td>
+                            <td>
+                              <select className="of-type-sel" value={f.type}
+                                onChange={e=>updateField(sel.typeId,f.id,'type',e.target.value)}>
+                                {OF_FIELD_TYPES.map(t=><option key={t} value={t}>{t}</option>)}
+                              </select>
+                            </td>
+                            <td style={{textAlign:'center'}}>
+                              <input type="checkbox" className="of-req-cb" checked={f.required}
+                                onChange={e=>updateField(sel.typeId,f.id,'required',e.target.checked)}/>
+                            </td>
+                            <td><input className="of-field-input" placeholder="Field description…" value={f.description}
+                              onChange={e=>updateField(sel.typeId,f.id,'description',e.target.value)}/></td>
+                            <td>
+                              <button className="of-del-btn" title="Remove field"
+                                onClick={()=>deleteField(sel.typeId,f.id)}><IC.Trash/></button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+        <div className="modal__footer">
+          <button className="btn btn-outline" onClick={onClose}>Discard</button>
+          <button className="btn btn-primary" onClick={()=>onSave(schemas)}>Save schema</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── App ── */
+function App(){
+  const {toasts,addToast,removeToast}=useToast();
+  const [page,setPage]=useState('lob-overview');
+  const [activeNav,setActiveNav]=useState('classification');
+  const [selectedLob,setSelectedLob]=useState(null);
+  const [typesModal,setTypesModal]=useState(null); // {lob, category}
+  const [showOutputFormat,setShowOutputFormat]=useState(false);
+  const [ofSchemas,setOfSchemas]=useState({});
+  const [tabMeta,setTabMeta]=useState({});       // persists across modal open/close
+  const [ofActiveLobId,setOfActiveLobId]=useState(null); // pre-selects LOB in tree
+  const [menus,setMenusState]=useState({user:false,tenant:false,lang:false});
+  const setMenu=key=>setMenusState(m=>Object.fromEntries(Object.keys(m).map(k=>[k,k===key?!m[k]:false])));
+  const handleNav=nav=>{
+    if(nav==='home'){setPage('dashboard');setActiveNav('home');return;}
+    if(nav==='classification'){setPage('lob-overview');setActiveNav('classification');return;}
+    addToast(`${nav.charAt(0).toUpperCase()+nav.slice(1)} section coming soon`,'info');
+  };
+
+  const [lobs,setLobs]=useState(INIT_LOBS);
+  const updateLobData=updated=>setLobs(ls=>ls.map(l=>l.id===updated.id?updated:l));
+  
+
+  /* Detail page state — initialized from selected LOB */
+  const [selectedLobId,setSelectedLobId]=useState(null);
+  const [cbLevels,setCbLevels]=useState({l1:true,l2:false});
+  const [l1Items,setL1Items]=useState([]);
+  const [l0Name,setL0Name]=useState('');
+  const [activeL1Tab,setActiveL1Tab]=useState('l1');
+  const [activeTab,setActiveTab]=useState('l1');
+  const [prompts,setPrompts]=useState({});
+  const [defaultPrompts,setDefaultPrompts]=useState({});
+  const [saveStates,setSaveStates]=useState({});
+  const saveTimers=useRef({});
+  const [showMenu,setShowMenu]=useState(null);
+  const [modal,setModal]=useState(null);
+  const [confirmState,setConfirmState]=useState(null);
+  const [docs,setDocs]=useState(makeDocs());
+  const [filter,setFilter]=useState('pending');
+  const [search,setSearch]=useState('');
+
+  const onSelectLob=lob=>{
+    setSelectedLob(lob);
+    setPage('category-overview');
+    setActiveNav('classification');
+  };
+
+  const deleteLob=lobId=>{
+    setLobs(ls=>ls.filter(l=>l.id!==lobId));
+    setPage('lob-overview');
+    addToast('LOB deleted','warning');
+  };
+  const deleteCategory=(lobId,catId)=>{
+    setLobs(ls=>ls.map(l=>l.id===lobId?{...l,categories:l.categories.filter(c=>c.id!==catId)}:l));
+    addToast('Category deleted','warning');
+  };
+  const addCategory=(lobId,name)=>{
+    const c={id:`cat-${Date.now()}`,name,activeVersion:'V.1',status:'Draft',confidence:0,trainedBy:'',prompt:'',types:[]};
+    setLobs(ls=>ls.map(l=>l.id===lobId?{...l,categories:[...l.categories,c]}:l));
+    addToast(`Category "${name}" added`);
+  };
+  const addType=(lobId,catId,name)=>{
+    const t={id:`type-${Date.now()}`,name,tags:[],prompt:''};
+    setLobs(ls=>ls.map(l=>l.id===lobId?{...l,categories:l.categories.map(c=>c.id===catId?{...c,types:[...c.types,t]}:c)}:l));
+    addToast(`Type "${name}" added`);
+  };
+
+  const onSelectCategory=(lob,cat)=>{
+    if(cat.types.length>0){
+      setTypesModal({lob,category:cat});
+    } else {
+      onManagePrompt(lob,cat,null);
+    }
+  };
+
+  const onManagePrompt=(lob,cat,type)=>{
+    const newL1Items=lob.categories.map(c=>({
+      id:c.id, name:c.name, expanded:false,
+      l2:c.types.map(t=>({id:t.id, name:t.name}))
+    }));
+    const newPrompts={
+      global:GLOBAL_PROMPT,
+      l1:lob.lobPrompt||'',
+      ...lob.categories.reduce((acc,c)=>{
+        acc[c.id]=c.prompt||'';
+        c.types.forEach(t=>{acc[t.id]=t.prompt||'';});
+        return acc;
+      },{})
+    };
+    // Build tab meta from live lob data
+    const meta={
+      global:{version:'1.0',score:'N/A',status:'Active'},
+      l1:{version:lob.classLv1Version||'V.1',score:`${lob.confidence}%`,status:lob.status},
+    };
+    lob.categories.forEach(c=>{
+      meta[c.id]={version:c.activeVersion||'V.1',score:`${c.confidence}%`,status:c.status};
+      c.types.forEach(t=>{meta[t.id]={version:c.activeVersion||'V.1',score:`${c.confidence}%`,status:c.status};});
+    });
+    const startTab=type?type.id:cat?cat.id:'l1';
+    const startL1Tab=cat?cat.id:'l1';
+    setSelectedLobId(lob.id);
+    setL1Items(newL1Items);
+    setL0Name(lob.name);
+    setPrompts(newPrompts);
+    setDefaultPrompts(newPrompts);
+    setTabMeta(meta);
+    setSaveStates({});
+    setActiveTab(startTab);
+    setActiveL1Tab(startL1Tab);
+    setPage('detail');
+    setActiveNav('classification');
+  };
+
+  const onBackToList=()=>{
+    setPage('category-overview');
+  };
+
+  const handleEdit=useCallback((tabId,value)=>{
+    setPrompts(p=>({...p,[tabId]:value}));
+    setSaveStates(s=>({...s,[tabId]:'unsaved'}));
+    clearTimeout(saveTimers.current[tabId]);
+    saveTimers.current[tabId]=setTimeout(()=>setSaveStates(s=>({...s,[tabId]:'saved'})),1500);
+  },[]);
+  const handleSave=useCallback(tabId=>{clearTimeout(saveTimers.current[tabId]);setSaveStates(s=>({...s,[tabId]:'saved'}));addToast('Prompt saved');},[addToast]);
+
+  const filteredDocs=docs.filter(d=>filter==='all'||d.status.toLowerCase()===filter).filter(d=>!search||d.name.toLowerCase().includes(search.toLowerCase()));
+  const toggleSel=id=>setDocs(ds=>ds.map(d=>d.id===id?{...d,selected:!d.selected}:d));
+  const selAll=()=>{const ids=new Set(filteredDocs.map(d=>d.id));const all=filteredDocs.every(d=>d.selected);setDocs(ds=>ds.map(d=>ids.has(d.id)?{...d,selected:!all}:d));};
+  const delDoc=id=>{setDocs(ds=>ds.filter(d=>d.id!==id));addToast('Document removed','warning');};
+  const markTested=id=>setDocs(ds=>ds.map(d=>d.id===id?{...d,status:'Tested',selected:false}:d));
+  const selCount=docs.filter(d=>d.selected).length;
+  const bulkDelete=()=>{setDocs(ds=>ds.filter(d=>!d.selected));addToast(`${selCount} document(s) deleted`,'warning');};
+  const handleUpload=files=>{
+    const all=Array.from(files);
+    const valid=all.filter(f=>['image/jpeg','image/png','application/pdf'].includes(f.type)&&f.size<=5*1024*1024);
+    const badType=all.filter(f=>!['image/jpeg','image/png','application/pdf'].includes(f.type));
+    const tooBig=all.filter(f=>f.type&&f.size>5*1024*1024);
+    valid.forEach(f=>setDocs(prev=>[...prev,{id:Date.now()+Math.random(),name:f.name,status:'Pending',selected:false}]));
+    if(valid.length>0)addToast(`${valid.length} file(s) uploaded`,'success');
+    if(badType.length>0)addToast(`${badType.length} file(s) rejected — PDF/JPG/PNG only`,'error');
+    if(tooBig.length>0)addToast(`${tooBig.length} file(s) rejected — max 5MB`,'error');
+  };
+
+  useEffect(()=>{
+    const validTabs=new Set(['global']);
+    if(cbLevels.l1)validTabs.add('l1');
+    if(cbLevels.l2)l1Items.forEach(i=>{validTabs.add(i.id);i.l2.forEach(l2=>validTabs.add(l2.id));});
+    if(!validTabs.has(activeTab)){
+      // Prefer L1 when coming from L2, else fall back to Global
+      const fallback=(activeTab!=='l1'&&cbLevels.l1)?'l1':'global';
+      setActiveTab(fallback);setActiveL1Tab(fallback);
+    }
+  },[l1Items,cbLevels]);
+
+  useEffect(()=>{
+    const handler=e=>{
+      if(e.key==='Escape'){setModal(null);setConfirmState(null);}
+      if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();handleSave(activeTab);}
+    };
+    window.addEventListener('keydown',handler);
+    return()=>window.removeEventListener('keydown',handler);
+  },[activeTab,handleSave]);
+
+  const closeAll=()=>{setMenusState({user:false,tenant:false,lang:false});setShowMenu(null);};
+  const selectedLobFromState=lobs.find(l=>l.id===selectedLobId)||selectedLob;
+
+  return(
+    <div className="app" onClick={closeAll}>
+      <NavBar activeNav={activeNav} onNav={handleNav} menus={menus} setMenu={setMenu}/>
+
+      {page==='dashboard'&&<Dashboard lobs={lobs} onNavigate={nav=>{if(nav==='config-list'){setPage('config-list');setActiveNav('classification');}else addToast(`${nav} coming soon`,'info');}}/>}
+
+      {page==='lob-overview'&&<LobOverview lobs={lobs} onSelectLob={onSelectLob} addToast={addToast}
+        onOpenOutputFormat={()=>{setOfActiveLobId(null);setShowOutputFormat(true);}}
+        onConfirm={setConfirmState} onDeleteLob={deleteLob}/>}
+
+      {page==='category-overview'&&selectedLob&&<CategoryOverview
+        lob={lobs.find(l=>l.id===selectedLob.id)||selectedLob}
+        onBack={()=>setPage('lob-overview')}
+        onSelectCategory={onSelectCategory}
+        onManagePrompt={onManagePrompt}
+        onOpenOutputFormat={()=>{setOfActiveLobId(selectedLob.id);setShowOutputFormat(true);}}
+        onConfirm={setConfirmState}
+        onAddCategory={addCategory}
+        onDeleteCategory={deleteCategory}
+        addToast={addToast}/>}
+
+      {page==='detail'&&<>
+        <div className="app__sub-bar">
+          <span className="app__breadcrumb">Classification › {selectedLob?.name||''} › Prompt management</span>
+        </div>
+        <div className="app__back-bar">
+          <button className="app__back-btn" onClick={onBackToList}><IC.Back/> Back to Categories</button>
+        </div>
+        <div className="app__content">
+          <Sidebar cbLevels={cbLevels} setCbLevels={setCbLevels} l0Name={l0Name} setL0Name={setL0Name}
+            l1Items={l1Items} setL1Items={setL1Items} showMenu={showMenu} setShowMenu={setShowMenu}
+            addToast={addToast} onConfirm={setConfirmState}/>
+          <Workspace activeL1Tab={activeL1Tab} setActiveL1Tab={setActiveL1Tab} activeTab={activeTab} setActiveTab={setActiveTab} l1Items={l1Items}
+            prompts={prompts} defaultPrompts={defaultPrompts} tabMeta={tabMeta} saveStates={saveStates}
+            onEdit={handleEdit} onSave={handleSave} cbLevels={cbLevels}
+            onVersion={()=>setModal('version')} onPreview={()=>setModal('preview')} onTest={()=>setModal('test')}/>
+          <DocumentPanel docs={filteredDocs} allDocs={docs} filter={filter} setFilter={setFilter}
+            search={search} setSearch={setSearch} toggleSel={toggleSel} selAll={selAll}
+            delDoc={delDoc} bulkDelete={bulkDelete} handleUpload={handleUpload}/>
+        </div>
+        {modal==='version'&&<VersionModal lob={selectedLobFromState} onClose={()=>setModal(null)}/>}
+        {modal==='preview'&&<PreviewModal prompt={prompts[activeTab]||''} onClose={()=>setModal(null)}/>}
+        {modal==='test'&&<TestModal prompt={prompts[activeTab]||''} docs={docs} onMarkTested={markTested} onClose={()=>setModal(null)}/>}
+      </>}
+
+      {typesModal&&(()=>{
+        const freshLob=lobs.find(l=>l.id===typesModal.lob.id)||typesModal.lob;
+        const freshCat=freshLob.categories.find(c=>c.id===typesModal.category.id)||typesModal.category;
+        return <TypesModal
+          lob={freshLob} category={freshCat}
+          onClose={()=>setTypesModal(null)}
+          onManagePrompt={(lob,cat,type)=>{setTypesModal(null);onManagePrompt(lob,cat,type);}}
+          onAddType={addType}
+          addToast={addToast}/>;
+      })()}
+
+      {confirmState&&<div className="modal-overlay" onClick={()=>setConfirmState(null)}>
+        <div className="confirm-dialog" onClick={e=>e.stopPropagation()}>
+          <div className="confirm-dialog__icon">⚠️</div>
+          <div className="confirm-dialog__title">{confirmState.title}</div>
+          <p className="confirm-dialog__msg">{confirmState.message}</p>
+          <div className="confirm-dialog__actions">
+            <button className="btn btn-outline" onClick={()=>setConfirmState(null)}>Cancel</button>
+            <button className="btn btn-danger" onClick={()=>{confirmState.onConfirm();setConfirmState(null);}}>{confirmState.confirmLabel}</button>
+          </div>
+        </div>
+      </div>}
+
+      {showOutputFormat&&<OutputFormatModal lobs={lobs} schemas={ofSchemas}
+        onSave={saved=>{setOfSchemas(saved);addToast('Output format saved');setShowOutputFormat(false);}}
+        activeLobId={ofActiveLobId} onClose={()=>setShowOutputFormat(false)}/>}
+
+      <ToastContainer toasts={toasts} removeToast={removeToast}/>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+
+</script>
+</body>
+</html>
