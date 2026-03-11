@@ -429,6 +429,7 @@ input,textarea,select{font-family:inherit}
 .prompt-ctx-chip--global{background:#f3e8ff;color:#7c3aed}
 .prompt-ctx-chip--l1{background:#dbeafe;color:#1d4ed8}
 .prompt-ctx-chip--l2{background:#d1fae5;color:#065f46}
+.prompt-ctx-chip--l1l2{background:linear-gradient(135deg,#dbeafe,#d1fae5);color:#1d4ed8;border:1px solid #bfdbfe}
 .prompt-ctx-scope{font-size:11px;color:#9ca3af;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 /* ── Output Format Modal ── */
@@ -1938,8 +1939,8 @@ function WorkspaceTabs({l1Items,activeL1Tab,setActiveL1Tab,activeTab,setActiveTa
   const MORE_W=100; // px reserved for "+N more" pill
 
   const allL1=[
-    {id:'global',label:'Global',l2:[]},
-    ...(cbLevels.l1?[{id:'l1',label:'L1 Classification',l2:[]}]:[]),
+    // L1 is always the first tab (Required). Global tab removed — too confusing for users.
+    {id:'l1',label:cbLevels.l2?'L1 + L2 Classification':'L1 Classification',l2:[]},
     ...(cbLevels.l2?l1Items.map(i=>({id:i.id,label:i.name,l2:i.l2})):[]),
   ];
 
@@ -2037,19 +2038,22 @@ function WorkspaceTabs({l1Items,activeL1Tab,setActiveL1Tab,activeTab,setActiveTa
 
 function Workspace({activeL1Tab,setActiveL1Tab,activeTab,setActiveTab,l1Items,prompts,defaultPrompts,tabMeta,saveStates,onEdit,onSave,onVersion,onPreview,onTest,cbLevels,ofSchemas,docs}){
   const getMeta=tabId=>{
-    if(tabId==='global')return{version:'1.0',score:'N/A',status:'Active',title:'Global Prompt'};
     const base=tabMeta?.[tabId]||DEFAULT_TAB_META;
-    if(tabId==='l1')return{...base,title:'Level 1 : Classification'};
+    if(tabId==='l1'){
+      const title=cbLevels.l2?'Global Classification Prompt (L1 + L2)':'L1 Classification Prompt';
+      return{...base,title};
+    }
     const item=l1Items.find(i=>i.id===tabId);
-    if(item)return{...base,title:`Level 2 : ${item.name}`};
+    if(item)return{...base,title:`Category : ${item.name}`};
     for(const l1 of l1Items){const l2=l1.l2.find(x=>x.id===tabId);if(l2)return{...base,title:`${l1.name}  ›  ${l2.name}`};}
     return{...base,title:tabId};
   };
   const getCtx=tabId=>{
-    if(tabId==='global')return{level:'global',chip:'Global',scope:'Base instructions · inherited by all levels'};
-    if(tabId==='l1')return{level:'l1',chip:'L1',scope:'Classifies documents into categories'};
+    if(tabId==='l1')return cbLevels.l2
+      ?{level:'l2',chip:'L1+L2',scope:'Classifies into categories and sub-types'}
+      :{level:'l1',chip:'L1',scope:'Classifies documents into top-level categories'};
     const item=l1Items.find(i=>i.id===tabId);
-    if(item)return{level:'l2',chip:'L2',scope:`Within ${item.name}`};
+    if(item)return{level:'l2',chip:'L2',scope:`Category refinement — ${item.name}`};
     for(const l1 of l1Items){const l2=l1.l2.find(x=>x.id===tabId);if(l2)return{level:'l2',chip:'L2',scope:`${l1.name} › ${l2.name}`};}
     return{level:'l1',chip:'',scope:''};
   };
@@ -2093,7 +2097,7 @@ function Workspace({activeL1Tab,setActiveL1Tab,activeTab,setActiveTab,l1Items,pr
         <div className="workspace__prompt-sec">
           <div className="workspace__prompt-hdr">
             <div style={{display:'flex',alignItems:'center',gap:'6px',minWidth:0,overflow:'hidden'}}>
-              <span className={`prompt-ctx-chip prompt-ctx-chip--${ctx.level}`}>{ctx.chip}</span>
+              <span className={`prompt-ctx-chip prompt-ctx-chip--${ctx.level==='l2'&&ctx.chip==='L1+L2'?'l1l2':ctx.level}`}>{ctx.chip}</span>
               <span className="workspace__prompt-lbl">Classification prompt</span>
               {ctx.scope&&<span className="prompt-ctx-scope">· {ctx.scope}</span>}
             </div>
@@ -2686,13 +2690,11 @@ function App(){
   };
 
   useEffect(()=>{
-    const validTabs=new Set(['global']);
-    if(cbLevels.l1)validTabs.add('l1');
+    // l1 tab is always valid (Required). Category/type tabs only valid when L2 is on.
+    const validTabs=new Set(['l1']);
     if(cbLevels.l2)l1Items.forEach(i=>{validTabs.add(i.id);i.l2.forEach(l2=>validTabs.add(l2.id));});
     if(!validTabs.has(activeTab)){
-      // Prefer L1 when coming from L2, else fall back to Global
-      const fallback=(activeTab!=='l1'&&cbLevels.l1)?'l1':'global';
-      setActiveTab(fallback);setActiveL1Tab(fallback);
+      setActiveTab('l1');setActiveL1Tab('l1');
     }
   },[l1Items,cbLevels]);
 
