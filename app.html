@@ -566,9 +566,12 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
 .cat-sec__body{overflow:hidden}
 .cat-sec__prompt{padding:18px 20px;display:flex;flex-direction:column;gap:12px}
 /* ── Test action zone (section footer bar) ── */
-.test-action-zone{display:flex;align-items:center;gap:8px;padding:10px 14px;background:#f8faff;border:1px solid #dbeafe;border-radius:10px;margin-top:8px}
-.test-action-zone__status{display:flex;align-items:center;gap:5px;flex:1;flex-wrap:wrap}
+.test-action-zone{display:flex;flex-direction:column;gap:8px;padding:12px 14px;background:#f8faff;border:1px solid #dbeafe;border-radius:10px;margin-top:8px}
+.test-action-zone__top{display:flex;align-items:center;gap:8px}
+.test-action-zone__title{font-size:12px;font-weight:600;color:#1d4ed8;flex:1}
 .test-action-zone__actions{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.test-action-zone__bottom{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.test-action-zone__hint{font-size:10px;color:#93c5fd;margin-left:auto;white-space:nowrap}
 .test-chip{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap;line-height:1.5}
 .test-chip--tested{background:#dcfce7;color:#15803d}
 .test-chip--pending{background:#fef3c7;color:#92400e}
@@ -1960,19 +1963,23 @@ function LobPromptSection({lobName,prompt,defaultPrompt,meta,saveState,onEdit,on
           </div>
           <div className="test-action-zone">
             <input ref={fileRef} type="file" accept=".jpg,.jpeg,.png,.pdf" multiple style={{display:'none'}} onChange={e=>processFiles(e.target.files)}/>
-            <div className="test-action-zone__status">
+            <div className="test-action-zone__top">
+              <span className="test-action-zone__title">🧪 Test this prompt</span>
+              <div className="test-action-zone__actions">
+                <button className="test-action-zone__add" onClick={()=>fileRef.current?.click()}>+ Add doc</button>
+                <button className="test-action-zone__btn" onClick={()=>{onSave();setShowTest(true);}}>Open test panel ↗</button>
+              </div>
+            </div>
+            <div className="test-action-zone__bottom">
               {allCount===0
-                ?<span className="test-chip test-chip--empty">No documents</span>
+                ?<span className="test-chip test-chip--empty">No documents yet</span>
                 :<>
                   {testedCount>0&&<span className="test-chip test-chip--tested">✓ {testedCount} tested</span>}
                   {pendingCount>0&&<span className="test-chip test-chip--pending">{pendingCount} pending</span>}
                   {testedCount===0&&pendingCount===0&&<span className="test-chip test-chip--empty">{allCount} uploaded</span>}
                 </>
               }
-            </div>
-            <div className="test-action-zone__actions">
-              <button className="test-action-zone__add" onClick={()=>fileRef.current?.click()}>+ Add doc</button>
-              <button className="test-action-zone__btn" onClick={()=>{onSave();setShowTest(true);}}>🧪 Run Test</button>
+              <span className="test-action-zone__hint">Pick a document → run → see output</span>
             </div>
           </div>
         </div>
@@ -2075,19 +2082,23 @@ function CategorySection({catItem,prompt,defaultPrompt,meta,saveState,onEdit,onS
           </div>
           <div className="test-action-zone">
             <input ref={fileRef} type="file" accept=".jpg,.jpeg,.png,.pdf" multiple style={{display:'none'}} onChange={e=>processFiles(e.target.files)}/>
-            <div className="test-action-zone__status">
+            <div className="test-action-zone__top">
+              <span className="test-action-zone__title">🧪 Test this prompt</span>
+              <div className="test-action-zone__actions">
+                <button className="test-action-zone__add" onClick={()=>fileRef.current?.click()}>+ Add doc</button>
+                <button className="test-action-zone__btn" onClick={()=>{onSave();setShowTest(true);}}>Open test panel ↗</button>
+              </div>
+            </div>
+            <div className="test-action-zone__bottom">
               {allCount===0
-                ?<span className="test-chip test-chip--empty">No documents</span>
+                ?<span className="test-chip test-chip--empty">No documents yet</span>
                 :<>
                   {testedCount>0&&<span className="test-chip test-chip--tested">✓ {testedCount} tested</span>}
                   {pendingCount>0&&<span className="test-chip test-chip--pending">{pendingCount} pending</span>}
                   {testedCount===0&&pendingCount===0&&<span className="test-chip test-chip--empty">{allCount} uploaded</span>}
                 </>
               }
-            </div>
-            <div className="test-action-zone__actions">
-              <button className="test-action-zone__add" onClick={()=>fileRef.current?.click()}>+ Add doc</button>
-              <button className="test-action-zone__btn" onClick={()=>{onSave();setShowTest(true);}}>🧪 Run Test</button>
+              <span className="test-action-zone__hint">Pick a document → run → see output</span>
             </div>
           </div>
         </div>
