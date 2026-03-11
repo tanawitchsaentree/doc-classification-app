@@ -1938,11 +1938,11 @@ function WorkspaceTabs({l1Items,activeL1Tab,setActiveL1Tab,activeTab,setActiveTa
   const recalcRef=useRef(null);
   const MORE_W=100; // px reserved for "+N more" pill
 
-  const allL1=[
-    // L1 is always the first tab (Required). Global tab removed — too confusing for users.
-    {id:'l1',label:cbLevels.l2?'L1 + L2 Classification':'L1 Classification',l2:[]},
-    ...(cbLevels.l2?l1Items.map(i=>({id:i.id,label:i.name,l2:i.l2})):[]),
-  ];
+  // L1 only  → one tab per category (each has its own prompt)
+  // L1+L2    → single unified global prompt, no category tabs
+  const allL1=cbLevels.l2
+    ?[{id:'l1',label:'Global Classification',l2:[]}]
+    :l1Items.map(i=>({id:i.id,label:i.name,l2:[]}));
 
   // Always keep recalcRef current so ResizeObserver closure doesn't go stale
   recalcRef.current=()=>{
@@ -1988,8 +1988,8 @@ function WorkspaceTabs({l1Items,activeL1Tab,setActiveL1Tab,activeTab,setActiveTa
   const hiddenCount=hiddenAll.length;
   const anyHiddenActive=hiddenAll.some(t=>t.id===activeL1Tab);
   const handleL1=id=>{setActiveL1Tab(id);setActiveTab(id);setShowMore(false);setMoreSearch('');};
-  const activeL1Item=l1Items.find(i=>i.id===activeL1Tab);
-  const l2Tabs=activeL1Item?.l2||[];
+  // No L2 sub-tabs in workspace bar — type-level prompts accessed through types modal
+  const l2Tabs=[];
 
   return(
     <div className="workspace__tab-area">
@@ -2039,22 +2039,19 @@ function WorkspaceTabs({l1Items,activeL1Tab,setActiveL1Tab,activeTab,setActiveTa
 function Workspace({activeL1Tab,setActiveL1Tab,activeTab,setActiveTab,l1Items,prompts,defaultPrompts,tabMeta,saveStates,onEdit,onSave,onVersion,onPreview,onTest,cbLevels,ofSchemas,docs}){
   const getMeta=tabId=>{
     const base=tabMeta?.[tabId]||DEFAULT_TAB_META;
-    if(tabId==='l1'){
-      const title=cbLevels.l2?'Global Classification Prompt (L1 + L2)':'L1 Classification Prompt';
-      return{...base,title};
-    }
+    // L1+L2 mode → single global prompt tab
+    if(tabId==='l1')return{...base,title:cbLevels.l2?'Global Classification Prompt (L1 + L2)':'L1 Classification Prompt'};
+    // L1 only mode → per-category tabs
     const item=l1Items.find(i=>i.id===tabId);
-    if(item)return{...base,title:`Category : ${item.name}`};
-    for(const l1 of l1Items){const l2=l1.l2.find(x=>x.id===tabId);if(l2)return{...base,title:`${l1.name}  ›  ${l2.name}`};}
+    if(item)return{...base,title:`${item.name} — Classification Prompt`};
     return{...base,title:tabId};
   };
   const getCtx=tabId=>{
     if(tabId==='l1')return cbLevels.l2
-      ?{level:'l2',chip:'L1+L2',scope:'Classifies into categories and sub-types'}
+      ?{level:'l1l2',chip:'L1+L2',scope:'Unified prompt — classifies into categories and types'}
       :{level:'l1',chip:'L1',scope:'Classifies documents into top-level categories'};
     const item=l1Items.find(i=>i.id===tabId);
-    if(item)return{level:'l2',chip:'L2',scope:`Category refinement — ${item.name}`};
-    for(const l1 of l1Items){const l2=l1.l2.find(x=>x.id===tabId);if(l2)return{level:'l2',chip:'L2',scope:`${l1.name} › ${l2.name}`};}
+    if(item)return{level:'l1',chip:'L1',scope:`Category: ${item.name}`};
     return{level:'l1',chip:'',scope:''};
   };
   const [showResetConfirm,setShowResetConfirm]=useState(false);
@@ -2097,7 +2094,7 @@ function Workspace({activeL1Tab,setActiveL1Tab,activeTab,setActiveTab,l1Items,pr
         <div className="workspace__prompt-sec">
           <div className="workspace__prompt-hdr">
             <div style={{display:'flex',alignItems:'center',gap:'6px',minWidth:0,overflow:'hidden'}}>
-              <span className={`prompt-ctx-chip prompt-ctx-chip--${ctx.level==='l2'&&ctx.chip==='L1+L2'?'l1l2':ctx.level}`}>{ctx.chip}</span>
+              <span className={`prompt-ctx-chip prompt-ctx-chip--${ctx.level}`}>{ctx.chip}</span>
               <span className="workspace__prompt-lbl">Classification prompt</span>
               {ctx.scope&&<span className="prompt-ctx-scope">· {ctx.scope}</span>}
             </div>
@@ -2644,8 +2641,10 @@ function App(){
       meta[c.id]={version:c.activeVersion||'V.1',score:`${c.confidence}%`,status:c.status};
       c.types.forEach(t=>{meta[t.id]={version:c.activeVersion||'V.1',score:`${c.confidence}%`,status:c.status};});
     });
-    const startTab=type?type.id:cat?cat.id:'l1';
-    const startL1Tab=cat?cat.id:'l1';
+    // L1+L2 mode: always land on global 'l1' tab
+    // L1 only:   land on the clicked category, else first category
+    const startTab=cbLevels.l2?'l1':(cat?cat.id:(newL1Items[0]?.id||'l1'));
+    const startL1Tab=startTab;
     setSelectedLobId(lob.id);
     setL1Items(newL1Items);
     setL0Name(lob.name);
@@ -2690,11 +2689,16 @@ function App(){
   };
 
   useEffect(()=>{
-    // l1 tab is always valid (Required). Category/type tabs only valid when L2 is on.
-    const validTabs=new Set(['l1']);
-    if(cbLevels.l2)l1Items.forEach(i=>{validTabs.add(i.id);i.l2.forEach(l2=>validTabs.add(l2.id));});
-    if(!validTabs.has(activeTab)){
-      setActiveTab('l1');setActiveL1Tab('l1');
+    if(cbLevels.l2){
+      // L1+L2 mode: only the global 'l1' tab exists
+      if(activeTab!=='l1'){setActiveTab('l1');setActiveL1Tab('l1');}
+    } else {
+      // L1 only mode: one tab per category — fallback to first category
+      const validIds=new Set(l1Items.map(i=>i.id));
+      if(!validIds.has(activeTab)&&l1Items.length>0){
+        const first=l1Items[0].id;
+        setActiveTab(first);setActiveL1Tab(first);
+      }
     }
   },[l1Items,cbLevels]);
 
