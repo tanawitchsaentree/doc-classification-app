@@ -862,6 +862,53 @@ body{font-family:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI'
 .sec-docs__zone:hover,.sec-docs__zone.drag-over{border-color:var(--a);background:var(--a-lt)}
 .sec-docs__browse{color:var(--a)}
 
+/* ── Test result card v2 ── */
+.tr-card{border-radius:var(--r-md);border:1px solid var(--bdr);overflow:hidden;animation:fadeUp .22s var(--smooth) both}
+.tr-card__header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;gap:10px}
+.tr-card__header--match{background:#f0fdf4;border-bottom:1px solid #bbf7d0}
+.tr-card__header--mismatch{background:#fef2f2;border-bottom:1px solid #fecaca}
+.tr-card__header--neutral{background:var(--a-lt);border-bottom:1px solid var(--a-mid)}
+.tr-card__label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--tx3);margin-bottom:3px}
+.tr-card__predicted{font-size:17px;font-weight:800;color:var(--tx1);letter-spacing:-.01em}
+.tr-card__verdict{font-size:11px;font-weight:700;padding:4px 11px;border-radius:var(--r-p);white-space:nowrap;flex-shrink:0}
+.tr-card__verdict--match{background:#dcfce7;color:#15803d}
+.tr-card__verdict--mismatch{background:#fee2e2;color:#dc2626}
+.tr-card__verdict--neutral{background:var(--a-d4);color:var(--a-h)}
+/* Confidence bar */
+.tr-conf{display:flex;align-items:center;gap:10px;padding:11px 16px;border-bottom:1px solid var(--bdr);background:var(--srf)}
+.tr-conf__title{font-size:11px;font-weight:600;color:var(--tx3);white-space:nowrap;min-width:70px}
+.tr-conf__bar{flex:1;height:6px;background:#f0f0f0;border-radius:3px;overflow:hidden}
+.tr-conf__fill{height:100%;border-radius:3px;transition:width .7s var(--eout)}
+.tr-conf__val{font-size:13px;font-weight:700;flex-shrink:0;min-width:42px;text-align:right}
+/* Compare row */
+.tr-compare{display:flex;align-items:center;border-bottom:1px solid var(--bdr)}
+.tr-compare--match{background:#f7fef9}
+.tr-compare--mismatch{background:#fff8f8}
+.tr-compare__col{display:flex;flex-direction:column;gap:3px;flex:1;padding:11px 16px}
+.tr-compare__lbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--tx3)}
+.tr-compare__val{font-size:13px;font-weight:700;color:var(--tx1)}
+.tr-compare__arrow{font-size:15px;font-weight:700;color:var(--tx3);flex-shrink:0;padding:0 2px}
+.tr-compare--match .tr-compare__arrow{color:#16a34a}
+.tr-compare--mismatch .tr-compare__arrow{color:#dc2626}
+/* Reasoning */
+.tr-reasoning{padding:12px 16px;font-size:12px;color:var(--tx2);line-height:1.6;background:var(--srf);border-bottom:1px solid var(--bdr)}
+/* Mismatch hint */
+.tr-hint{display:flex;align-items:center;gap:8px;padding:10px 16px;background:#fffbeb;font-size:11px;color:#92400e}
+.tr-hint__btn{margin-left:auto;background:none;border:none;font-size:11px;font-weight:600;color:#d97706;cursor:pointer;font-family:inherit;text-decoration:underline;padding:0;white-space:nowrap}
+/* No expectation */
+.tr-no-expect{display:flex;align-items:center;padding:10px 16px;background:var(--srf2);font-size:11px;color:var(--tx3)}
+.tr-no-expect__btn{margin-left:auto;background:none;border:none;font-size:11px;font-weight:600;color:var(--a);cursor:pointer;font-family:inherit;padding:0;white-space:nowrap}
+/* Expected label selector */
+.test-expect-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--srf2);border:1px solid var(--bdr);border-radius:var(--r);animation:fadeUp .15s var(--smooth) both}
+.test-expect-lbl{font-size:12px;font-weight:500;color:var(--tx2);white-space:nowrap;flex-shrink:0}
+.test-expect-sel{flex:1;padding:6px 10px;border:1.5px solid var(--bdr);border-radius:var(--r-sm);font-size:12px;color:var(--tx1);background:var(--srf);outline:none;font-family:inherit;cursor:pointer;transition:border-color var(--tf) var(--smooth),box-shadow var(--tf) var(--smooth)}
+.test-expect-sel:focus{border-color:var(--bdr-f);box-shadow:0 0 0 3px var(--a-glow)}
+/* Per-doc status badges */
+.test-status-badge--untested{background:#f3f4f6;color:var(--tx3)}
+.test-status-badge--matched{background:#dcfce7;color:#15803d}
+.test-status-badge--mismatched{background:#fee2e2;color:#dc2626}
+.test-status-badge--tested{background:var(--a-lt);color:var(--a-h)}
+
 /* ── Classification Setup wrap (shared bar above both layouts) ── */
 .cl-setup-wrap{padding:8px 20px 0;flex-shrink:0;background:var(--bg)}
 .cl-setup-wrap .cl-setup{margin-bottom:0}
@@ -2790,19 +2837,18 @@ function PreviewModal({prompt,onClose}){return(<div className="modal-overlay" on
 /* targets = [{id,name}]  — categories for Stage 1, types for Stage 2
    testTitle  = string shown in modal header
    expectedPlaceholder = hint text for the expected input */
-function TestModal({prompt,docs,onMarkTested,onClose,targets=[],testTitle='Test Prompt',expectedPlaceholder,onAddDoc,addToast}){
+function TestModal({prompt,docs,onMarkTested,onClose,targets=[],testTitle='Test Prompt',onAddDoc,addToast}){
   const allDocs=docs||[];
   const [docSearch,setDocSearch]=useState('');
   const [selDoc,setSelDoc]=useState(()=>allDocs.find(d=>d.status==='Pending')?.id||allDocs[0]?.id||null);
-  const [expectedType,setExpectedType]=useState('');
+  const [expectedLabel,setExpectedLabel]=useState('');
   const [running,setRunning]=useState(false);
   const [result,setResult]=useState(null);
   const [showPrompt,setShowPrompt]=useState(false);
+  const [docResults,setDocResults]=useState({});
   const fileRef=useRef(null);
 
-  const builtPlaceholder=expectedPlaceholder||(targets.length>0
-    ?`e.g. ${targets.slice(0,3).map(t=>t.name).join(', ')}${targets.length>3?'…':''}`
-    :'e.g. FNOL, Repair Invoice, Policy Schedule…');
+  useEffect(()=>{setResult(null);setExpectedLabel('');},[selDoc]);
 
   const filteredDocs=allDocs.filter(d=>!docSearch||d.name.toLowerCase().includes(docSearch.toLowerCase()));
 
@@ -2815,116 +2861,154 @@ function TestModal({prompt,docs,onMarkTested,onClose,targets=[],testTitle='Test 
     if(all.filter(f=>f.type&&f.size>5*1024*1024).length>0&&addToast)addToast('Some files rejected — max 5MB','error');
   };
 
+  const getDocBadge=doc=>{
+    const dr=docResults[doc.id];
+    if(!dr)return{label:'Untested',cls:'untested'};
+    if(dr.matched===true)return{label:'✓ Match',cls:'matched'};
+    if(dr.matched===false)return{label:'✗ Mismatch',cls:'mismatched'};
+    return{label:'Tested',cls:'tested'};
+  };
+
   const run=()=>{
     const doc=allDocs.find(d=>d.id===selDoc);
     if(!doc)return;
     setRunning(true);setResult(null);
     const effectiveTargets=targets.length>0
       ?targets
-      :[{id:'doc',name:doc.name.replace(/\.(pdf|jpg|jpeg|png)$/i,'').replace(/[_\-]/g,' ')||'Document'}];
+      :[{id:'doc',name:doc.name.replace(/\.(pdf|jpg|jpeg|png)$/i,'').replace(/[_-]/g,' ')||'Document'}];
     const r=mockClassify(doc.name,effectiveTargets);
     const delay=r?.processingMs||1400;
     setTimeout(()=>{
-      setResult(r);
+      const matched=expectedLabel
+        ?r.classification.toLowerCase().trim()===expectedLabel.toLowerCase().trim()
+        :null;
+      const full={...r,expectedLabel,matched};
+      setResult(full);
+      setDocResults(prev=>({...prev,[selDoc]:full}));
       setRunning(false);
       if(selDoc&&onMarkTested)onMarkTested(selDoc);
     },delay);
   };
+
+  const confNum=result?parseFloat(result.confidence)||0:0;
+  const confColor=confNum>=85?'#15803d':confNum>=70?'#d97706':'#dc2626';
 
   return(<div className="modal-overlay" onClick={onClose}><div className="modal lg" onClick={e=>e.stopPropagation()}>
     <div className="modal__header">
       <div>
         <h3>{testTitle}</h3>
         {targets.length>0&&<div style={{fontSize:'11px',color:'#9ca3af',marginTop:'2px'}}>
-          Classifying into {targets.length} target{targets.length!==1?'s':''}: {targets.slice(0,4).map(t=>t.name).join(', ')}{targets.length>4?`… +${targets.length-4} more`:''}
+          {targets.length} target{targets.length!==1?'s':''}: {targets.slice(0,4).map(t=>t.name).join(', ')}{targets.length>4?` +${targets.length-4} more`:''}
         </div>}
       </div>
       <button className="modal__close" onClick={onClose}>×</button>
     </div>
     <div className="modal__body"><div className="test-modal">
+
+      {/* ── 1. Doc selector ── */}
       <div className="test-doc-section">
-        <h4>Test against</h4>
-        <input className="test-doc-search" placeholder="Search documents…" value={docSearch}
-          onChange={e=>setDocSearch(e.target.value)}/>
+        <h4>Select document</h4>
+        <input className="test-doc-search" placeholder="Search…" value={docSearch} onChange={e=>setDocSearch(e.target.value)}/>
         {onAddDoc&&<div className="test-doc-upload-row" onClick={()=>fileRef.current?.click()}>
-          <input ref={fileRef} type="file" accept=".jpg,.jpeg,.png,.pdf" multiple style={{display:'none'}}
-            onChange={e=>processFiles(e.target.files)}/>
-          <span style={{fontSize:'13px',lineHeight:1}}>↑</span> Add a document to test
+          <input ref={fileRef} type="file" accept=".jpg,.jpeg,.png,.pdf" multiple style={{display:'none'}} onChange={e=>processFiles(e.target.files)}/>
+          <span style={{fontSize:'13px'}}>↑</span> Upload document
         </div>}
         {filteredDocs.length===0
-          ?<div className="test-doc-none">{allDocs.length===0?'No documents yet — upload a file above.':'No documents match your search.'}</div>
-          :<div className="test-doc-list">{filteredDocs.map(d=>(
-            <label key={d.id} className={`test-doc-item${selDoc===d.id?' selected':''}`} onClick={()=>setSelDoc(d.id)}>
-              <input type="radio" name="testDoc" checked={selDoc===d.id} onChange={()=>setSelDoc(d.id)}/>
-              <IC.File/>
-              <span style={{flex:1,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{d.name}</span>
-              <span className={`test-status-badge test-status-badge--${d.status.toLowerCase()}`}>{d.status}</span>
-            </label>
-          ))}</div>
+          ?<div className="test-doc-none">{allDocs.length===0?'No documents yet — upload one above.':'No documents match your search.'}</div>
+          :<div className="test-doc-list">{filteredDocs.map(d=>{
+            const badge=getDocBadge(d);
+            return(
+              <label key={d.id} className={`test-doc-item${selDoc===d.id?' selected':''}`} onClick={()=>setSelDoc(d.id)}>
+                <input type="radio" name="testDoc" checked={selDoc===d.id} onChange={()=>setSelDoc(d.id)}/>
+                <IC.File/>
+                <span style={{flex:1,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{d.name}</span>
+                <span className={`test-status-badge test-status-badge--${badge.cls}`}>{badge.label}</span>
+              </label>
+            );
+          })}</div>
         }
       </div>
 
-      {!result&&!running&&allDocs.length>0&&(
-        <div className="test-expected">
-          <h4>Expected result <span style={{fontWeight:400,color:'#9ca3af'}}>(optional — for accuracy check)</span></h4>
-          <input className="test-expected__input" placeholder={builtPlaceholder}
-            value={expectedType} onChange={e=>setExpectedType(e.target.value)}/>
+      {/* ── 2. Expected label (appears after doc selected) ── */}
+      {selDoc&&!running&&(
+        <div className="test-expect-row">
+          <span className="test-expect-lbl">I expect this to be</span>
+          <select className="test-expect-sel" value={expectedLabel} onChange={e=>{setExpectedLabel(e.target.value);setResult(null);}}>
+            <option value="">— No expectation (skip) —</option>
+            {targets.map(t=><option key={t.id} value={t.name}>{t.name}</option>)}
+          </select>
         </div>
       )}
 
+      {/* ── Prompt toggle ── */}
       <button className="test-prompt-toggle" onClick={()=>setShowPrompt(s=>!s)}>
-        {showPrompt?'▾':'▸'} {showPrompt?'Hide prompt':'View prompt being tested'}
+        {showPrompt?'▾':'▸'} {showPrompt?'Hide prompt':'View prompt'}
       </button>
-      {showPrompt&&<div className="preview-box" style={{marginBottom:'12px'}}><pre>{prompt}</pre></div>}
+      {showPrompt&&<div className="preview-box" style={{marginBottom:'8px'}}><pre>{prompt}</pre></div>}
 
-      {running&&(
-        <div className="test-running">
-          <div className="test-spinner"/>
-          <span>Running classification engine…</span>
-        </div>
-      )}
+      {/* ── Running ── */}
+      {running&&<div className="test-running"><div className="test-spinner"/><span>Classifying document…</span></div>}
 
+      {/* ── Result card ── */}
       {result&&(()=>{
-        const norm=s=>s.toLowerCase().trim();
-        const isMatch=expectedType.trim()&&norm(result.classification)===norm(expectedType);
+        const {matched}=result;
+        const hdr=matched===true?'match':matched===false?'mismatch':'neutral';
         return(
-          <div className="test-result-section">
-            <h4>Result
-              {result.processingMs&&<span style={{fontWeight:400,color:'#9ca3af',fontSize:'11px',marginLeft:'8px'}}>
-                processed in {result.processingMs}ms
-              </span>}
-            </h4>
-            <div className="test-result">
-              <div className="test-result__item"><span className="test-result__label">Classification:</span><span className="test-result__value" style={{fontWeight:600,color:'#1e40af'}}>{result.classification}</span></div>
-              <div className="test-result__item"><span className="test-result__label">Confidence:</span>
-                <span className="test-result__value">
-                  <span style={{fontWeight:700,color:parseFloat(result.confidence)>=85?'#16a34a':parseFloat(result.confidence)>=70?'#d97706':'#dc2626'}}>{result.confidence}</span>
-                </span>
+          <div className="tr-card">
+            {/* Header */}
+            <div className={`tr-card__header tr-card__header--${hdr}`}>
+              <div>
+                <div className="tr-card__label">Predicted classification</div>
+                <div className="tr-card__predicted">{result.classification}</div>
               </div>
-              <div className="test-result__item"><span className="test-result__label">Reasoning:</span><span className="test-result__value">{result.reasoning}</span></div>
+              <span className={`tr-card__verdict tr-card__verdict--${hdr}`}>
+                {matched===true?'✓ Match':matched===false?'✗ Mismatch':'Result'}
+              </span>
             </div>
-            {expectedType.trim()&&(
-              <div className="test-comparison" style={{marginTop:'12px'}}>
-                <h4>Expected vs Predicted</h4>
-                <div className={`test-comparison__row test-comparison__row--${isMatch?'match':'mismatch'}`}>
-                  <span className="test-comparison__lbl">Expected</span>
-                  <span className="test-comparison__val">{expectedType.trim()}</span>
-                  <span style={{color:'#9ca3af',flexShrink:0}}>→</span>
-                  <span className="test-comparison__lbl">Predicted</span>
-                  <span className="test-comparison__val">{result.classification}</span>
-                  <span className={`test-comparison__badge test-comparison__badge--${isMatch?'match':'mismatch'}`}>
-                    {isMatch?'✓ Match':'✗ Mismatch'}
-                  </span>
+            {/* Confidence bar */}
+            <div className="tr-conf">
+              <span className="tr-conf__title">Confidence</span>
+              <div className="tr-conf__bar"><div className="tr-conf__fill" style={{width:result.confidence,background:confColor}}/></div>
+              <span className="tr-conf__val" style={{color:confColor}}>{result.confidence}</span>
+            </div>
+            {/* Expected vs Predicted (only when expected was set) */}
+            {matched!==null&&(
+              <div className={`tr-compare tr-compare--${matched?'match':'mismatch'}`}>
+                <div className="tr-compare__col">
+                  <span className="tr-compare__lbl">Expected</span>
+                  <span className="tr-compare__val">{result.expectedLabel}</span>
                 </div>
+                <span className="tr-compare__arrow">{matched?'✓':'✗'}</span>
+                <div className="tr-compare__col">
+                  <span className="tr-compare__lbl">Predicted</span>
+                  <span className="tr-compare__val">{result.classification}</span>
+                </div>
+              </div>
+            )}
+            {/* Reasoning */}
+            <div className="tr-reasoning">{result.reasoning}</div>
+            {/* Mismatch: actionable hint */}
+            {matched===false&&(
+              <div className="tr-hint">
+                <span>💡 Prompt may need adjustment to better distinguish these document types.</span>
+                <button className="tr-hint__btn" onClick={onClose}>Open editor →</button>
+              </div>
+            )}
+            {/* No expectation: offer to set */}
+            {matched===null&&(
+              <div className="tr-no-expect">
+                <span>No expected label — result only</span>
+                <button className="tr-no-expect__btn" onClick={()=>setResult(null)}>Set expected & retest →</button>
               </div>
             )}
           </div>
         );
       })()}
+
     </div></div>
     <div className="modal__footer">
       <button className="btn btn-outline" onClick={onClose}>Close</button>
-      <button className="btn btn-primary" onClick={run} disabled={running||selDoc===null}>
+      <button className="btn btn-primary" onClick={run} disabled={running||!selDoc}>
         {running?'Running…':result?'Run again':'Run Test'}
       </button>
     </div>
