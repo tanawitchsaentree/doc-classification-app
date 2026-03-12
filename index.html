@@ -367,12 +367,11 @@ input,textarea,select{font-family:inherit}
 .ds-group__sel-bar{display:flex;align-items:center;justify-content:space-between;padding:4px 10px;border-bottom:1px solid var(--bdr);background:var(--srf2)}
 .ds-group__sel-all{background:none;border:none;font-size:10px;color:var(--a);font-weight:500;cursor:pointer;font-family:inherit}
 .ds-group__sel-all:hover{text-decoration:underline}
-.ds-doc-row{display:flex;align-items:center;gap:6px;padding:5px 10px;border-bottom:1px solid var(--bdr);transition:background var(--tf) var(--smooth)}
+.ds-doc-row{display:flex;align-items:center;gap:6px;padding:5px 10px;border-bottom:1px solid var(--bdr);transition:background var(--tf) var(--smooth);cursor:pointer}
 .ds-doc-row:last-child{border-bottom:none}
 .ds-doc-row:hover{background:var(--srf)}
 .ds-doc-row--selected{background:var(--a-lt)}
 .ds-doc-row input[type=checkbox]{accent-color:var(--a);flex-shrink:0;width:13px;height:13px;cursor:pointer}
-.ds-doc-name{font-size:11px;color:var(--tx1);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 .ds-doc-sub-line{display:flex;align-items:center;gap:4px;flex-wrap:wrap;min-width:0}
 .expect-chip{font-size:10px;font-weight:500;padding:1px 6px;border-radius:20px;background:var(--a-lt);color:var(--a);border:1px solid var(--a-mid);white-space:nowrap;flex-shrink:0}
 .trace-badge{font-size:10px;font-weight:600;padding:1px 6px;border-radius:20px;white-space:nowrap}
@@ -380,7 +379,7 @@ input,textarea,select{font-family:inherit}
 .trace-badge--mismatch{background:#fee2e2;color:#b91c1c;border:1px solid #fecaca}
 .trace-badge--tested{background:var(--srf2);color:var(--tx3);border:1px solid var(--bdr)}
 .ds-doc-del{background:none;border:none;cursor:pointer;color:var(--tx3);padding:2px;border-radius:3px;display:flex;align-items:center;flex-shrink:0;opacity:0;transition:all var(--tf)}
-.ds-doc-row:hover .ds-doc-del{opacity:1}
+.ds-doc-row:hover .ds-doc-del,.ds-doc-row--selected .ds-doc-del{opacity:1}
 .ds-doc-del:hover{color:#dc2626;background:#fee2e2}
 .ds-empty{text-align:center;padding:12px;font-size:11px;color:var(--tx3)}
 /* Doc panel tabs */
@@ -2987,32 +2986,21 @@ function DocumentPanel({docs,dataSets,onAddDocs,toggleSel,delDoc,addDataSet,styl
   const [openSets,setOpenSets]=useState(()=>Object.fromEntries((dataSets||[]).map(ds=>[ds.id,true])));
   const [pendingFiles,setPendingFiles]=useState([]);
   const [dpTab,setDpTab]=useState('datasets'); // 'datasets' | 'results'
-  const testedDocs=docs.filter(d=>d.status==='Tested'); // [{file, dataSetId, expectedLabels[], newSetName}]
-  const [addLabelInput,setAddLabelInput]=useState('');
+  const testedDocs=docs.filter(d=>d.status==='Tested');
   const fileRef=useRef(null);
 
   const processRawFiles=files=>{
     const valid=Array.from(files).filter(f=>['image/jpeg','image/png','application/pdf'].includes(f.type)&&f.size<=5*1024*1024);
     if(!valid.length)return;
-    setPendingFiles(valid.map(f=>({file:f,dataSetId:dataSets[0]?.id||'',expectedLabels:[],newSetName:'',isNew:false})));
+    setPendingFiles(valid.map(f=>({file:f,dataSetId:dataSets[0]?.id||'',expectedLabels:[],newSetName:'',isNew:false,addLabelInput:''})));
   };
 
   const updatePending=(i,patch)=>setPendingFiles(pf=>pf.map((p,j)=>j===i?{...p,...patch}:p));
   const addExpLabel=(i,label)=>{
     if(!label.trim())return;
-    setPendingFiles(pf=>pf.map((p,j)=>j===i&&p.expectedLabels.length<2&&!p.expectedLabels.includes(label.trim())?{...p,expectedLabels:[...p.expectedLabels,label.trim()]}:p));
-    setAddLabelInput('');
+    setPendingFiles(pf=>pf.map((p,j)=>j===i&&p.expectedLabels.length<2&&!p.expectedLabels.includes(label.trim())?{...p,expectedLabels:[...p.expectedLabels,label.trim()],addLabelInput:''}:p));
   };
   const rmExpLabel=(i,label)=>setPendingFiles(pf=>pf.map((p,j)=>j===i?{...p,expectedLabels:p.expectedLabels.filter(l=>l!==label)}:p));
-
-  const confirmUpload=()=>{
-    pendingFiles.forEach(p=>{
-      let dsId=p.dataSetId;
-      if(p.isNew&&p.newSetName.trim()){dsId=addDataSet(p.newSetName.trim());}
-      onAddDocs([{id:Date.now()+Math.random(),name:p.file.name,dataSetId:dsId,expectedLabels:p.expectedLabels,status:'Pending',selected:false,lastTest:null}]);
-    });
-    setPendingFiles([]);
-  };
 
   const toggleSet=id=>setOpenSets(o=>({...o,[id]:!o[id]}));
   const selAllInSet=(dsId)=>{
@@ -3061,9 +3049,9 @@ function DocumentPanel({docs,dataSets,onAddDocs,toggleSel,delDoc,addDataSet,styl
                   </span>
                 ))}
                 {p.expectedLabels.length<2&&<input className="upload-pending__input" style={{width:'90px'}}
-                  placeholder="Add label…" value={addLabelInput}
-                  onChange={e=>setAddLabelInput(e.target.value)}
-                  onKeyDown={e=>{if(e.key==='Enter'||e.key===','){addExpLabel(i,addLabelInput);}}}/>}
+                  placeholder="Add label…" value={p.addLabelInput||''}
+                  onChange={e=>updatePending(i,{addLabelInput:e.target.value})}
+                  onKeyDown={e=>{if(e.key==='Enter'||e.key===','){addExpLabel(i,p.addLabelInput||'');}}}/>}
               </div>
             </div>
             <div className="upload-pending__actions">
@@ -3120,8 +3108,8 @@ function DocumentPanel({docs,dataSets,onAddDocs,toggleSel,delDoc,addDataSet,styl
                       </button>
                     </div>
                     {setDocs.map(doc=>(
-                      <div key={doc.id} className={`ds-doc-row${doc.selected?' ds-doc-row--selected':''}`}>
-                        <input type="checkbox" checked={doc.selected} onChange={()=>toggleSel(doc.id)}/>
+                      <div key={doc.id} className={`ds-doc-row${doc.selected?' ds-doc-row--selected':''}`} onClick={()=>toggleSel(doc.id)}>
+                        <input type="checkbox" checked={doc.selected} onChange={()=>toggleSel(doc.id)} onClick={e=>e.stopPropagation()}/>
                         <div className="ds-doc-info">
                           <span className="ds-doc-name" title={doc.name}>{doc.name}</span>
                           <div className="ds-doc-sub-line">
@@ -3135,7 +3123,7 @@ function DocumentPanel({docs,dataSets,onAddDocs,toggleSel,delDoc,addDataSet,styl
                             )}
                           </div>
                         </div>
-                        <button className="ds-doc-del" onClick={()=>delDoc(doc.id)} title="Remove"><IC.Trash/></button>
+                        <button className="ds-doc-del" onClick={e=>{e.stopPropagation();delDoc(doc.id);}} title="Remove"><IC.Trash/></button>
                       </div>
                     ))}
                   </>
