@@ -967,6 +967,13 @@ Rules:
 - Poor scan quality or handwriting should reduce confidence by 10–15 points
 - If confidence is below 60, flag for manual review`;
 
+/* ── Hierarchy level labels — change here, updates everywhere ── */
+const LABELS = {
+  l0: { short:'L0', label:'LoB',          full:'Line of Business',  plural:'LoBs'        },
+  l1: { short:'L1', label:'Doc Category', full:'Document Category', plural:'Categories'  },
+  l2: { short:'L2', label:'Doc Type',     full:'Document Type',     plural:'Doc Types'   },
+};
+
 const INIT_LOBS = [
   {
     id:'motor', name:'Motor',
@@ -1785,9 +1792,9 @@ function Dashboard({lobs,onNavigate}){
       </div>
       <div className="stats-grid">
         {[
-          {lbl:'Lines of Business',val:lobs.length,     sub:`${deployed} deployed`},
-          {lbl:'Total Categories', val:totalCats,       sub:`across all LOBs`},
-          {lbl:'Document Types',   val:totalTypes,      sub:`leaf-level config`},
+          {lbl:LABELS.l0.plural,          val:lobs.length, sub:`${deployed} deployed`},
+          {lbl:`Total ${LABELS.l1.plural}`,val:totalCats,sub:`across all ${LABELS.l0.plural}`},
+          {lbl:LABELS.l2.plural,          val:totalTypes,sub:`leaf-level config`},
           {lbl:'Avg Confidence',   val:`${avgConf}%`,   sub:'classification score'},
         ].map(s=>(
           <div key={s.lbl} className="stat-card">
@@ -1809,16 +1816,16 @@ function Dashboard({lobs,onNavigate}){
           </div>
         </React.Fragment>)}
       </div>
-      <div className="section-title">LOB Performance</div>
+      <div className="section-title">{LABELS.l0.short} Performance</div>
       <div className="lob-perf">
         <div className="lob-perf__hdr">
-          <span>Line of Business</span><span>Categories</span><span>Types</span><span>Confidence</span><span>Status</span>
+          <span>{LABELS.l0.full}</span><span>{LABELS.l1.plural}</span><span>{LABELS.l2.plural}</span><span>Confidence</span><span>Status</span>
         </div>
         {lobs.map(l=>(
           <div key={l.id} className="lob-perf__row" onClick={()=>onNavigate('lob-overview')}>
             <div className="lob-perf__name">
               <div className="lob-dot" style={{background:l.status==='Deployed'?'#16a34a':'#dc2626'}}/>
-              <div><div className="lob-perf__name-text">{l.name}</div><div className="lob-perf__name-sub">{l.categories.length} categories</div></div>
+              <div><div className="lob-perf__name-text">{l.name}</div><div className="lob-perf__name-sub">{l.categories.length} {LABELS.l1.plural.toLowerCase()}</div></div>
             </div>
             <div className="lob-perf__cell">{l.categories.length}</div>
             <div className="lob-perf__cell">{l.categories.reduce((a,c)=>a+c.types.length,0)}</div>
@@ -1920,7 +1927,7 @@ function LobOverview({lobs,onSelectLob,addToast,onOpenOutputFormat,onConfirm,onD
       <div className="ov-filter-row">
         <div className="ov-search-wrap">
           <IC.Search/>
-          <input className="ov-search" placeholder="Search LOB name…" value={search}
+          <input className="ov-search" placeholder={`Search ${LABELS.l0.label}…`} value={search}
             onChange={e=>{setSearch(e.target.value);setPage(1);}}/>
           {search&&<button className="search-clear-btn" onClick={()=>{setSearch('');setPage(1);}}>×</button>}
         </div>
@@ -1938,10 +1945,10 @@ function LobOverview({lobs,onSelectLob,addToast,onOpenOutputFormat,onConfirm,onD
       <div className="ov-table-wrap">
         <table className="ov-table">
           <thead><tr>
-            <th className="sortable" onClick={()=>handleSort('name')}>Line of Business <SortIco col="name"/></th>
-            <th className="sortable" onClick={()=>handleSort('categories')}>Categories <SortIco col="categories"/></th>
-            <th>Lv.1 version</th>
-            <th>Lv.2 version</th>
+            <th className="sortable" onClick={()=>handleSort('name')}>{LABELS.l0.full} <SortIco col="name"/></th>
+            <th className="sortable" onClick={()=>handleSort('categories')}>{LABELS.l1.plural} <SortIco col="categories"/></th>
+            <th>{LABELS.l1.short} version</th>
+            <th>{LABELS.l2.short} version</th>
             <th className="sortable" onClick={()=>handleSort('status')}>Status <SortIco col="status"/></th>
             <th className="sortable" onClick={()=>handleSort('confidence')}>Confidence <SortIco col="confidence"/></th>
             <th className="sortable" onClick={()=>handleSort('trainedBy')}>Trained by <SortIco col="trainedBy"/></th>
@@ -1959,7 +1966,7 @@ function LobOverview({lobs,onSelectLob,addToast,onOpenOutputFormat,onConfirm,onD
                 <td>{lob.trainedBy}</td>
                 <td><div className="tbl-actions" onClick={e=>e.stopPropagation()}>
                   <button className="tbl-icon-btn" title="Edit" onClick={()=>onSelectLob(lob)}><IC.Edit/></button>
-                  <button className="tbl-icon-btn danger" title="Delete" onClick={()=>onConfirm({title:`Delete "${lob.name}"?`,message:'This will permanently remove this LOB and all its categories.',confirmLabel:'Delete LOB',onConfirm:()=>onDeleteLob(lob.id)})}><IC.Trash/></button>
+                  <button className="tbl-icon-btn danger" title="Delete" onClick={()=>onConfirm({title:`Delete "${lob.name}"?`,message:`This will permanently remove this ${LABELS.l0.label} and all its ${LABELS.l1.plural.toLowerCase()}.`,confirmLabel:`Delete ${LABELS.l0.label}`,onConfirm:()=>onDeleteLob(lob.id)})}><IC.Trash/></button>
                 </div></td>
               </tr>
             ))}
@@ -2010,11 +2017,11 @@ function CategoryOverview({lob,onBack,onSelectCategory,onManagePrompt,addToast,o
         <span className="ov-bc-sep">›</span>
         <span className="ov-bc-curr">{lob.name}</span>
       </div>
-      <h1 className="ov-title">Categories</h1>
+      <h1 className="ov-title">{LABELS.l1.plural}</h1>
       <div className="ov-filter-row">
         <div className="ov-search-wrap">
           <IC.Search/>
-          <input className="ov-search" placeholder="Search category…" value={search}
+          <input className="ov-search" placeholder={`Search ${LABELS.l1.label}…`} value={search}
             onChange={e=>{setSearch(e.target.value);setPage(1);}}/>
           {search&&<button className="search-clear-btn" onClick={()=>{setSearch('');setPage(1);}}>×</button>}
         </div>
@@ -2027,14 +2034,14 @@ function CategoryOverview({lob,onBack,onSelectCategory,onManagePrompt,addToast,o
         <div style={{flex:1}}/>
         {filtersActive&&<span style={{fontSize:'12px',color:'#6b7280'}}>{sorted.length} result{sorted.length!==1?'s':''}</span>}
         <button className="btn btn-outline btn-sm" onClick={onOpenOutputFormat}>Output format</button>
-        <button className="btn btn-outline btn-sm" onClick={()=>onManagePrompt(lob,null,null)}>Edit LOB prompt</button>
-        <button className="btn btn-primary btn-sm" onClick={()=>setShowAddCat(true)}><IC.Plus s={11}/> Add category</button>
+        <button className="btn btn-outline btn-sm" onClick={()=>onManagePrompt(lob,null,null)}>Edit {LABELS.l0.short} prompt</button>
+        <button className="btn btn-primary btn-sm" onClick={()=>setShowAddCat(true)}><IC.Plus s={11}/> Add {LABELS.l1.label}</button>
       </div>
       <div className="ov-table-wrap">
         <table className="ov-table">
           <thead><tr>
-            <th className="sortable" onClick={()=>handleSort('name')}>Category <SortIco col="name"/></th>
-            <th className="sortable" onClick={()=>handleSort('types')}>Types <SortIco col="types"/></th>
+            <th className="sortable" onClick={()=>handleSort('name')}>{LABELS.l1.label} <SortIco col="name"/></th>
+            <th className="sortable" onClick={()=>handleSort('types')}>{LABELS.l2.plural} <SortIco col="types"/></th>
             <th className="sortable" onClick={()=>handleSort('activeVersion')}>Active version <SortIco col="activeVersion"/></th>
             <th className="sortable" onClick={()=>handleSort('status')}>Status <SortIco col="status"/></th>
             <th className="sortable" onClick={()=>handleSort('confidence')}>Confidence <SortIco col="confidence"/></th>
@@ -2052,7 +2059,7 @@ function CategoryOverview({lob,onBack,onSelectCategory,onManagePrompt,addToast,o
                 <td>{cat.trainedBy}</td>
                 <td><div className="tbl-actions" onClick={e=>e.stopPropagation()}>
                   <button className="tbl-icon-btn" title="Edit" onClick={()=>onManagePrompt(lob,cat,null)}><IC.Edit/></button>
-                  <button className="tbl-icon-btn danger" title="Delete" onClick={()=>onConfirm({title:`Delete "${cat.name}"?`,message:'This will permanently remove this category and all its types.',confirmLabel:'Delete',onConfirm:()=>onDeleteCategory(lob.id,cat.id)})}><IC.Trash/></button>
+                  <button className="tbl-icon-btn danger" title="Delete" onClick={()=>onConfirm({title:`Delete "${cat.name}"?`,message:`This will permanently remove this ${LABELS.l1.label} and all its ${LABELS.l2.plural.toLowerCase()}.`,confirmLabel:'Delete',onConfirm:()=>onDeleteCategory(lob.id,cat.id)})}><IC.Trash/></button>
                 </div></td>
               </tr>
             ))}
@@ -2064,17 +2071,17 @@ function CategoryOverview({lob,onBack,onSelectCategory,onManagePrompt,addToast,o
     </div>
     {showAddCat&&<div className="modal-overlay" onClick={()=>setShowAddCat(false)}>
       <div className="modal" onClick={e=>e.stopPropagation()}>
-        <div className="modal__header"><h3>Add Category</h3><button className="modal__close" onClick={()=>setShowAddCat(false)}>×</button></div>
+        <div className="modal__header"><h3>Add {LABELS.l1.label}</h3><button className="modal__close" onClick={()=>setShowAddCat(false)}>×</button></div>
         <div className="modal__body">
-          <label className="add-modal-label">Category name</label>
+          <label className="add-modal-label">{LABELS.l1.label} name</label>
           <input autoFocus className="add-modal-input" value={newCatName} onChange={e=>setNewCatName(e.target.value)}
             onKeyDown={e=>{if(e.key==='Enter')submitAddCat();if(e.key==='Escape')setShowAddCat(false);}}
             placeholder="e.g. Claim Notification"/>
-          <p className="add-modal-hint">This will be added to {lob.name} as a new Draft category.</p>
+          <p className="add-modal-hint">This will be added to {lob.name} as a new Draft {LABELS.l1.label.toLowerCase()}.</p>
         </div>
         <div className="modal__footer">
           <button className="btn btn-outline" onClick={()=>setShowAddCat(false)}>Cancel</button>
-          <button className="btn btn-primary" onClick={submitAddCat} disabled={!newCatName.trim()}>Add Category</button>
+          <button className="btn btn-primary" onClick={submitAddCat} disabled={!newCatName.trim()}>Add {LABELS.l1.label}</button>
         </div>
       </div>
     </div>}
@@ -2092,7 +2099,7 @@ function TypesModal({lob,category,onClose,onManagePrompt,addToast,onAddType}){
       <div className="modal types" onClick={e=>e.stopPropagation()}>
         <div className="modal__header">
           <div>
-            <h3>Document types — {category.name}</h3>
+            <h3>{LABELS.l2.plural} — {category.name}</h3>
             <div style={{fontSize:'11px',color:'#9ca3af',marginTop:'2px'}}>
               {withPrompt}/{category.types.length} prompts configured
             </div>
@@ -2101,7 +2108,7 @@ function TypesModal({lob,category,onClose,onManagePrompt,addToast,onAddType}){
         </div>
         <div className="modal__toolbar">
           <button className="btn btn-outline btn-sm"
-            onClick={()=>{onClose();onManagePrompt(lob,category,null);}}>Edit category prompt</button>
+            onClick={()=>{onClose();onManagePrompt(lob,category,null);}}>Edit {LABELS.l1.label} prompt</button>
           <button className="btn btn-primary btn-sm" onClick={()=>setShowAddType(s=>!s)}><IC.Plus s={11}/> Add type</button>
         </div>
         {showAddType&&<div style={{padding:'10px 16px',borderBottom:'1px solid #f3f4f6',display:'flex',gap:'8px',alignItems:'center'}}>
@@ -2115,7 +2122,7 @@ function TypesModal({lob,category,onClose,onManagePrompt,addToast,onAddType}){
         <div className="modal__body types-modal-body">
           <table className="types-table">
             <thead><tr>
-              <th>Document Type</th>
+              <th>{LABELS.l2.label}</th>
               <th style={{width:'90px',textAlign:'center'}}>Prompt</th>
             </tr></thead>
             <tbody>
@@ -2463,12 +2470,12 @@ function Sidebar({cbLevels,setCbLevels,l0Name,setL0Name,l1Items,setL1Items,showM
       <div className="sidebar__header"><h2 className="sidebar__title">Document Classification</h2></div>
       <div className="sidebar__divider"/>
       <div className="sidebar__level0">
-        <span className="sidebar__level-lbl">Level : 0</span>
+        <span className="sidebar__level-lbl">{LABELS.l0.short} · {LABELS.l0.label}</span>
         {editingL0?<input className="sidebar__l0-input" value={l0Draft} onChange={e=>setL0Draft(e.target.value)} onBlur={commitL0} onKeyDown={e=>{if(e.key==='Enter')commitL0();if(e.key==='Escape'){setL0Draft(l0Name);setEditingL0(false);}}} autoFocus/>
         :<span className="sidebar__l0-name" title="Click to rename" onClick={()=>{setL0Draft(l0Name);setEditingL0(true);}}>{l0Name} <IC.Edit/></span>}
       </div>
       <div className="sidebar__divider"/>
-      <div className="sidebar__l1-header"><span className="sidebar__level-lbl">Level : 1</span></div>
+      <div className="sidebar__l1-header"><span className="sidebar__level-lbl">{LABELS.l1.short} · {LABELS.l1.label}</span></div>
       <div className="sidebar__list-controls">
         <div className="sidebar__search-wrap">
           <span className="sidebar__search-icon"><IC.Search/></span>
@@ -2521,8 +2528,8 @@ function Sidebar({cbLevels,setCbLevels,l0Name,setL0Name,l1Items,setL1Items,showM
             </div>
             )}
             {item.expanded&&<div className="sidebar__l2-wrap">
-              <span className="sidebar__level-lbl sub">Level : 2</span>
-              {item.l2.length===0?<p className="sidebar__empty-l2">There's no document type</p>
+              <span className="sidebar__level-lbl sub">{LABELS.l2.short} · {LABELS.l2.label}</span>
+              {item.l2.length===0?<p className="sidebar__empty-l2">There's no {LABELS.l2.label.toLowerCase()}</p>
               :<ul className="sidebar__l2-list">{item.l2.map(l2=>(
                 <li key={l2.id} className="sidebar__l2-item"><IC.Grid/><span>{l2.name}</span>
                   <button className="sidebar__l2-del" onClick={()=>delL2(item.id,l2.id,l2.name)}>×</button>
@@ -3097,7 +3104,7 @@ function OutputFormatModal({lobs,schemas:initSchemas,onSave,activeLobId,onClose}
   };
 
   const toJson=()=>{
-    if(!sel)return '// Select a document type from the tree';
+    if(!sel)return `// Select a ${LABELS.l2.label.toLowerCase()} from the tree`;
     const fields=getSchema(sel.typeId);
     if(!fields.length)return '// No fields defined yet\n// Click "+ Add field" or import a template';
     const schema=Object.fromEntries(fields.filter(f=>f.name).map(f=>[f.name,{
@@ -3122,7 +3129,7 @@ function OutputFormatModal({lobs,schemas:initSchemas,onSave,activeLobId,onClose}
         <div className="modal__body">
           {/* ── Left tree ── */}
           <div className="of-tree">
-            {scopedLobs.length===0&&<div style={{padding:'12px',fontSize:'12px',color:'#9ca3af'}}>No document types defined</div>}
+            {scopedLobs.length===0&&<div style={{padding:'12px',fontSize:'12px',color:'#9ca3af'}}>No {LABELS.l2.plural.toLowerCase()} defined</div>}
             {scopedLobs.map(lob=>(
               <div key={lob.id} className="of-tree__lob">
                 <button className="of-tree__lob-btn" onClick={()=>toggleLob(lob.id)}
@@ -3155,7 +3162,7 @@ function OutputFormatModal({lobs,schemas:initSchemas,onSave,activeLobId,onClose}
             {!sel?(
               <div className="of-no-sel">
                 <span style={{fontSize:'32px'}}>🗂️</span>
-                <span>Select a document type from the tree<br/>to define its extraction schema</span>
+                <span>Select a {LABELS.l2.label.toLowerCase()} from the tree<br/>to define its extraction schema</span>
               </div>
             ):(
               <>
@@ -3529,7 +3536,7 @@ function App(){
                     </label>
                     <label className={`cl-setup__card${cbLevels.l2?' cl-setup__card--active':''}`}>
                       <input type="checkbox" checked={cbLevels.l2} onChange={e=>setCbLevels(p=>({...p,l2:e.target.checked}))}/>
-                      <span className="cl-setup__card-name">L2 · Document Types</span>
+                      <span className="cl-setup__card-name">{LABELS.l2.short} · {LABELS.l2.plural}</span>
                       <span className="cl-setup__card-tag cl-setup__card-tag--opt">Optional</span>
                     </label>
                     <div className={`cl-setup__mode${cbLevels.l2?' cl-setup__mode--on':''}`}>
