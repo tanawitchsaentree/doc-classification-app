@@ -373,8 +373,8 @@ input,textarea,select{font-family:inherit}
 .ds-doc-row--selected{background:var(--a-lt)}
 .ds-doc-row input[type=checkbox]{accent-color:var(--a);flex-shrink:0;width:13px;height:13px;cursor:pointer}
 .ds-doc-name{font-size:11px;color:var(--tx1);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
-.ds-doc-meta{display:flex;align-items:center;gap:3px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end}
-.expect-chip{font-size:10px;font-weight:500;padding:1px 6px;border-radius:20px;background:var(--a-lt);color:var(--a);border:1px solid var(--a-mid);white-space:nowrap}
+.ds-doc-sub-line{display:flex;align-items:center;gap:4px;flex-wrap:wrap;min-width:0}
+.expect-chip{font-size:10px;font-weight:500;padding:1px 6px;border-radius:20px;background:var(--a-lt);color:var(--a);border:1px solid var(--a-mid);white-space:nowrap;flex-shrink:0}
 .trace-badge{font-size:10px;font-weight:600;padding:1px 6px;border-radius:20px;white-space:nowrap}
 .trace-badge--match{background:#dcfce7;color:#15803d;border:1px solid #bbf7d0}
 .trace-badge--mismatch{background:#fee2e2;color:#b91c1c;border:1px solid #fecaca}
@@ -3124,16 +3124,16 @@ function DocumentPanel({docs,dataSets,onAddDocs,toggleSel,delDoc,addDataSet,styl
                         <input type="checkbox" checked={doc.selected} onChange={()=>toggleSel(doc.id)}/>
                         <div className="ds-doc-info">
                           <span className="ds-doc-name" title={doc.name}>{doc.name}</span>
-                          <span className="ds-doc-sub">{doc.size} · {ds.name}</span>
-                        </div>
-                        <div className="ds-doc-meta">
-                          {doc.expectedLabels.map(l=><span key={l} className="expect-chip">{l}</span>)}
-                          {doc.lastTest&&(
-                            <span className={`trace-badge trace-badge--${doc.lastTest.match?'match':'mismatch'}`}
-                              title={`via ${doc.lastTest.ctx} · predicted: ${doc.lastTest.pred}`}>
-                              {doc.lastTest.match?'✓':'✗'} {doc.lastTest.conf}%
-                            </span>
-                          )}
+                          <div className="ds-doc-sub-line">
+                            <span className="ds-doc-sub">{doc.size} · {ds.name}</span>
+                            {doc.expectedLabels.map(l=><span key={l} className="expect-chip">{l}</span>)}
+                            {doc.lastTest&&(
+                              <span className={`trace-badge trace-badge--${doc.lastTest.match?'match':'mismatch'}`}
+                                title={`via ${doc.lastTest.ctx} · predicted: ${doc.lastTest.pred}`}>
+                                {doc.lastTest.match?'✓':'✗'} {doc.lastTest.conf}%
+                              </span>
+                            )}
+                          </div>
                         </div>
                         <button className="ds-doc-del" onClick={()=>delDoc(doc.id)} title="Remove"><IC.Trash/></button>
                       </div>
