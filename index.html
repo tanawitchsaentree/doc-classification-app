@@ -2040,8 +2040,8 @@ function CategoryOverview({lob,onBack,onSelectCategory,onManagePrompt,addToast,o
       <div className="ov-table-wrap">
         <table className="ov-table">
           <thead><tr>
-            <th className="sortable" onClick={()=>handleSort('name')}>{LABELS.l1.label} <SortIco col="name"/></th>
-            <th className="sortable" onClick={()=>handleSort('types')}>{LABELS.l2.plural} <SortIco col="types"/></th>
+            <th className="sortable" onClick={()=>handleSort('name')}>{LABELS.l1.short} · {LABELS.l1.label} <SortIco col="name"/></th>
+            <th className="sortable" onClick={()=>handleSort('types')}>{LABELS.l2.short} · {LABELS.l2.label} <SortIco col="types"/></th>
             <th className="sortable" onClick={()=>handleSort('activeVersion')}>Active version <SortIco col="activeVersion"/></th>
             <th className="sortable" onClick={()=>handleSort('status')}>Status <SortIco col="status"/></th>
             <th className="sortable" onClick={()=>handleSort('confidence')}>Confidence <SortIco col="confidence"/></th>
@@ -2063,7 +2063,7 @@ function CategoryOverview({lob,onBack,onSelectCategory,onManagePrompt,addToast,o
                 </div></td>
               </tr>
             ))}
-            {rows.length===0&&<tr><td colSpan={7} className="tbl-empty">{filtersActive?'No categories match your filters':'No categories found'}</td></tr>}
+            {rows.length===0&&<tr><td colSpan={7} className="tbl-empty">{filtersActive?`No ${LABELS.l1.plural.toLowerCase()} match your filters`:`No ${LABELS.l1.plural.toLowerCase()} found`}</td></tr>}
           </tbody>
         </table>
         <Pagination page={page} totalPages={totalPages} perPage={perPage} setPage={setPage} setPerPage={p=>{setPerPage(p);setPage(1);}}/>
@@ -2109,7 +2109,7 @@ function TypesModal({lob,category,onClose,onManagePrompt,addToast,onAddType}){
         <div className="modal__toolbar">
           <button className="btn btn-outline btn-sm"
             onClick={()=>{onClose();onManagePrompt(lob,category,null);}}>Edit {LABELS.l1.label} prompt</button>
-          <button className="btn btn-primary btn-sm" onClick={()=>setShowAddType(s=>!s)}><IC.Plus s={11}/> Add type</button>
+          <button className="btn btn-primary btn-sm" onClick={()=>setShowAddType(s=>!s)}><IC.Plus s={11}/> Add {LABELS.l2.label}</button>
         </div>
         {showAddType&&<div style={{padding:'10px 16px',borderBottom:'1px solid #f3f4f6',display:'flex',gap:'8px',alignItems:'center'}}>
           <input autoFocus className="add-modal-input" style={{flex:1}} value={newTypeName}
@@ -2122,7 +2122,7 @@ function TypesModal({lob,category,onClose,onManagePrompt,addToast,onAddType}){
         <div className="modal__body types-modal-body">
           <table className="types-table">
             <thead><tr>
-              <th>{LABELS.l2.label}</th>
+              <th>{LABELS.l2.short} · {LABELS.l2.label}</th>
               <th style={{width:'90px',textAlign:'center'}}>Prompt</th>
             </tr></thead>
             <tbody>
@@ -2147,7 +2147,7 @@ function TypesModal({lob,category,onClose,onManagePrompt,addToast,onAddType}){
                   </td>
                 </tr>
               ))}
-              {category.types.length===0&&<tr><td colSpan={2} className="tbl-empty">No types defined for this category</td></tr>}
+              {category.types.length===0&&<tr><td colSpan={2} className="tbl-empty">No {LABELS.l2.plural.toLowerCase()} defined for this {LABELS.l1.label.toLowerCase()}</td></tr>}
             </tbody>
           </table>
         </div>
