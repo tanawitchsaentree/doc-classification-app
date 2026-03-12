@@ -383,6 +383,31 @@ input,textarea,select{font-family:inherit}
 .ds-doc-row:hover .ds-doc-del{opacity:1}
 .ds-doc-del:hover{color:#dc2626;background:#fee2e2}
 .ds-empty{text-align:center;padding:12px;font-size:11px;color:var(--tx3)}
+/* Doc panel tabs */
+.dp-tabs{display:flex;border-bottom:1px solid var(--bdr);flex-shrink:0;background:var(--srf)}
+.dp-tab{flex:1;padding:8px 4px;font-size:11px;font-weight:600;color:var(--tx3);background:none;border:none;cursor:pointer;border-bottom:2px solid transparent;transition:all var(--tf) var(--smooth);font-family:inherit;display:flex;align-items:center;justify-content:center;gap:5px}
+.dp-tab:hover{color:var(--tx1)}
+.dp-tab--active{color:var(--a);border-bottom-color:var(--a)}
+.dp-tab__badge{font-size:10px;font-weight:700;padding:1px 5px;border-radius:20px;background:var(--a-lt);color:var(--a)}
+/* Doc metadata */
+.ds-doc-info{display:flex;flex-direction:column;gap:1px;flex:1;min-width:0}
+.ds-doc-name{font-size:11px;color:var(--tx1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ds-doc-sub{font-size:10px;color:var(--tx3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* Testing Results tab */
+.tr-list{display:flex;flex-direction:column;gap:0;padding:0 10px 8px}
+.tr-row{display:flex;flex-direction:column;gap:4px;padding:8px 0;border-bottom:1px solid var(--bdr)}
+.tr-row:last-child{border-bottom:none}
+.tr-row__top{display:flex;align-items:center;gap:6px}
+.tr-row__name{font-size:11px;font-weight:600;color:var(--tx1);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.tr-row__result{font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;white-space:nowrap;flex-shrink:0}
+.tr-row__result--match{background:#dcfce7;color:#15803d;border:1px solid #bbf7d0}
+.tr-row__result--mismatch{background:#fee2e2;color:#b91c1c;border:1px solid #fecaca}
+.tr-row__meta{font-size:10px;color:var(--tx3)}
+/* Save row at bottom of prompt */
+.prompt-save-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0 4px;margin-top:4px;border-top:1px solid var(--bdr)}
+.prompt-save-row__state{font-size:11px;color:var(--tx3)}
+.prompt-save-row__state--unsaved{color:#d97706}
+.prompt-save-row__state--saved{color:#16a34a}
 /* Upload pending form */
 .upload-pending{border:1px solid var(--bdr);border-radius:var(--r);padding:8px 10px;background:var(--srf);margin-top:8px;display:flex;flex-direction:column;gap:6px}
 .upload-pending__file{font-size:11px;font-weight:600;color:var(--tx1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -1789,9 +1814,10 @@ const INIT_DOC_META=[
   ['ds-de',      'Cancellation',       null],
   ['ds-de',      'Property Policy',    null],
 ];
+const MOCK_SIZES=['48 KB','112 KB','239 KB','185 KB','76 KB','320 KB','95 KB','54 KB','143 KB','88 KB','201 KB','67 KB','156 KB','93 KB','274 KB','41 KB','118 KB','209 KB','73 KB','162 KB','88 KB','311 KB','55 KB','129 KB','197 KB','84 KB','243 KB','61 KB','174 KB','92 KB','288 KB','47 KB','136 KB','215 KB','79 KB'];
 const makeDocs=()=>DOC_NAMES.map((name,i)=>{
   const [dsId,expLabel,lastTest]=INIT_DOC_META[i]||['ds-motor','',null];
-  return{id:i+1,name,dataSetId:dsId,expectedLabels:expLabel?[expLabel]:[],
+  return{id:i+1,name,size:MOCK_SIZES[i]||'100 KB',dataSetId:dsId,expectedLabels:expLabel?[expLabel]:[],
     status:lastTest?'Tested':'Pending',selected:false,
     lastTest:lastTest?{...lastTest,testedAt:'2025-03-01'}:null};
 });
@@ -2413,6 +2439,12 @@ function LobPromptSection({lobName,prompt,defaultPrompt,meta,saveState,onEdit,on
               </div>
               <span className="char-count">{prompt.length.toLocaleString()} chars</span>
             </div>
+            <div className="prompt-save-row">
+              <span className={`prompt-save-row__state${ss==='unsaved'?' prompt-save-row__state--unsaved':ss==='saved'?' prompt-save-row__state--saved':''}`}>
+                {ss==='unsaved'?'● Unsaved changes':ss==='saved'?'✓ Saved':''}
+              </span>
+              <button className="btn btn-primary btn-sm" onClick={onSave} disabled={ss!=='unsaved'}>Save draft</button>
+            </div>
           </div>
           <div className="test-action-zone">
             <input ref={fileRef} type="file" accept=".jpg,.jpeg,.png,.pdf" multiple style={{display:'none'}} onChange={e=>processFiles(e.target.files)}/>
@@ -2531,6 +2563,12 @@ function CategorySection({catItem,prompt,defaultPrompt,meta,saveState,onEdit,onS
             <div className="prompt-footer" style={{marginTop:'6px'}}>
               {prompt.includes('{{CLASSIFICATION_HIERARCHY}}')&&<span className="ph-badge found"><IC.Check/> {'{{CLASSIFICATION_HIERARCHY}}'}</span>}
               <span className="char-count">{prompt.length.toLocaleString()} chars</span>
+            </div>
+            <div className="prompt-save-row">
+              <span className={`prompt-save-row__state${ss==='unsaved'?' prompt-save-row__state--unsaved':ss==='saved'?' prompt-save-row__state--saved':''}`}>
+                {ss==='unsaved'?'● Unsaved changes':ss==='saved'?'✓ Saved':''}
+              </span>
+              <button className="btn btn-primary btn-sm" onClick={onSave} disabled={ss!=='unsaved'}>Save draft</button>
             </div>
           </div>
           <div className="test-action-zone">
@@ -2947,7 +2985,9 @@ function Workspace({activeL1Tab,setActiveL1Tab,activeTab,setActiveTab,l1Items,pr
 function DocumentPanel({docs,dataSets,onAddDocs,toggleSel,delDoc,addDataSet,style}){
   const [dragOver,setDragOver]=useState(false);
   const [openSets,setOpenSets]=useState(()=>Object.fromEntries((dataSets||[]).map(ds=>[ds.id,true])));
-  const [pendingFiles,setPendingFiles]=useState([]); // [{file, dataSetId, expectedLabels[], newSetName}]
+  const [pendingFiles,setPendingFiles]=useState([]);
+  const [dpTab,setDpTab]=useState('datasets'); // 'datasets' | 'results'
+  const testedDocs=docs.filter(d=>d.status==='Tested'); // [{file, dataSetId, expectedLabels[], newSetName}]
   const [addLabelInput,setAddLabelInput]=useState('');
   const fileRef=useRef(null);
 
@@ -3042,11 +3082,21 @@ function DocumentPanel({docs,dataSets,onAddDocs,toggleSel,delDoc,addDataSet,styl
         ))}
       </div>
 
-      {/* Data Sets */}
-      <div className="doc-panel__sets">
+      {/* Tabs */}
+      <div className="dp-tabs">
+        <button className={`dp-tab${dpTab==='datasets'?' dp-tab--active':''}`} onClick={()=>setDpTab('datasets')}>
+          Datasets <span className="dp-tab__badge">{dataSets.length}</span>
+        </button>
+        <button className={`dp-tab${dpTab==='results'?' dp-tab--active':''}`} onClick={()=>setDpTab('results')}>
+          Testing Results <span className="dp-tab__badge">{testedDocs.length}</span>
+        </button>
+      </div>
+
+      {/* Datasets tab */}
+      {dpTab==='datasets'&&<div className="doc-panel__sets">
         <div className="doc-panel__sets-hdr">
           <span className="doc-panel__sets-title">Data Sets</span>
-          <button className="doc-panel__new-set" onClick={()=>{const n=prompt('New Data Set name:');if(n?.trim())addDataSet(n.trim());}}>+ New set</button>
+          <button className="doc-panel__new-set" onClick={()=>{const n=window.prompt('New Data Set name:');if(n?.trim())addDataSet(n.trim());}}>+ New set</button>
         </div>
         {dataSets.map(ds=>{
           const setDocs=docs.filter(d=>d.dataSetId===ds.id);
@@ -3064,7 +3114,7 @@ function DocumentPanel({docs,dataSets,onAddDocs,toggleSel,delDoc,addDataSet,styl
                 {setDocs.length===0?<div className="ds-empty">No documents yet</div>:(
                   <>
                     <div className="ds-group__sel-bar">
-                      <span style={{fontSize:'10px',color:'var(--tx3)'}}>{selCount>0?`${selCount} selected`:' '}</span>
+                      <span style={{fontSize:'10px',color:'var(--tx3)'}}>{selCount>0?`${selCount} selected`:'\u00a0'}</span>
                       <button className="ds-group__sel-all" onClick={()=>selAllInSet(ds.id)}>
                         {setDocs.every(d=>d.selected)?'Deselect all':'Select all'}
                       </button>
@@ -3072,12 +3122,15 @@ function DocumentPanel({docs,dataSets,onAddDocs,toggleSel,delDoc,addDataSet,styl
                     {setDocs.map(doc=>(
                       <div key={doc.id} className={`ds-doc-row${doc.selected?' ds-doc-row--selected':''}`}>
                         <input type="checkbox" checked={doc.selected} onChange={()=>toggleSel(doc.id)}/>
-                        <span className="ds-doc-name" title={doc.name}>{doc.name}</span>
+                        <div className="ds-doc-info">
+                          <span className="ds-doc-name" title={doc.name}>{doc.name}</span>
+                          <span className="ds-doc-sub">{doc.size} · {ds.name}</span>
+                        </div>
                         <div className="ds-doc-meta">
                           {doc.expectedLabels.map(l=><span key={l} className="expect-chip">{l}</span>)}
                           {doc.lastTest&&(
                             <span className={`trace-badge trace-badge--${doc.lastTest.match?'match':'mismatch'}`}
-                              title={`Tested via ${doc.lastTest.ctx} · ${doc.lastTest.pred} ${doc.lastTest.conf}%`}>
+                              title={`via ${doc.lastTest.ctx} · predicted: ${doc.lastTest.pred}`}>
                               {doc.lastTest.match?'✓':'✗'} {doc.lastTest.conf}%
                             </span>
                           )}
@@ -3091,7 +3144,43 @@ function DocumentPanel({docs,dataSets,onAddDocs,toggleSel,delDoc,addDataSet,styl
             </div>
           );
         })}
-      </div>
+      </div>}
+
+      {/* Testing Results tab */}
+      {dpTab==='results'&&<div className="doc-panel__sets">
+        <div className="doc-panel__sets-hdr">
+          <span className="doc-panel__sets-title">Testing Results</span>
+          <span style={{fontSize:'10px',color:'var(--tx3)'}}>{testedDocs.length} tested</span>
+        </div>
+        {testedDocs.length===0
+          ?<div className="ds-empty" style={{paddingTop:'32px'}}>No documents tested yet</div>
+          :<div className="tr-list">
+            {testedDocs.map(doc=>{
+              const ds=dataSets.find(s=>s.id===doc.dataSetId);
+              return(
+                <div key={doc.id} className="tr-row">
+                  <div className="tr-row__top">
+                    <span className="tr-row__name" title={doc.name}>{doc.name}</span>
+                    {doc.lastTest&&<span className={`tr-row__result tr-row__result--${doc.lastTest.match?'match':'mismatch'}`}>
+                      {doc.lastTest.match?'✓ Match':'✗ Mismatch'} · {doc.lastTest.conf}%
+                    </span>}
+                  </div>
+                  <div className="tr-row__meta">
+                    {doc.size} · {ds?.name||'—'}
+                    {doc.lastTest&&<> · via <strong>{doc.lastTest.ctx}</strong> · predicted: <strong>{doc.lastTest.pred}</strong></>}
+                  </div>
+                  {doc.expectedLabels.length>0&&<div style={{display:'flex',gap:'4px'}}>
+                    {doc.expectedLabels.map(l=><span key={l} className="expect-chip">Expected: {l}</span>)}
+                  </div>}
+                </div>
+              );
+            })}
+          </div>
+        }
+      </div>}
+    </aside>
+  );
+}
     </aside>
   );
 }
