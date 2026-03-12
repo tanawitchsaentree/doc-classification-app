@@ -970,7 +970,7 @@ Rules:
 /* ── Hierarchy level labels — change here, updates everywhere ── */
 const LABELS = {
   l0: { short:'L0', label:'LoB',          full:'Line of Business',  plural:'LoBs'        },
-  l1: { short:'L1', label:'Doc Category', full:'Document Category', plural:'Categories'  },
+  l1: { short:'L1', label:'Doc Category', full:'Document Category', plural:'Doc Categories'  },
   l2: { short:'L2', label:'Doc Type',     full:'Document Type',     plural:'Doc Types'   },
 };
 
@@ -1819,7 +1819,7 @@ function Dashboard({lobs,onNavigate}){
       <div className="section-title">{LABELS.l0.short} Performance</div>
       <div className="lob-perf">
         <div className="lob-perf__hdr">
-          <span>{LABELS.l0.full}</span><span>{LABELS.l1.plural}</span><span>{LABELS.l2.plural}</span><span>Confidence</span><span>Status</span>
+          <span>{LABELS.l0.short} · {LABELS.l0.label}</span><span>{LABELS.l1.short} · {LABELS.l1.label}</span><span>{LABELS.l2.short} · {LABELS.l2.label}</span><span>Confidence</span><span>Status</span>
         </div>
         {lobs.map(l=>(
           <div key={l.id} className="lob-perf__row" onClick={()=>onNavigate('lob-overview')}>
@@ -1945,8 +1945,8 @@ function LobOverview({lobs,onSelectLob,addToast,onOpenOutputFormat,onConfirm,onD
       <div className="ov-table-wrap">
         <table className="ov-table">
           <thead><tr>
-            <th className="sortable" onClick={()=>handleSort('name')}>{LABELS.l0.full} <SortIco col="name"/></th>
-            <th className="sortable" onClick={()=>handleSort('categories')}>{LABELS.l1.plural} <SortIco col="categories"/></th>
+            <th className="sortable" onClick={()=>handleSort('name')}>{LABELS.l0.short} · {LABELS.l0.label} <SortIco col="name"/></th>
+            <th className="sortable" onClick={()=>handleSort('categories')}>{LABELS.l1.short} · {LABELS.l1.label} <SortIco col="categories"/></th>
             <th>{LABELS.l1.short} version</th>
             <th>{LABELS.l2.short} version</th>
             <th className="sortable" onClick={()=>handleSort('status')}>Status <SortIco col="status"/></th>
