@@ -349,6 +349,55 @@ input,textarea,select{font-family:inherit}
 .doc-panel__footer{padding:8px 0;font-size:11px;color:#9ca3af;border-top:1px solid #f3f4f6;flex-shrink:0}
 .doc-panel__footer strong{color:#6b7280}
 
+/* ── Data Sets panel ── */
+.doc-panel__sets{flex:1;overflow-y:auto;display:flex;flex-direction:column;padding:0 10px 8px}
+.doc-panel__sets-hdr{display:flex;align-items:center;justify-content:space-between;padding:8px 0 6px;flex-shrink:0}
+.doc-panel__sets-title{font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em}
+.doc-panel__new-set{background:none;border:none;font-size:11px;color:var(--a);font-weight:500;cursor:pointer;padding:0;font-family:inherit}
+.doc-panel__new-set:hover{text-decoration:underline}
+.ds-group{border:1px solid var(--bdr);border-radius:var(--r-md);overflow:hidden;margin-bottom:6px;flex-shrink:0}
+.ds-group__hdr{display:flex;align-items:center;gap:7px;padding:7px 10px;background:var(--srf);cursor:pointer;user-select:none;transition:background var(--tf) var(--smooth)}
+.ds-group__hdr:hover{background:var(--srf2)}
+.ds-group__dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.ds-group__name{font-size:12px;font-weight:600;color:var(--tx1);flex:1}
+.ds-group__count{font-size:11px;color:var(--tx3);background:var(--srf2);border:1px solid var(--bdr);border-radius:20px;padding:1px 7px;font-weight:500}
+.ds-group__chev{color:var(--tx3);transition:transform var(--tf) var(--smooth);display:flex;align-items:center;flex-shrink:0}
+.ds-group__chev--open{transform:rotate(180deg)}
+.ds-group__body{background:var(--bg);border-top:1px solid var(--bdr)}
+.ds-group__sel-bar{display:flex;align-items:center;justify-content:space-between;padding:4px 10px;border-bottom:1px solid var(--bdr);background:var(--srf2)}
+.ds-group__sel-all{background:none;border:none;font-size:10px;color:var(--a);font-weight:500;cursor:pointer;font-family:inherit}
+.ds-group__sel-all:hover{text-decoration:underline}
+.ds-doc-row{display:flex;align-items:center;gap:6px;padding:5px 10px;border-bottom:1px solid var(--bdr);transition:background var(--tf) var(--smooth)}
+.ds-doc-row:last-child{border-bottom:none}
+.ds-doc-row:hover{background:var(--srf)}
+.ds-doc-row--selected{background:var(--a-lt)}
+.ds-doc-row input[type=checkbox]{accent-color:var(--a);flex-shrink:0;width:13px;height:13px;cursor:pointer}
+.ds-doc-name{font-size:11px;color:var(--tx1);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.ds-doc-meta{display:flex;align-items:center;gap:3px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end}
+.expect-chip{font-size:10px;font-weight:500;padding:1px 6px;border-radius:20px;background:var(--a-lt);color:var(--a);border:1px solid var(--a-mid);white-space:nowrap}
+.trace-badge{font-size:10px;font-weight:600;padding:1px 6px;border-radius:20px;white-space:nowrap}
+.trace-badge--match{background:#dcfce7;color:#15803d;border:1px solid #bbf7d0}
+.trace-badge--mismatch{background:#fee2e2;color:#b91c1c;border:1px solid #fecaca}
+.trace-badge--tested{background:var(--srf2);color:var(--tx3);border:1px solid var(--bdr)}
+.ds-doc-del{background:none;border:none;cursor:pointer;color:var(--tx3);padding:2px;border-radius:3px;display:flex;align-items:center;flex-shrink:0;opacity:0;transition:all var(--tf)}
+.ds-doc-row:hover .ds-doc-del{opacity:1}
+.ds-doc-del:hover{color:#dc2626;background:#fee2e2}
+.ds-empty{text-align:center;padding:12px;font-size:11px;color:var(--tx3)}
+/* Upload pending form */
+.upload-pending{border:1px solid var(--bdr);border-radius:var(--r);padding:8px 10px;background:var(--srf);margin-top:8px;display:flex;flex-direction:column;gap:6px}
+.upload-pending__file{font-size:11px;font-weight:600;color:var(--tx1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.upload-pending__row{display:flex;align-items:center;gap:6px}
+.upload-pending__label{font-size:10px;color:var(--tx3);white-space:nowrap;width:52px;flex-shrink:0}
+.upload-pending__sel{flex:1;font-size:11px;border:1px solid var(--bdr);border-radius:var(--r);padding:3px 6px;background:var(--srf);color:var(--tx1);font-family:inherit;cursor:pointer}
+.upload-pending__sel:focus{outline:none;border-color:var(--a)}
+.upload-pending__input{flex:1;font-size:11px;border:1px solid var(--bdr);border-radius:var(--r);padding:3px 6px;background:var(--srf);color:var(--tx1);font-family:inherit}
+.upload-pending__input:focus{outline:none;border-color:var(--a)}
+.upload-pending__chips{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.upload-pending__chip{font-size:10px;font-weight:500;padding:1px 6px;border-radius:20px;background:var(--a-lt);color:var(--a);border:1px solid var(--a-mid);display:flex;align-items:center;gap:3px}
+.upload-pending__chip-rm{cursor:pointer;color:var(--a);font-weight:700;line-height:1}
+.upload-pending__chip-rm:hover{color:#b91c1c}
+.upload-pending__actions{display:flex;gap:6px;justify-content:flex-end;margin-top:2px}
+
 /* ── Keyframes ── */
 @keyframes slideDown{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
@@ -1697,7 +1746,55 @@ const DOC_NAMES = [
   'Schadenmeldung_KFZ_B-MN3421.pdf','Versicherungsschein_Haftpflicht_2025.pdf','Beschwerde_Regulierungsverzoegerung.pdf',
   'Nachtrag_Fahrerwechsel_Police-8821.pdf','Kuendigung_KFZ_Versicherung.pdf','Wohngebaeude_Police_DE-4421.pdf',
 ];
-const makeDocs=()=>DOC_NAMES.map((name,i)=>({id:i+1,name,status:[0,4,9,14,19,24,29,34].includes(i)?'Tested':'Pending',selected:false}));
+/* ── Data Sets ── */
+const INIT_DATASETS=[
+  {id:'ds-motor',    name:'Motor Samples',      color:'#3b82f6'},
+  {id:'ds-property', name:'Property & Health',  color:'#10b981'},
+  {id:'ds-marine',   name:'Marine & Cafes',     color:'#f59e0b'},
+  {id:'ds-de',       name:'Germany Batch',      color:'#8b5cf6'},
+];
+/* [dataSetId, expectedLabel, lastTest|null] — one entry per DOC_NAMES index */
+const INIT_DOC_META=[
+  ['ds-motor',   'Claim Notification', {ctx:'Motor',pred:'Claim Notification',conf:94,match:true}],
+  ['ds-motor',   'Repair & Garage',    null],
+  ['ds-motor',   'Policy Schedule',    null],
+  ['ds-motor',   'Policy Schedule',    null],
+  ['ds-motor',   'Accident Evidence',  {ctx:'Motor',pred:'Accident Evidence',conf:88,match:true}],
+  ['ds-motor',   'Repair & Garage',    null],
+  ['ds-motor',   'Accident Evidence',  {ctx:'Motor',pred:'Claim Notification',conf:62,match:false}],
+  ['ds-motor',   'Vehicle Registration',null],
+  ['ds-motor',   'Complaint',          null],
+  ['ds-property','Policy Schedule',    {ctx:'Property',pred:'Policy Schedule',conf:92,match:true}],
+  ['ds-property','Claim Notification', null],
+  ['ds-property','Contractor Invoice', null],
+  ['ds-property','Policy Schedule',    null],
+  ['ds-property','Medical Report',     {ctx:'Health',pred:'Medical Report',conf:87,match:true}],
+  ['ds-property','Medical Report',     null],
+  ['ds-property','GP Referral',        null],
+  ['ds-property','Critical Illness',   null],
+  ['ds-marine',  'Bill of Lading',     null],
+  ['ds-marine',  'Survey Report',      null],
+  ['ds-marine',  'Charter Party',      null],
+  ['ds-marine',  'Public Liability',   {ctx:'Cafes',pred:'Public Liability',conf:91,match:true}],
+  ['ds-marine',  'Employer Liability', null],
+  ['ds-marine',  'Fire Safety',        null],
+  ['ds-marine',  'Premises Licence',   null],
+  ['ds-marine',  'Media Liability',    {ctx:'Media',pred:'Media Liability',conf:85,match:true}],
+  ['ds-marine',  'E&O Policy',         null],
+  ['ds-marine',  'Content Contract',   null],
+  ['ds-de',      'KFZ Claim',          {ctx:'Germany',pred:'KFZ Claim',conf:93,match:true}],
+  ['ds-de',      'Policy Document',    null],
+  ['ds-de',      'Complaint',          {ctx:'Germany',pred:'Policy Document',conf:71,match:false}],
+  ['ds-de',      'Amendment',          null],
+  ['ds-de',      'Cancellation',       null],
+  ['ds-de',      'Property Policy',    null],
+];
+const makeDocs=()=>DOC_NAMES.map((name,i)=>{
+  const [dsId,expLabel,lastTest]=INIT_DOC_META[i]||['ds-motor','',null];
+  return{id:i+1,name,dataSetId:dsId,expectedLabels:expLabel?[expLabel]:[],
+    status:lastTest?'Tested':'Pending',selected:false,
+    lastTest:lastTest?{...lastTest,testedAt:'2025-03-01'}:null};
+});
 
 /* ──────────────────────────────────────────────────────────────────────────
    Mock Classification Engine
@@ -2238,6 +2335,7 @@ function TypesModal({lob,category,onClose,onManagePrompt,addToast,onAddType}){
 /* targets = l1Items passed from App so classifier knows the category targets */
 function LobPromptSection({lobName,prompt,defaultPrompt,meta,saveState,onEdit,onSave,
   docs,onAddDoc,onToggleSel,onDelDoc,onMarkTested,addToast,onVersion,targets=[]}){
+  const [open,setOpen]=useState(true);
   const [showResetConfirm,setShowResetConfirm]=useState(false);
   const [showPreview,setShowPreview]=useState(false);
   const [showTest,setShowTest]=useState(false);
@@ -2259,12 +2357,17 @@ function LobPromptSection({lobName,prompt,defaultPrompt,meta,saveState,onEdit,on
   };
   return(
     <div className="l1-prompt-sec" id="cat-sec-l1">
-      <div className="l1-prompt-sec__hdr">
+      <div className="l1-prompt-sec__hdr" onClick={()=>setOpen(o=>!o)} style={{cursor:'pointer'}}>
+        <span className="cat-sec__chevron" style={{transform:open?'rotate(0deg)':'rotate(-90deg)',transition:'transform .15s'}}><IC.ChevDown s={13}/></span>
         <span className="l1-prompt-sec__badge">STAGE 1</span>
         <span className="l1-prompt-sec__title">LOB Classification Prompt — {lobName}</span>
-        <button className="workspace__manage-btn" onClick={onVersion} style={{fontSize:'11px'}}>Manage version</button>
+        <div style={{display:'flex',alignItems:'center',gap:'6px',marginLeft:'auto'}}>
+          {allCount>0&&<span className="test-chip test-chip--pending" style={{fontSize:'10px'}}>{allCount} doc{allCount!==1?'s':''}</span>}
+          <span className={`workspace__status ${(meta||{status:'Draft'}).status.toLowerCase()}`} style={{fontSize:'11px'}}>{(meta||{status:'Draft'}).status}</span>
+          <button className="workspace__manage-btn" onClick={e=>{e.stopPropagation();onVersion();}} style={{fontSize:'11px'}}>Version</button>
+        </div>
       </div>
-      <div className="l1-prompt-sec__body">
+      {open&&<div className="l1-prompt-sec__body">
         {/* Left: Prompt editor */}
         <div className="l1-prompt-sec__prompt">
           <p className="l1-prompt-sec__desc">
@@ -2333,7 +2436,7 @@ function LobPromptSection({lobName,prompt,defaultPrompt,meta,saveState,onEdit,on
             </div>
           </div>
         </div>
-      </div>
+      </div>}
       {showPreview&&<PreviewModal prompt={prompt} onClose={()=>setShowPreview(false)}/>}
       {showTest&&<TestModal
         prompt={prompt}
@@ -2841,58 +2944,153 @@ function Workspace({activeL1Tab,setActiveL1Tab,activeTab,setActiveTab,l1Items,pr
 }
 
 /* ── Document Panel ── */
-function DocumentPanel({docs,allDocs,filter,setFilter,search,setSearch,toggleSel,selAll,delDoc,bulkDelete,handleUpload,style}){
+function DocumentPanel({docs,dataSets,onAddDocs,toggleSel,delDoc,addDataSet,style}){
   const [dragOver,setDragOver]=useState(false);
+  const [openSets,setOpenSets]=useState(()=>Object.fromEntries((dataSets||[]).map(ds=>[ds.id,true])));
+  const [pendingFiles,setPendingFiles]=useState([]); // [{file, dataSetId, expectedLabels[], newSetName}]
+  const [addLabelInput,setAddLabelInput]=useState('');
   const fileRef=useRef(null);
-  const allCount=allDocs.length,testedCount=allDocs.filter(d=>d.status==='Tested').length,pendCount=allDocs.filter(d=>d.status==='Pending').length;
-  const selCount=allDocs.filter(d=>d.selected).length,allSel=docs.length>0&&docs.every(d=>d.selected);
+
+  const processRawFiles=files=>{
+    const valid=Array.from(files).filter(f=>['image/jpeg','image/png','application/pdf'].includes(f.type)&&f.size<=5*1024*1024);
+    if(!valid.length)return;
+    setPendingFiles(valid.map(f=>({file:f,dataSetId:dataSets[0]?.id||'',expectedLabels:[],newSetName:'',isNew:false})));
+  };
+
+  const updatePending=(i,patch)=>setPendingFiles(pf=>pf.map((p,j)=>j===i?{...p,...patch}:p));
+  const addExpLabel=(i,label)=>{
+    if(!label.trim())return;
+    setPendingFiles(pf=>pf.map((p,j)=>j===i&&p.expectedLabels.length<2&&!p.expectedLabels.includes(label.trim())?{...p,expectedLabels:[...p.expectedLabels,label.trim()]}:p));
+    setAddLabelInput('');
+  };
+  const rmExpLabel=(i,label)=>setPendingFiles(pf=>pf.map((p,j)=>j===i?{...p,expectedLabels:p.expectedLabels.filter(l=>l!==label)}:p));
+
+  const confirmUpload=()=>{
+    pendingFiles.forEach(p=>{
+      let dsId=p.dataSetId;
+      if(p.isNew&&p.newSetName.trim()){dsId=addDataSet(p.newSetName.trim());}
+      onAddDocs([{id:Date.now()+Math.random(),name:p.file.name,dataSetId:dsId,expectedLabels:p.expectedLabels,status:'Pending',selected:false,lastTest:null}]);
+    });
+    setPendingFiles([]);
+  };
+
+  const toggleSet=id=>setOpenSets(o=>({...o,[id]:!o[id]}));
+  const selAllInSet=(dsId)=>{
+    const setDocs=docs.filter(d=>d.dataSetId===dsId);
+    const allSel=setDocs.every(d=>d.selected);
+    setDocs.forEach(d=>toggleSel(d.id,!allSel));
+  };
+
   return(
     <aside className="doc-panel" style={style}>
+      {/* Upload zone */}
       <div className="doc-panel__upload">
         <p className="doc-panel__sec-title">Upload test document</p>
         <div className={`doc-panel__dropzone${dragOver?' drag-over':''}`}
           onDragOver={e=>{e.preventDefault();setDragOver(true);}} onDragLeave={()=>setDragOver(false)}
-          onDrop={e=>{e.preventDefault();setDragOver(false);handleUpload(e.dataTransfer.files);}}
+          onDrop={e=>{e.preventDefault();setDragOver(false);processRawFiles(e.dataTransfer.files);}}
           onClick={()=>fileRef.current?.click()}>
-          <input ref={fileRef} type="file" accept=".jpg,.jpeg,.png,.pdf" multiple style={{display:'none'}} onChange={e=>handleUpload(e.target.files)}/>
+          <input ref={fileRef} type="file" accept=".jpg,.jpeg,.png,.pdf" multiple style={{display:'none'}} onChange={e=>processRawFiles(e.target.files)}/>
           <IC.Upload/>
-          <p className="doc-panel__dz-text">Drag your file here or <span className="doc-panel__browse">browse</span></p>
-          <p className="doc-panel__dz-hint">JPG, PNG or PDF · less than 5MB · up to 5 files</p>
+          <p className="doc-panel__dz-text">Drag here or <span className="doc-panel__browse">browse</span></p>
+          <p className="doc-panel__dz-hint">PDF · JPG · PNG · max 5MB</p>
         </div>
-      </div>
-      <div className="doc-panel__docs">
-        <p className="doc-panel__sec-title">Documents</p>
-        <div className="doc-panel__search-wrap"><span className="doc-panel__search-icon"><IC.Search/></span>
-          <input className="doc-panel__search" placeholder="Search documents…" value={search} onChange={e=>setSearch(e.target.value)}/>
-          {search&&<button className="search-clear-btn" onClick={()=>setSearch('')}>×</button>}</div>
-        <div className="doc-panel__filters">
-          {[['all','All',allCount],['tested','Tested',testedCount],['pending','Pending',pendCount]].map(([id,lbl,cnt])=>(
-            <button key={id} className={`doc-panel__filter-btn${filter===id?' active':''}`} onClick={()=>setFilter(id)}>
-              <span className={`doc-panel__cnt ${id}`}>{cnt}</span>{lbl}
-            </button>
-          ))}
-        </div>
-        {selCount>=2&&<div className="bulk-bar">
-          <span className="bulk-bar__info">{selCount} selected</span>
-          <button className="bulk-bar__btn danger" onClick={bulkDelete}><IC.Trash/> Delete</button>
-        </div>}
-        <div className="doc-panel__list-hdr">
-          <span className="doc-panel__sel-info">{selCount>0?`${selCount} of ${allCount} selected`:`0 of ${allCount}`}</span>
-          <button className="doc-panel__sel-all" onClick={selAll}>{allSel&&docs.length>0?'Deselect all':'Select all'}</button>
-        </div>
-        <div className="doc-panel__list">
-          {docs.length===0?<div className="doc-panel__empty">{search?'No results found':'No documents found'}</div>
-          :docs.map(doc=>(
-            <div key={doc.id} className={`doc-panel__item${doc.selected?' selected':''}`}>
-              <input type="checkbox" className="doc-panel__cb" checked={doc.selected} onChange={()=>toggleSel(doc.id)}/>
-              <span className="doc-panel__file-icon"><IC.File/></span>
-              <span className="doc-panel__file-name" title={doc.name}>{doc.name}</span>
-              <span className={`doc-panel__status ${doc.status.toLowerCase()}`}>{doc.status}</span>
-              <button className="doc-panel__del" onClick={()=>delDoc(doc.id)} title="Delete"><IC.Trash/></button>
+        {/* Inline assign form */}
+        {pendingFiles.map((p,i)=>(
+          <div key={i} className="upload-pending">
+            <div className="upload-pending__file" title={p.file.name}>{p.file.name}</div>
+            <div className="upload-pending__row">
+              <span className="upload-pending__label">Data Set</span>
+              <select className="upload-pending__sel" value={p.isNew?'__new__':p.dataSetId}
+                onChange={e=>{const v=e.target.value;updatePending(i,v==='__new__'?{isNew:true,dataSetId:''}:{isNew:false,dataSetId:v});}}>
+                {dataSets.map(ds=><option key={ds.id} value={ds.id}>{ds.name}</option>)}
+                <option value="__new__">+ New Data Set…</option>
+              </select>
             </div>
-          ))}
+            {p.isNew&&<div className="upload-pending__row">
+              <span className="upload-pending__label">Set name</span>
+              <input className="upload-pending__input" placeholder="e.g. Invoice Batch Feb"
+                value={p.newSetName} onChange={e=>updatePending(i,{newSetName:e.target.value})}/>
+            </div>}
+            <div className="upload-pending__row">
+              <span className="upload-pending__label">Expect</span>
+              <div className="upload-pending__chips">
+                {p.expectedLabels.map(l=>(
+                  <span key={l} className="upload-pending__chip">{l}
+                    <span className="upload-pending__chip-rm" onClick={()=>rmExpLabel(i,l)}>×</span>
+                  </span>
+                ))}
+                {p.expectedLabels.length<2&&<input className="upload-pending__input" style={{width:'90px'}}
+                  placeholder="Add label…" value={addLabelInput}
+                  onChange={e=>setAddLabelInput(e.target.value)}
+                  onKeyDown={e=>{if(e.key==='Enter'||e.key===','){addExpLabel(i,addLabelInput);}}}/>}
+              </div>
+            </div>
+            <div className="upload-pending__actions">
+              <button className="btn btn-outline btn-sm" onClick={()=>setPendingFiles(pf=>pf.filter((_,j)=>j!==i))}>Cancel</button>
+              <button className="btn btn-primary btn-sm"
+                onClick={()=>{
+                  let dsId=p.dataSetId;
+                  if(p.isNew&&p.newSetName.trim()){dsId=addDataSet(p.newSetName.trim());}
+                  if(!dsId)return;
+                  onAddDocs([{id:Date.now()+Math.random(),name:p.file.name,dataSetId:dsId,expectedLabels:p.expectedLabels,status:'Pending',selected:false,lastTest:null}]);
+                  setPendingFiles(pf=>pf.filter((_,j)=>j!==i));
+                }}
+                disabled={!p.dataSetId&&!(p.isNew&&p.newSetName.trim())}>Add</button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Data Sets */}
+      <div className="doc-panel__sets">
+        <div className="doc-panel__sets-hdr">
+          <span className="doc-panel__sets-title">Data Sets</span>
+          <button className="doc-panel__new-set" onClick={()=>{const n=prompt('New Data Set name:');if(n?.trim())addDataSet(n.trim());}}>+ New set</button>
         </div>
-        <div className="doc-panel__footer">Showing <strong>{docs.length}</strong> of <strong>{allCount}</strong></div>
+        {dataSets.map(ds=>{
+          const setDocs=docs.filter(d=>d.dataSetId===ds.id);
+          const isOpen=openSets[ds.id]!==false;
+          const selCount=setDocs.filter(d=>d.selected).length;
+          return(
+            <div key={ds.id} className="ds-group">
+              <div className="ds-group__hdr" onClick={()=>toggleSet(ds.id)}>
+                <span className="ds-group__dot" style={{background:ds.color}}/>
+                <span className="ds-group__name">{ds.name}</span>
+                <span className="ds-group__count">{setDocs.length}</span>
+                <span className={`ds-group__chev${isOpen?' ds-group__chev--open':''}`}><IC.ChevDown s={12}/></span>
+              </div>
+              {isOpen&&<div className="ds-group__body">
+                {setDocs.length===0?<div className="ds-empty">No documents yet</div>:(
+                  <>
+                    <div className="ds-group__sel-bar">
+                      <span style={{fontSize:'10px',color:'var(--tx3)'}}>{selCount>0?`${selCount} selected`:' '}</span>
+                      <button className="ds-group__sel-all" onClick={()=>selAllInSet(ds.id)}>
+                        {setDocs.every(d=>d.selected)?'Deselect all':'Select all'}
+                      </button>
+                    </div>
+                    {setDocs.map(doc=>(
+                      <div key={doc.id} className={`ds-doc-row${doc.selected?' ds-doc-row--selected':''}`}>
+                        <input type="checkbox" checked={doc.selected} onChange={()=>toggleSel(doc.id)}/>
+                        <span className="ds-doc-name" title={doc.name}>{doc.name}</span>
+                        <div className="ds-doc-meta">
+                          {doc.expectedLabels.map(l=><span key={l} className="expect-chip">{l}</span>)}
+                          {doc.lastTest&&(
+                            <span className={`trace-badge trace-badge--${doc.lastTest.match?'match':'mismatch'}`}
+                              title={`Tested via ${doc.lastTest.ctx} · ${doc.lastTest.pred} ${doc.lastTest.conf}%`}>
+                              {doc.lastTest.match?'✓':'✗'} {doc.lastTest.conf}%
+                            </span>
+                          )}
+                        </div>
+                        <button className="ds-doc-del" onClick={()=>delDoc(doc.id)} title="Remove"><IC.Trash/></button>
+                      </div>
+                    ))}
+                  </>
+                )}
+              </div>}
+            </div>
+          );
+        })}
       </div>
     </aside>
   );
@@ -3384,10 +3582,13 @@ function App(){
   const [showMenu,setShowMenu]=useState(null);
   const [modal,setModal]=useState(null);
   const [confirmState,setConfirmState]=useState(null);
-  // L1+L2 mode: global docs
+  // Data Sets
+  const [dataSets,setDataSets]=useState(INIT_DATASETS);
+  const addDataSet=name=>{const id=`ds-${Date.now()}`;setDataSets(prev=>[...prev,{id,name,color:'#6b7280'}]);return id;};
+
+  // Global docs pool
   const [docs,setDocs]=useState(makeDocs());
   const [filter,setFilter]=useState('pending');
-  const [search,setSearch]=useState('');
   // Stage 1 LOB docs — keyed by LOB id so they persist if you navigate away and back
   const [lobDocs,setLobDocs]=useState({});
   const getLobDocs=()=>lobDocs[selectedLobId]||[];
@@ -3496,23 +3697,10 @@ function App(){
   },[]);
   const handleSave=useCallback(tabId=>{clearTimeout(saveTimers.current[tabId]);setSaveStates(s=>({...s,[tabId]:'saved'}));addToast('Prompt saved');},[addToast]);
 
-  const filteredDocs=docs.filter(d=>filter==='all'||d.status.toLowerCase()===filter).filter(d=>!search||d.name.toLowerCase().includes(search.toLowerCase()));
-  const toggleSel=id=>setDocs(ds=>ds.map(d=>d.id===id?{...d,selected:!d.selected}:d));
-  const selAll=()=>{const ids=new Set(filteredDocs.map(d=>d.id));const all=filteredDocs.every(d=>d.selected);setDocs(ds=>ds.map(d=>ids.has(d.id)?{...d,selected:!all}:d));};
+  const toggleSel=(id,forceTo)=>setDocs(ds=>ds.map(d=>d.id===id?{...d,selected:forceTo!==undefined?forceTo:!d.selected}:d));
   const delDoc=id=>{setDocs(ds=>ds.filter(d=>d.id!==id));addToast('Document removed','warning');};
-  const markTested=id=>setDocs(ds=>ds.map(d=>d.id===id?{...d,status:'Tested',selected:false}:d));
-  const selCount=docs.filter(d=>d.selected).length;
-  const bulkDelete=()=>{setDocs(ds=>ds.filter(d=>!d.selected));addToast(`${selCount} document(s) deleted`,'warning');};
-  const handleUpload=files=>{
-    const all=Array.from(files);
-    const valid=all.filter(f=>['image/jpeg','image/png','application/pdf'].includes(f.type)&&f.size<=5*1024*1024);
-    const badType=all.filter(f=>!['image/jpeg','image/png','application/pdf'].includes(f.type));
-    const tooBig=all.filter(f=>f.type&&f.size>5*1024*1024);
-    valid.forEach(f=>setDocs(prev=>[...prev,{id:Date.now()+Math.random(),name:f.name,status:'Pending',selected:false}]));
-    if(valid.length>0)addToast(`${valid.length} file(s) uploaded`,'success');
-    if(badType.length>0)addToast(`${badType.length} file(s) rejected — PDF/JPG/PNG only`,'error');
-    if(tooBig.length>0)addToast(`${tooBig.length} file(s) rejected — max 5MB`,'error');
-  };
+  const markTested=(id,testMeta)=>setDocs(ds=>ds.map(d=>d.id===id?{...d,status:'Tested',selected:false,lastTest:testMeta||d.lastTest}:d));
+  const onAddDocs=newDocs=>{setDocs(prev=>[...prev,...newDocs]);addToast(`${newDocs.length} file(s) added`,'success');};
 
   useEffect(()=>{
     if(cbLevels.l2){
@@ -3657,9 +3845,8 @@ function App(){
             }
           </div>
           <ResizeHandle onResize={dx=>setDocPanelW(w=>Math.min(420,Math.max(200,w-dx)))}/>
-          <DocumentPanel docs={filteredDocs} allDocs={docs} filter={filter} setFilter={setFilter}
-            search={search} setSearch={setSearch} toggleSel={toggleSel} selAll={selAll}
-            delDoc={delDoc} bulkDelete={bulkDelete} handleUpload={handleUpload}
+          <DocumentPanel docs={docs} dataSets={dataSets} onAddDocs={onAddDocs}
+            toggleSel={toggleSel} delDoc={delDoc} addDataSet={addDataSet}
             style={{width:docPanelW+'px',borderLeft:'1px solid var(--bdr)'}}/>
         </div>
         {modal==='version'&&<VersionModal lob={selectedLobFromState} onClose={()=>setModal(null)}/>}
