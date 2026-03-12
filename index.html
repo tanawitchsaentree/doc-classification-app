@@ -163,7 +163,11 @@ input,textarea,select{font-family:inherit}
 .toast__close:hover{opacity:1}
 
 /* ── Sidebar ── */
-.sidebar{width:220px;min-width:220px;background:#fff;border-right:1px solid #e5e7eb;display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}
+.sidebar{width:220px;min-width:160px;max-width:400px;background:#fff;border-right:none;display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}
+.resize-handle{width:4px;flex-shrink:0;background:transparent;cursor:col-resize;position:relative;z-index:2;transition:background 150ms var(--smooth)}
+.resize-handle:hover,.resize-handle--active{background:var(--a-mid)}
+.resize-handle::after{content:'';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:2px;height:32px;background:var(--bdr);border-radius:1px;transition:background 150ms}
+.resize-handle:hover::after,.resize-handle--active::after{background:var(--a)}
 .sidebar__header{padding:14px 16px 10px;border-bottom:1px solid #f3f4f6;flex-shrink:0}
 .sidebar__title{font-size:13px;font-weight:700;color:#111827}
 .sidebar__section{padding:12px 16px;flex-shrink:0}
@@ -282,7 +286,7 @@ input,textarea,select{font-family:inherit}
 .save-indicator.unsaved{color:#d97706}.save-indicator.saved{color:#16a34a}
 
 /* ── Document Panel ── */
-.doc-panel{width:260px;min-width:260px;background:#fff;border-left:1px solid #e5e7eb;display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}
+.doc-panel{width:260px;min-width:200px;max-width:420px;background:#fff;border-left:none;display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}
 .doc-panel__upload{padding:14px;border-bottom:1px solid #e5e7eb;flex-shrink:0}
 .doc-panel__sec-title{font-size:12px;font-weight:600;color:#111827;margin-bottom:10px}
 .doc-panel__dropzone{border:1.5px dashed #d1d5db;border-radius:8px;padding:18px 12px;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;transition:all .15s;background:#fff}
@@ -910,7 +914,7 @@ body{font-family:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI'
 .test-status-badge--tested{background:var(--a-lt);color:var(--a-h)}
 
 /* ── Classification Setup wrap (shared bar above both layouts) ── */
-.cl-setup-wrap{padding:8px 20px 0;flex-shrink:0;background:var(--bg)}
+.cl-setup-wrap{padding:0 0 14px 0;flex-shrink:0}
 .cl-setup-wrap .cl-setup{margin-bottom:0}
 
 /* ── Classification Setup bar (horizontal, top of center panel) ── */
@@ -2426,7 +2430,7 @@ function ReadinessChecklist({l1Items,ofSchemas,docs}){
 }
 
 /* ── Sidebar (Detail) ── */
-function Sidebar({cbLevels,setCbLevels,l0Name,setL0Name,l1Items,setL1Items,showMenu,setShowMenu,addToast,onConfirm,onScrollTo,activeCatId}){
+function Sidebar({cbLevels,setCbLevels,l0Name,setL0Name,l1Items,setL1Items,showMenu,setShowMenu,addToast,onConfirm,onScrollTo,activeCatId,style}){
   const [editingL0,setEditingL0]=useState(false);
   const [l0Draft,setL0Draft]=useState(l0Name);
   const [showAddL2,setShowAddL2]=useState(null);
@@ -2455,7 +2459,7 @@ function Sidebar({cbLevels,setCbLevels,l0Name,setL0Name,l1Items,setL1Items,showM
   const requestDelL1=id=>{const item=l1Items.find(i=>i.id===id);setShowMenu(null);onConfirm({title:'Delete Level 1 item',message:`Delete "${item?.name}"? This will remove its workspace tab.`,confirmLabel:'Delete',onConfirm:()=>{setL1Items(items=>items.filter(i=>i.id!==id));addToast(`"${item?.name}" deleted`,'warning');}});};
   const addL1=()=>{if(!addL1Name.trim())return;const id=addL1Name.toLowerCase().replace(/\s+/g,'-')+'-'+Date.now();setL1Items(items=>[...items,{id,name:addL1Name.trim(),expanded:false,l2:[]}]);addToast(`"${addL1Name.trim()}" added`);setAddL1Name('');setShowAddL1(false);};
   return(
-    <aside className="sidebar">
+    <aside className="sidebar" style={style}>
       <div className="sidebar__header"><h2 className="sidebar__title">Document Classification</h2></div>
       <div className="sidebar__divider"/>
       <div className="sidebar__level0">
@@ -2752,13 +2756,13 @@ function Workspace({activeL1Tab,setActiveL1Tab,activeTab,setActiveTab,l1Items,pr
 }
 
 /* ── Document Panel ── */
-function DocumentPanel({docs,allDocs,filter,setFilter,search,setSearch,toggleSel,selAll,delDoc,bulkDelete,handleUpload}){
+function DocumentPanel({docs,allDocs,filter,setFilter,search,setSearch,toggleSel,selAll,delDoc,bulkDelete,handleUpload,style}){
   const [dragOver,setDragOver]=useState(false);
   const fileRef=useRef(null);
   const allCount=allDocs.length,testedCount=allDocs.filter(d=>d.status==='Tested').length,pendCount=allDocs.filter(d=>d.status==='Pending').length;
   const selCount=allDocs.filter(d=>d.selected).length,allSel=docs.length>0&&docs.every(d=>d.selected);
   return(
-    <aside className="doc-panel">
+    <aside className="doc-panel" style={style}>
       <div className="doc-panel__upload">
         <p className="doc-panel__sec-title">Upload test document</p>
         <div className={`doc-panel__dropzone${dragOver?' drag-over':''}`}
@@ -3240,6 +3244,22 @@ function OutputFormatModal({lobs,schemas:initSchemas,onSave,activeLobId,onClose}
 }
 
 /* ── App ── */
+function ResizeHandle({onResize}){
+  const activeRef=useRef(false);
+  const [active,setActive]=useState(false);
+  const onMouseDown=e=>{
+    e.preventDefault();
+    let lastX=e.clientX;
+    activeRef.current=true;
+    setActive(true);
+    const onMove=e=>{if(!activeRef.current)return;const dx=e.clientX-lastX;lastX=e.clientX;onResize(dx);};
+    const onUp=()=>{activeRef.current=false;setActive(false);document.removeEventListener('mousemove',onMove);document.removeEventListener('mouseup',onUp);};
+    document.addEventListener('mousemove',onMove);
+    document.addEventListener('mouseup',onUp);
+  };
+  return <div className={`resize-handle${active?' resize-handle--active':''}`} onMouseDown={onMouseDown}/>;
+}
+
 function App(){
   const {toasts,addToast,removeToast}=useToast();
   const [page,setPage]=useState('lob-overview');
@@ -3266,6 +3286,8 @@ function App(){
   const [selectedLobId,setSelectedLobId]=useState(null);
   // l1 is always true (Required); only l2 can be toggled
   const [cbLevels,setCbLevels]=useState({l1:true,l2:false});
+  const [sidebarW,setSidebarW]=useState(220);
+  const [docPanelW,setDocPanelW]=useState(260);
   const [l1Items,setL1Items]=useState([]);
   const [l0Name,setL0Name]=useState('');
   const [activeL1Tab,setActiveL1Tab]=useState('l1');
@@ -3466,50 +3488,57 @@ function App(){
           <button className="app__back-btn" onClick={onBackToList}><IC.Back/> Back to Categories</button>
           <PipelineBar/>
         </div>
-        <div className="cl-setup-wrap">
-          <div className="cl-setup">
-            <span className="cl-setup__label">Classification Levels</span>
-            <div className="cl-setup__row">
-              <label className="cl-setup__card cl-setup__card--required" onClick={e=>e.preventDefault()}>
-                <input type="checkbox" checked readOnly/>
-                <span className="cl-setup__card-name">L1 · Document Categories</span>
-                <span className="cl-setup__card-tag cl-setup__card-tag--req">Required</span>
-              </label>
-              <label className={`cl-setup__card${cbLevels.l2?' cl-setup__card--active':''}`}>
-                <input type="checkbox" checked={cbLevels.l2} onChange={e=>setCbLevels(p=>({...p,l2:e.target.checked}))}/>
-                <span className="cl-setup__card-name">L2 · Document Types</span>
-                <span className="cl-setup__card-tag cl-setup__card-tag--opt">Optional</span>
-              </label>
-              <div className={`cl-setup__mode${cbLevels.l2?' cl-setup__mode--on':''}`}>
-                <span className="cl-setup__mode-dot"/>
-                {cbLevels.l2?'L1 + L2 active':'L1 only'}
-              </div>
-            </div>
-          </div>
-        </div>
         {cbLevels.l2
-          /* ── L1+L2: single unified prompt + global doc panel ── */
+          /* ── L1+L2: sidebar | workspace | docpanel (all resizable) ── */
           ?<div className="app__content">
             <Sidebar cbLevels={cbLevels} setCbLevels={setCbLevels} l0Name={l0Name} setL0Name={setL0Name}
               l1Items={l1Items} setL1Items={setL1Items} showMenu={showMenu} setShowMenu={setShowMenu}
               addToast={addToast} onConfirm={setConfirmState}
-              onScrollTo={scrollToCategory} activeCatId={activeCatId}/>
+              onScrollTo={scrollToCategory} activeCatId={activeCatId}
+              style={{width:sidebarW+'px',borderRight:'1px solid var(--bdr)'}}/>
+            <ResizeHandle onResize={dx=>setSidebarW(w=>Math.min(400,Math.max(160,w+dx)))}/>
             <Workspace activeL1Tab={activeL1Tab} setActiveL1Tab={setActiveL1Tab} activeTab={activeTab} setActiveTab={setActiveTab} l1Items={l1Items}
               prompts={prompts} defaultPrompts={defaultPrompts} tabMeta={tabMeta} saveStates={saveStates}
               onEdit={handleEdit} onSave={handleSave} cbLevels={cbLevels}
               ofSchemas={ofSchemas} docs={docs}
               onVersion={()=>setModal('version')} onPreview={()=>setModal('preview')} onTest={()=>setModal('test')}/>
+            <ResizeHandle onResize={dx=>setDocPanelW(w=>Math.min(420,Math.max(200,w-dx)))}/>
             <DocumentPanel docs={filteredDocs} allDocs={docs} filter={filter} setFilter={setFilter}
               search={search} setSearch={setSearch} toggleSel={toggleSel} selAll={selAll}
-              delDoc={delDoc} bulkDelete={bulkDelete} handleUpload={handleUpload}/>
+              delDoc={delDoc} bulkDelete={bulkDelete} handleUpload={handleUpload}
+              style={{width:docPanelW+'px',borderLeft:'1px solid var(--bdr)'}}/>
           </div>
-          /* ── L1 only: scroll accordion, per-category docs ── */
+          /* ── L1 only: sidebar | detail-scroll__main (resizable) ── */
           :<div className="detail-scroll">
             <Sidebar cbLevels={cbLevels} setCbLevels={setCbLevels} l0Name={l0Name} setL0Name={setL0Name}
               l1Items={l1Items} setL1Items={setL1Items} showMenu={showMenu} setShowMenu={setShowMenu}
               addToast={addToast} onConfirm={setConfirmState}
-              onScrollTo={scrollToCategory} activeCatId={activeCatId}/>
+              onScrollTo={scrollToCategory} activeCatId={activeCatId}
+              style={{width:sidebarW+'px',borderRight:'1px solid var(--bdr)'}}/>
+            <ResizeHandle onResize={dx=>setSidebarW(w=>Math.min(400,Math.max(160,w+dx)))}/>
             <div className="detail-scroll__main">
+              {/* cl-setup lives here — same column as content */}
+              <div className="cl-setup-wrap">
+                <div className="cl-setup">
+                  <span className="cl-setup__label">Classification Levels</span>
+                  <div className="cl-setup__row">
+                    <label className="cl-setup__card cl-setup__card--required" onClick={e=>e.preventDefault()}>
+                      <input type="checkbox" checked readOnly/>
+                      <span className="cl-setup__card-name">L1 · Document Categories</span>
+                      <span className="cl-setup__card-tag cl-setup__card-tag--req">Required</span>
+                    </label>
+                    <label className={`cl-setup__card${cbLevels.l2?' cl-setup__card--active':''}`}>
+                      <input type="checkbox" checked={cbLevels.l2} onChange={e=>setCbLevels(p=>({...p,l2:e.target.checked}))}/>
+                      <span className="cl-setup__card-name">L2 · Document Types</span>
+                      <span className="cl-setup__card-tag cl-setup__card-tag--opt">Optional</span>
+                    </label>
+                    <div className={`cl-setup__mode${cbLevels.l2?' cl-setup__mode--on':''}`}>
+                      <span className="cl-setup__mode-dot"/>
+                      {cbLevels.l2?'L1 + L2 active':'L1 only'}
+                    </div>
+                  </div>
+                </div>
+              </div>
               <div className="detail-scroll__toolbar">
                 <span className="detail-scroll__count">{l1Items.length} categor{l1Items.length!==1?'ies':'y'}</span>
               </div>
