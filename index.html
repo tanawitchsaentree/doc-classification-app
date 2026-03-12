@@ -432,7 +432,7 @@ input,textarea,select{font-family:inherit}
 .reset-confirm{display:flex;align-items:center;gap:8px;padding:8px 12px;background:#fef9c3;border:1px solid #fde047;border-radius:7px;font-size:12px;color:#713f12}
 .reset-confirm__actions{display:flex;gap:6px;margin-left:auto}
 /* Wider types modal */
-.modal.types{max-width:440px}
+.modal.types{max-width:600px;width:90vw}
 /* Improve workspace no-title layout */
 .workspace__header{padding:10px 20px 0}
 .workspace__title{font-size:11px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em}
@@ -1584,6 +1584,81 @@ Key identifiers:
           {id:'ger-haft-police',name:'Haftpflicht Versicherungsschein',tags:[],prompt:'German personal or commercial liability policy. Contains: insured activities description, Deckungssumme (coverage limit), deductible (Selbstbehalt).'},
           {id:'ger-wohngebaeude',name:'Wohngebäude Police',tags:[],prompt:'German residential buildings insurance policy. Contains: property address, Versicherungswert (insured value), Elementarschadendeckung (natural hazards coverage), Wohnfläche (floor area).'},
         ]},
+    ]
+  },
+  {
+    id:'travel', name:'Travel',
+    classLv1Version:'V.1', classLv2Version:null,
+    status:'Draft', confidence:0, trainedBy:'',
+    lobPrompt:
+`You are classifying Travel Insurance documents.
+
+This LOB covers travel insurance including claims, policies, medical emergencies, cancellations, and baggage loss.
+
+{{CLASSIFICATION_HIERARCHY}}
+
+Key identifiers:
+- Policy numbers starting with "TRV-" or "TI-"
+- Trip dates, destination country, departure/return dates
+- Booking reference numbers
+- Medical certificate or hospital letterhead (overseas)
+- "Travel Insurance" header or insurer travel logo`,
+    versions:[
+      {v:'V.1',date:'2025-03-01',status:'Active',score:'—',note:'Initial Travel LOB setup. L1 categories configured, L2 types pending.',createdBy:'Jennie Cooper'},
+    ],
+    categories:[
+      {id:'trv-cancellation',name:'Trip Cancellation',activeVersion:'V.1',status:'Draft',confidence:0,trainedBy:'',
+        prompt:
+`Classify Trip Cancellation documents for Travel Insurance.
+
+Look for:
+- Cancellation reason (illness, bereavement, natural disaster, airline bankruptcy)
+- Booking confirmation and cancellation confirmation pair
+- Refund amount claimed vs original booking cost
+- Supporting evidence (doctor certificate, death certificate, airline notice)`,
+        types:[]},
+      {id:'trv-medical',name:'Medical Emergency',activeVersion:'V.1',status:'Draft',confidence:0,trainedBy:'',
+        prompt:
+`Classify overseas medical emergency documents.
+
+Look for:
+- Hospital or clinic letterhead (non-UK)
+- Diagnosis, treatment dates, itemised costs
+- Emergency repatriation or evacuation references
+- Treating physician name and registration number
+- "Guarantee of Payment" or "Medical Assistance" reference`,
+        types:[]},
+      {id:'trv-baggage',name:'Baggage & Personal Effects',activeVersion:'V.1',status:'Draft',confidence:0,trainedBy:'',
+        prompt:
+`Classify baggage loss, damage, or delay claims.
+
+Look for:
+- Property Irregularity Report (PIR) from airline
+- Receipt or proof of ownership for claimed items
+- Delay duration (hours) and compensation calculation
+- Carrier liability reference number`,
+        types:[]},
+      {id:'trv-policy',name:'Travel Policy Document',activeVersion:'V.1',status:'Draft',confidence:0,trainedBy:'',
+        prompt:
+`Travel insurance policy schedules and certificates.
+
+Key identifiers:
+- Policy number (TRV- / TI-)
+- Insured names and travel dates
+- Destination region/country
+- Cover levels: Single trip vs Annual multi-trip
+- Sum insured per section (medical, cancellation, baggage)`,
+        types:[]},
+      {id:'trv-delay',name:'Travel Delay',activeVersion:'V.1',status:'Draft',confidence:0,trainedBy:'',
+        prompt:
+`Travel delay and missed departure documents.
+
+Look for:
+- Official delay notification from carrier (letter or stamp)
+- Departure and actual departure time comparison
+- Delay duration exceeding policy threshold (usually 4–12 hrs)
+- Additional expenses receipts (meals, accommodation)`,
+        types:[]},
     ]
   },
 ];
