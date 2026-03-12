@@ -3363,11 +3363,7 @@ function App(){
   };
 
   const onSelectCategory=(lob,cat)=>{
-    if(cat.types.length>0){
-      setTypesModal({lob,category:cat});
-    } else {
-      onManagePrompt(lob,cat,null);
-    }
+    setTypesModal({lob,category:cat});
   };
 
   const onManagePrompt=(lob,cat,type)=>{
