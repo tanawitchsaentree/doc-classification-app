@@ -2044,7 +2044,6 @@ function CategoryOverview({lob,onBack,onSelectCategory,onManagePrompt,addToast,o
           <thead><tr>
             <th className="sortable" onClick={()=>handleSort('name')}>{LABELS.l1.short} · {LABELS.l1.label} <SortIco col="name"/></th>
             <th className="sortable" onClick={()=>handleSort('types')}>{LABELS.l2.short} · {LABELS.l2.label} <SortIco col="types"/></th>
-            <th className="sortable" onClick={()=>handleSort('activeVersion')}>Active version <SortIco col="activeVersion"/></th>
             <th className="sortable" onClick={()=>handleSort('status')}>Status <SortIco col="status"/></th>
             <th className="sortable" onClick={()=>handleSort('confidence')}>Confidence <SortIco col="confidence"/></th>
             <th className="sortable" onClick={()=>handleSort('trainedBy')}>Trained by <SortIco col="trainedBy"/></th>
@@ -2054,8 +2053,7 @@ function CategoryOverview({lob,onBack,onSelectCategory,onManagePrompt,addToast,o
             {rows.map(cat=>(
               <tr key={cat.id} onClick={()=>onSelectCategory(lob,cat)}>
                 <td><button className="tbl-name-link" onClick={e=>{e.stopPropagation();onSelectCategory(lob,cat);}}>{cat.name}</button></td>
-                <td>{cat.types.length||<span style={{color:'#9ca3af'}}>—</span>}</td>
-                <td>{cat.activeVersion}</td>
+                <td>{cat.types.length===0?<span className="badge-no-l2">No {LABELS.l2.plural}</span>:<span className="tbl-count-cell"><span className="tbl-count-num">{cat.types.length}</span>{cat.activeVersion&&<span className="tbl-ver-badge">{cat.activeVersion}</span>}</span>}</td>
                 <td><span className={`status-chip status-chip--${cat.status.toLowerCase()}`}>{cat.status}</span></td>
                 <td>{cat.confidence}%</td>
                 <td>{cat.trainedBy}</td>
@@ -2065,7 +2063,7 @@ function CategoryOverview({lob,onBack,onSelectCategory,onManagePrompt,addToast,o
                 </div></td>
               </tr>
             ))}
-            {rows.length===0&&<tr><td colSpan={7} className="tbl-empty">{filtersActive?`No ${LABELS.l1.plural.toLowerCase()} match your filters`:`No ${LABELS.l1.plural.toLowerCase()} found`}</td></tr>}
+            {rows.length===0&&<tr><td colSpan={6} className="tbl-empty">{filtersActive?`No ${LABELS.l1.plural.toLowerCase()} match your filters`:`No ${LABELS.l1.plural.toLowerCase()} found`}</td></tr>}
           </tbody>
         </table>
         <Pagination page={page} totalPages={totalPages} perPage={perPage} setPage={setPage} setPerPage={p=>{setPerPage(p);setPage(1);}}/>
