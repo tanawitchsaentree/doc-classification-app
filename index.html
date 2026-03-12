@@ -2114,7 +2114,7 @@ function CategoryOverview({lob,onBack,onSelectCategory,onManagePrompt,addToast,o
         <div style={{flex:1}}/>
         {filtersActive&&<span style={{fontSize:'12px',color:'#6b7280'}}>{sorted.length} result{sorted.length!==1?'s':''}</span>}
         <button className="btn btn-outline btn-sm" onClick={onOpenOutputFormat}>Output format</button>
-        <button className="btn btn-outline btn-sm" onClick={()=>onManagePrompt(lob,null,null)}>Edit {LABELS.l0.short} prompt</button>
+        <button className="btn btn-outline btn-sm" onClick={()=>onManagePrompt(lob,null,null)}>Edit {lob.name} prompt</button>
         <button className="btn btn-primary btn-sm" onClick={()=>setShowAddCat(true)}><IC.Plus s={11}/> Add {LABELS.l1.label}</button>
       </div>
       <div className="ov-table-wrap">
@@ -2186,7 +2186,7 @@ function TypesModal({lob,category,onClose,onManagePrompt,addToast,onAddType}){
         </div>
         <div className="modal__toolbar">
           <button className="btn btn-outline btn-sm"
-            onClick={()=>{onClose();onManagePrompt(lob,category,null);}}>Edit {LABELS.l1.label} prompt</button>
+            onClick={()=>{onClose();onManagePrompt(lob,category,null);}}>Edit {category.name} prompt</button>
           <button className="btn btn-primary btn-sm" onClick={()=>setShowAddType(s=>!s)}><IC.Plus s={11}/> Add {LABELS.l2.label}</button>
         </div>
         {showAddType&&<div style={{padding:'10px 16px',borderBottom:'1px solid #f3f4f6',display:'flex',gap:'8px',alignItems:'center'}}>
