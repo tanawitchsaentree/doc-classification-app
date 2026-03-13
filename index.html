@@ -1049,20 +1049,20 @@ Rules:
 
 /* ── Hierarchy level labels — change here, updates everywhere ── */
 const LABELS = {
-  l0: { short:'L0', label:'LoB',          full:'Line of Business',  plural:'LoBs'        },
-  l1: { short:'L1', label:'Doc Category', full:'Document Category', plural:'Doc Categories'  },
-  l2: { short:'L2', label:'Doc Type',     full:'Document Type',     plural:'Doc Types'   },
+  l0: { short:'L0', label:'L0', full:'L0', plural:'L0' },
+  l1: { short:'L1', label:'L1', full:'L1', plural:'L1' },
+  l2: { short:'L2', label:'L2', full:'L2', plural:'L2' },
 };
 
 const INIT_LOBS = [
   {
     id:'motor', name:'Motor',
-    classLv1Version:'V.3', classLv2Version:'V.2',
+    classL1Version:'V.3', classL2Version:'V.2',
     status:'Deployed', confidence:95, trainedBy:'Arlene Wilson',
     lobPrompt:
 `You are classifying Motor Insurance documents.
 
-This LOB covers vehicle insurance: claims, policies, quotations, registrations, and legal documentation.
+This L0 covers vehicle insurance: claims, policies, quotations, registrations, and legal documentation.
 
 {{CLASSIFICATION_HIERARCHY}}
 
@@ -1075,7 +1075,7 @@ Key identifiers:
     versions:[
       {v:'V.3',date:'2025-02-18',status:'Active',  score:'95%',note:'Improved FNOL and repair invoice accuracy. Reduced false positives on estimate vs invoice.',createdBy:'Arlene Wilson'},
       {v:'V.2',date:'2025-01-05',status:'Archived',score:'91%',note:'Added underwriting inspection classifier. Expanded complaint sub-types.',createdBy:'Jennie Cooper'},
-      {v:'V.1',date:'2024-11-20',status:'Archived',score:'87%',note:'Initial Motor LOB release.',createdBy:'Arlene Wilson'},
+      {v:'V.1',date:'2024-11-20',status:'Archived',score:'87%',note:'Initial Motor L0 release.',createdBy:'Arlene Wilson'},
     ],
     categories:[
       {id:'complaint',name:'Complaint',activeVersion:'V.3',status:'Failed',confidence:81.2,trainedBy:'Evan Flores',
@@ -1225,12 +1225,12 @@ Key identifiers:
   },
   {
     id:'property', name:'Property',
-    classLv1Version:'V.3', classLv2Version:'V.2',
+    classL1Version:'V.3', classL2Version:'V.2',
     status:'Failed', confidence:81.2, trainedBy:'Evan Flores',
     lobPrompt:
 `You are classifying Property Insurance documents.
 
-This LOB covers residential and commercial property insurance including claims, surveys, contractor invoices, and policy documents.
+This L0 covers residential and commercial property insurance including claims, surveys, contractor invoices, and policy documents.
 
 {{CLASSIFICATION_HIERARCHY}}
 
@@ -1243,7 +1243,7 @@ Key identifiers:
     versions:[
       {v:'V.3',date:'2025-02-01',status:'Active',  score:'81%',note:'Retraining for water damage sub-type accuracy. Storm damage added as new type.',createdBy:'Evan Flores'},
       {v:'V.2',date:'2024-12-10',status:'Archived',score:'78%',note:'Added contractor invoice classifier. Improved survey report detection.',createdBy:'Evan Flores'},
-      {v:'V.1',date:'2024-09-15',status:'Archived',score:'74%',note:'Initial Property LOB release.',createdBy:'Philip Steward'},
+      {v:'V.1',date:'2024-09-15',status:'Archived',score:'74%',note:'Initial Property L0 release.',createdBy:'Philip Steward'},
     ],
     categories:[
       {id:'prop-claim',name:'Property Claim',activeVersion:'V.2',status:'Failed',confidence:78,trainedBy:'Evan Flores',
@@ -1314,12 +1314,12 @@ Key identifiers:
   },
   {
     id:'health', name:'Health',
-    classLv1Version:'V.2', classLv2Version:'V.1',
+    classL1Version:'V.2', classL2Version:'V.1',
     status:'Deployed', confidence:89, trainedBy:'Jennie Cooper',
     lobPrompt:
 `You are classifying Health Insurance documents.
 
-This LOB covers private medical insurance, dental, optical, and critical illness claims and policies.
+This L0 covers private medical insurance, dental, optical, and critical illness claims and policies.
 
 {{CLASSIFICATION_HIERARCHY}}
 
@@ -1332,7 +1332,7 @@ Key identifiers:
 - Policy numbers starting with "HLT-" or "PMI-"`,
     versions:[
       {v:'V.2',date:'2025-01-20',status:'Active',  score:'89%',note:'Improved pre-auth vs in-progress claim distinction. Added physiotherapy sub-type.',createdBy:'Jennie Cooper'},
-      {v:'V.1',date:'2024-10-01',status:'Archived',score:'83%',note:'Initial Health LOB release.',createdBy:'Jennie Cooper'},
+      {v:'V.1',date:'2024-10-01',status:'Archived',score:'83%',note:'Initial Health L0 release.',createdBy:'Jennie Cooper'},
     ],
     categories:[
       {id:'health-claim',name:'Medical Claim',activeVersion:'V.2',status:'Deployed',confidence:91,trainedBy:'Jennie Cooper',
@@ -1401,12 +1401,12 @@ Look for:
   },
   {
     id:'marine', name:'Marine',
-    classLv1Version:'V.2', classLv2Version:'V.1',
+    classL1Version:'V.2', classL2Version:'V.1',
     status:'Deployed', confidence:88, trainedBy:'Jorge Black',
     lobPrompt:
 `You are classifying Marine Insurance documents.
 
-This LOB covers cargo, hull, and marine liability insurance for shipping and freight operations.
+This L0 covers cargo, hull, and marine liability insurance for shipping and freight operations.
 
 {{CLASSIFICATION_HIERARCHY}}
 
@@ -1419,7 +1419,7 @@ Key identifiers:
 - Policy numbers starting with "MAR-" or "CARGO-"`,
     versions:[
       {v:'V.2',date:'2025-02-10',status:'Active',  score:'88%',note:'Added pollution liability sub-type. Improved cargo vs hull distinction.',createdBy:'Jorge Black'},
-      {v:'V.1',date:'2025-01-10',status:'Archived',score:'82%',note:'Initial Marine LOB release.',createdBy:'Jorge Black'},
+      {v:'V.1',date:'2025-01-10',status:'Archived',score:'82%',note:'Initial Marine L0 release.',createdBy:'Jorge Black'},
     ],
     categories:[
       {id:'cargo',name:'Cargo',activeVersion:'V.2',status:'Deployed',confidence:90,trainedBy:'Jorge Black',
@@ -1467,7 +1467,7 @@ Look for:
   },
   {
     id:'cafes', name:'Cafes',
-    classLv1Version:'V.2', classLv2Version:'V.1',
+    classL1Version:'V.2', classL2Version:'V.1',
     status:'Deployed', confidence:92.1, trainedBy:'Jennie Cooper',
     lobPrompt:
 `You are classifying documents for the Cafes & Food Service business line.
@@ -1484,7 +1484,7 @@ Key identifiers:
 - Food Safety and Hygiene (England) Regulations 2013 compliance references`,
     versions:[
       {v:'V.2',date:'2025-02-20',status:'Active',  score:'92%',note:'Added food hygiene and compliance document types. Improved liability sub-type accuracy.',createdBy:'Jennie Cooper'},
-      {v:'V.1',date:'2025-01-08',status:'Archived',score:'87%',note:'Initial Cafes LOB release.',createdBy:'Clark Rai'},
+      {v:'V.1',date:'2025-01-08',status:'Archived',score:'87%',note:'Initial Cafes L0 release.',createdBy:'Clark Rai'},
     ],
     categories:[
       {id:'cafe-liability',name:'Liability',activeVersion:'V.1',status:'Deployed',confidence:93,trainedBy:'Clark Rai',
@@ -1540,12 +1540,12 @@ Key identifiers:
   },
   {
     id:'media', name:'Media & Entertainment',
-    classLv1Version:'V.2', classLv2Version:'V.1',
+    classL1Version:'V.2', classL2Version:'V.1',
     status:'Failed', confidence:83.4, trainedBy:'Philip Steward',
     lobPrompt:
 `You are classifying Media and Entertainment industry documents.
 
-This LOB covers production insurance, errors & omissions, intellectual property, and rights licensing.
+This L0 covers production insurance, errors & omissions, intellectual property, and rights licensing.
 
 {{CLASSIFICATION_HIERARCHY}}
 
@@ -1557,7 +1557,7 @@ Key identifiers:
 - Distribution agreement references`,
     versions:[
       {v:'V.2',date:'2025-01-15',status:'Active',  score:'83%',note:'Added errors & omissions sub-types.',createdBy:'Philip Steward'},
-      {v:'V.1',date:'2024-10-20',status:'Archived',score:'77%',note:'Initial Media LOB release.',createdBy:'Philip Steward'},
+      {v:'V.1',date:'2024-10-20',status:'Archived',score:'77%',note:'Initial Media L0 release.',createdBy:'Philip Steward'},
     ],
     categories:[
       {id:'media-prod',name:'Production Insurance',activeVersion:'V.2',status:'Failed',confidence:82,trainedBy:'Philip Steward',
@@ -1592,7 +1592,7 @@ Look for: copyright clearance certificates, rights chain documentation, E&O poli
   },
   {
     id:'ins-ger', name:'Germany',
-    classLv1Version:'V.2', classLv2Version:'V.1',
+    classL1Version:'V.2', classL2Version:'V.1',
     status:'Deployed', confidence:92, trainedBy:'Clark Rai',
     lobPrompt:
 `Sie sind ein Klassifizierungsassistent für deutsche Versicherungsdokumente.
@@ -1609,7 +1609,7 @@ Key identifiers:
 - German regulatory references (BaFin, VVG — Versicherungsvertragsgesetz)`,
     versions:[
       {v:'V.2',date:'2025-02-05',status:'Active',  score:'92%',note:'Improved German OCR handling for umlauts and ß. Added BaFin escalation sub-type.',createdBy:'Clark Rai'},
-      {v:'V.1',date:'2024-12-01',status:'Archived',score:'87%',note:'Initial Germany LOB release.',createdBy:'Clark Rai'},
+      {v:'V.1',date:'2024-12-01',status:'Archived',score:'87%',note:'Initial Germany L0 release.',createdBy:'Clark Rai'},
     ],
     categories:[
       {id:'ger-schaden',name:'Schaden',activeVersion:'V.2',status:'Deployed',confidence:93,trainedBy:'Clark Rai',
@@ -1667,12 +1667,12 @@ Key identifiers:
   },
   {
     id:'travel', name:'Travel',
-    classLv1Version:'V.1', classLv2Version:null,
+    classL1Version:'V.1', classL2Version:null,
     status:'Draft', confidence:0, trainedBy:'',
     lobPrompt:
 `You are classifying Travel Insurance documents.
 
-This LOB covers travel insurance including claims, policies, medical emergencies, cancellations, and baggage loss.
+This L0 covers travel insurance including claims, policies, medical emergencies, cancellations, and baggage loss.
 
 {{CLASSIFICATION_HIERARCHY}}
 
@@ -1683,7 +1683,7 @@ Key identifiers:
 - Medical certificate or hospital letterhead (overseas)
 - "Travel Insurance" header or insurer travel logo`,
     versions:[
-      {v:'V.1',date:'2025-03-01',status:'Active',score:'—',note:'Initial Travel LOB setup. L1 categories configured, L2 types pending.',createdBy:'Jennie Cooper'},
+      {v:'V.1',date:'2025-03-01',status:'Active',score:'—',note:'Initial Travel L0 setup. L1 configured, L2 pending.',createdBy:'Jennie Cooper'},
     ],
     categories:[
       {id:'trv-cancellation',name:'Trip Cancellation',activeVersion:'V.1',status:'Draft',confidence:0,trainedBy:'',
@@ -2026,7 +2026,7 @@ function Dashboard({lobs,onNavigate}){
       <div className="section-title">{LABELS.l0.short} Performance</div>
       <div className="lob-perf">
         <div className="lob-perf__hdr">
-          <span>{LABELS.l0.short} · {LABELS.l0.label}</span><span>{LABELS.l1.short} · {LABELS.l1.label}</span><span>{LABELS.l2.short} · {LABELS.l2.label}</span><span>Confidence</span><span>Status</span>
+          <span>{LABELS.l0.short}</span><span>{LABELS.l1.short}</span><span>{LABELS.l2.short}</span><span>Confidence</span><span>Status</span>
         </div>
         {lobs.map(l=>(
           <div key={l.id} className="lob-perf__row" onClick={()=>onNavigate('lob-overview')}>
@@ -2047,7 +2047,7 @@ function Dashboard({lobs,onNavigate}){
       <div className="section-title">Quick Actions</div>
       <div className="quick-links">
         {[
-          {icon:'⚙️',color:'#eff6ff',label:'Configure Classification',sub:'Manage LOBs, categories, types & prompts',action:'lob-overview'},
+          {icon:'⚙️',color:'#eff6ff',label:'Configure Classification',sub:`Manage ${LABELS.l0.label}, ${LABELS.l1.label}, ${LABELS.l2.label} & prompts`,action:'lob-overview'},
           {icon:'📋',color:'#f0fdf4',label:'Manual Review Queue',      sub:'72 documents pending review',           action:'queue'},
           {icon:'📊',color:'#faf5ff',label:'Audit Log',               sub:'View classification history',            action:'audit'},
         ].map(q=>(
@@ -2152,9 +2152,9 @@ function LobOverview({lobs,onSelectLob,addToast,onOpenOutputFormat,onConfirm,onD
       <div className="ov-table-wrap">
         <table className="ov-table">
           <thead><tr>
-            <th className="sortable" onClick={()=>handleSort('name')}>{LABELS.l0.short} · {LABELS.l0.label} <SortIco col="name"/></th>
-            <th className="sortable" onClick={()=>handleSort('categories')}>{LABELS.l1.short} · {LABELS.l1.label} <SortIco col="categories"/></th>
-            <th>{LABELS.l2.short} · {LABELS.l2.label}</th>
+            <th className="sortable" onClick={()=>handleSort('name')}>{LABELS.l0.short} <SortIco col="name"/></th>
+            <th className="sortable" onClick={()=>handleSort('categories')}>{LABELS.l1.short} <SortIco col="categories"/></th>
+            <th>{LABELS.l2.short}</th>
             <th className="sortable" onClick={()=>handleSort('status')}>Status <SortIco col="status"/></th>
             <th className="sortable" onClick={()=>handleSort('confidence')}>Confidence <SortIco col="confidence"/></th>
             <th className="sortable" onClick={()=>handleSort('trainedBy')}>Trained by <SortIco col="trainedBy"/></th>
@@ -2164,8 +2164,8 @@ function LobOverview({lobs,onSelectLob,addToast,onOpenOutputFormat,onConfirm,onD
             {rows.map(lob=>(
               <tr key={lob.id} onClick={()=>onSelectLob(lob)}>
                 <td><button className="tbl-name-link" onClick={e=>{e.stopPropagation();onSelectLob(lob);}}>{lob.name}</button></td>
-                <td><span className="tbl-count-cell"><span className="tbl-count-num">{lob.categories.length||'—'}</span>{lob.classLv1Version&&<span className="tbl-ver-badge">{lob.classLv1Version}</span>}</span></td>
-                <td>{(()=>{const n=lob.categories.reduce((s,c)=>s+c.types.length,0);return n===0?<span className="badge-no-l2">No {LABELS.l2.plural}</span>:<span className="tbl-count-cell"><span className="tbl-count-num">{n}</span>{lob.classLv2Version&&<span className="tbl-ver-badge">{lob.classLv2Version}</span>}</span>;})()}</td>
+                <td><span className="tbl-count-cell"><span className="tbl-count-num">{lob.categories.length||'—'}</span>{lob.classL1Version&&<span className="tbl-ver-badge">{lob.classL1Version}</span>}</span></td>
+                <td>{(()=>{const n=lob.categories.reduce((s,c)=>s+c.types.length,0);return n===0?<span className="badge-no-l2">No {LABELS.l2.plural}</span>:<span className="tbl-count-cell"><span className="tbl-count-num">{n}</span>{lob.classL2Version&&<span className="tbl-ver-badge">{lob.classL2Version}</span>}</span>;})()}</td>
                 <td><span className={`status-chip status-chip--${lob.status.toLowerCase()}`}>{lob.status}</span></td>
                 <td>{lob.confidence}%</td>
                 <td>{lob.trainedBy}</td>
@@ -2175,7 +2175,7 @@ function LobOverview({lobs,onSelectLob,addToast,onOpenOutputFormat,onConfirm,onD
                 </div></td>
               </tr>
             ))}
-            {rows.length===0&&<tr><td colSpan={7} className="tbl-empty">{filtersActive?'No LOBs match your filters':'No LOBs found'}</td></tr>}
+            {rows.length===0&&<tr><td colSpan={7} className="tbl-empty">{filtersActive?`No ${LABELS.l0.label} match your filters`:`No ${LABELS.l0.label} found`}</td></tr>}
           </tbody>
         </table>
         <Pagination page={page} totalPages={totalPages} perPage={perPage} setPage={setPage} setPerPage={p=>{setPerPage(p);setPage(1);}}/>
@@ -2245,8 +2245,8 @@ function CategoryOverview({lob,onBack,onSelectCategory,onManagePrompt,addToast,o
       <div className="ov-table-wrap">
         <table className="ov-table">
           <thead><tr>
-            <th className="sortable" onClick={()=>handleSort('name')}>{LABELS.l1.short} · {LABELS.l1.label} <SortIco col="name"/></th>
-            <th className="sortable" onClick={()=>handleSort('types')}>{LABELS.l2.short} · {LABELS.l2.label} <SortIco col="types"/></th>
+            <th className="sortable" onClick={()=>handleSort('name')}>{LABELS.l1.short} <SortIco col="name"/></th>
+            <th className="sortable" onClick={()=>handleSort('types')}>{LABELS.l2.short} <SortIco col="types"/></th>
             <th className="sortable" onClick={()=>handleSort('status')}>Status <SortIco col="status"/></th>
             <th className="sortable" onClick={()=>handleSort('confidence')}>Confidence <SortIco col="confidence"/></th>
             <th className="sortable" onClick={()=>handleSort('trainedBy')}>Trained by <SortIco col="trainedBy"/></th>
@@ -2325,7 +2325,7 @@ function TypesModal({lob,category,onClose,onManagePrompt,addToast,onAddType}){
         <div className="modal__body types-modal-body">
           <table className="types-table">
             <thead><tr>
-              <th>{LABELS.l2.short} · {LABELS.l2.label}</th>
+              <th>{LABELS.l2.short}</th>
               <th style={{width:'90px',textAlign:'center'}}>Prompt</th>
             </tr></thead>
             <tbody>
@@ -2388,7 +2388,7 @@ function LobPromptSection({lobName,prompt,defaultPrompt,meta,saveState,onEdit,on
       <div className="l1-prompt-sec__hdr" onClick={()=>setOpen(o=>!o)} style={{cursor:'pointer'}}>
         <span className="cat-sec__chevron" style={{transform:open?'rotate(0deg)':'rotate(-90deg)',transition:'transform .15s'}}><IC.ChevDown s={13}/></span>
         <span className="l1-prompt-sec__badge">STAGE 1</span>
-        <span className="l1-prompt-sec__title">LOB Classification Prompt — {lobName}</span>
+        <span className="l1-prompt-sec__title">{LABELS.l0.label} Classification Prompt — {lobName}</span>
         <div style={{display:'flex',alignItems:'center',gap:'6px',marginLeft:'auto'}}>
           {allCount>0&&<span className="test-chip test-chip--pending" style={{fontSize:'10px'}}>{allCount} doc{allCount!==1?'s':''}</span>}
           <span className={`workspace__status ${(meta||{status:'Draft'}).status.toLowerCase()}`} style={{fontSize:'11px'}}>{(meta||{status:'Draft'}).status}</span>
@@ -2426,7 +2426,7 @@ function LobPromptSection({lobName,prompt,defaultPrompt,meta,saveState,onEdit,on
             {missing&&<div style={{display:'flex',alignItems:'center',gap:'7px',padding:'7px 10px',background:'#fffbeb',border:'1px solid #fde68a',borderRadius:'6px',marginBottom:'8px',fontSize:'11px',color:'#92400e'}}><IC.Warn/> The <code style={{fontFamily:'monospace',background:'#fef3c7',padding:'1px 4px',borderRadius:'3px'}}>{'{{CLASSIFICATION_HIERARCHY}}'}</code> placeholder is required</div>}
             <textarea className="workspace__textarea" style={{minHeight:'180px',width:'100%'}} value={prompt}
               onChange={e=>onEdit(e.target.value)} spellCheck={false}
-              placeholder="Enter LOB-level classification prompt…"/>
+              placeholder={`Enter ${LABELS.l0.label} classification prompt…`}/>
             {showResetConfirm&&<div className="reset-confirm" style={{marginTop:'6px'}}>
               <span>Reset prompt to default?</span>
               <div className="reset-confirm__actions">
@@ -2478,7 +2478,7 @@ function LobPromptSection({lobName,prompt,defaultPrompt,meta,saveState,onEdit,on
         onMarkTested={onMarkTested}
         onClose={()=>setShowTest(false)}
         targets={targets}
-        testTitle={`Test Stage 1 — ${lobName} LOB`}
+        testTitle={`Test Stage 1 — ${lobName} (${LABELS.l0.label})`}
         expectedPlaceholder={targets.length>0?`e.g. ${targets.slice(0,3).map(t=>t.name).join(', ')}`:undefined}
         onAddDoc={onAddDoc}
         addToast={addToast}
@@ -2684,19 +2684,19 @@ function Sidebar({cbLevels,setCbLevels,l0Name,setL0Name,l1Items,setL1Items,showM
   const startRenameL1=id=>{const item=l1Items.find(i=>i.id===id);setRenameDraft(item?.name||'');setRenamingId(id);setShowMenu(null);};
   const commitRename=()=>{if(renameDraft.trim()&&renamingId){const item=l1Items.find(i=>i.id===renamingId);if(renameDraft.trim()!==item?.name){setL1Items(items=>items.map(i=>i.id===renamingId?{...i,name:renameDraft.trim()}:i));addToast(`Renamed to "${renameDraft.trim()}"`);}setRenamingId(null);setRenameDraft('');}else{setRenamingId(null);}};
   const cancelRename=()=>{setRenamingId(null);setRenameDraft('');};
-  const requestDelL1=id=>{const item=l1Items.find(i=>i.id===id);setShowMenu(null);onConfirm({title:'Delete Level 1 item',message:`Delete "${item?.name}"? This will remove its workspace tab.`,confirmLabel:'Delete',onConfirm:()=>{setL1Items(items=>items.filter(i=>i.id!==id));addToast(`"${item?.name}" deleted`,'warning');}});};
+  const requestDelL1=id=>{const item=l1Items.find(i=>i.id===id);setShowMenu(null);onConfirm({title:`Delete ${LABELS.l1.label}`,message:`Delete "${item?.name}"? This will remove its workspace tab.`,confirmLabel:'Delete',onConfirm:()=>{setL1Items(items=>items.filter(i=>i.id!==id));addToast(`"${item?.name}" deleted`,'warning');}});};
   const addL1=()=>{if(!addL1Name.trim())return;const id=addL1Name.toLowerCase().replace(/\s+/g,'-')+'-'+Date.now();setL1Items(items=>[...items,{id,name:addL1Name.trim(),expanded:false,l2:[]}]);addToast(`"${addL1Name.trim()}" added`);setAddL1Name('');setShowAddL1(false);};
   return(
     <aside className="sidebar" style={style}>
       <div className="sidebar__header"><h2 className="sidebar__title">Document Classification</h2></div>
       <div className="sidebar__divider"/>
       <div className="sidebar__level0">
-        <span className="sidebar__level-lbl">{LABELS.l0.short} · {LABELS.l0.label}</span>
+        <span className="sidebar__level-lbl">{LABELS.l0.short}</span>
         {editingL0?<input className="sidebar__l0-input" value={l0Draft} onChange={e=>setL0Draft(e.target.value)} onBlur={commitL0} onKeyDown={e=>{if(e.key==='Enter')commitL0();if(e.key==='Escape'){setL0Draft(l0Name);setEditingL0(false);}}} autoFocus/>
         :<span className="sidebar__l0-name" title="Click to rename" onClick={()=>{setL0Draft(l0Name);setEditingL0(true);}}>{l0Name} <IC.Edit/></span>}
       </div>
       <div className="sidebar__divider"/>
-      <div className="sidebar__l1-header"><span className="sidebar__level-lbl">{LABELS.l1.short} · {LABELS.l1.label}</span></div>
+      <div className="sidebar__l1-header"><span className="sidebar__level-lbl">{LABELS.l1.short}</span></div>
       <div className="sidebar__list-controls">
         <div className="sidebar__search-wrap">
           <span className="sidebar__search-icon"><IC.Search/></span>
@@ -2712,7 +2712,7 @@ function Sidebar({cbLevels,setCbLevels,l0Name,setL0Name,l1Items,setL1Items,showM
               <button className={`sidebar__l1-nav${activeCatId==='l1'?' sidebar__l1-nav--active':''}`}
                 onClick={()=>onScrollTo?.('l1')}>
                 <span className="sidebar__l1-nav__dot" style={{background:'#1d4ed8'}}/>
-                LOB Prompt (Stage 1)
+                {LABELS.l0.label} Prompt (Stage 1)
               </button>
             </div>
           </div>
@@ -2749,7 +2749,7 @@ function Sidebar({cbLevels,setCbLevels,l0Name,setL0Name,l1Items,setL1Items,showM
             </div>
             )}
             {item.expanded&&<div className="sidebar__l2-wrap">
-              <span className="sidebar__level-lbl sub">{LABELS.l2.short} · {LABELS.l2.label}</span>
+              <span className="sidebar__level-lbl sub">{LABELS.l2.short}</span>
               {item.l2.length===0?<p className="sidebar__empty-l2">There's no {LABELS.l2.label.toLowerCase()}</p>
               :<ul className="sidebar__l2-list">{item.l2.map(l2=>(
                 <li key={l2.id} className="sidebar__l2-item"><IC.Grid/><span>{l2.name}</span>
@@ -2769,7 +2769,7 @@ function Sidebar({cbLevels,setCbLevels,l0Name,setL0Name,l1Items,setL1Items,showM
       </div>
       <div className="sidebar__add-l1-bar">
         {showAddL1?<div className="sidebar__add-l1-input-wrap">
-          <input ref={addL1Ref} className="sidebar__add-l1-input" value={addL1Name} onChange={e=>setAddL1Name(e.target.value)} onKeyDown={e=>{if(e.key==='Enter')addL1();if(e.key==='Escape'){setShowAddL1(false);setAddL1Name('');}}} placeholder="Level 1 name…"/>
+          <input ref={addL1Ref} className="sidebar__add-l1-input" value={addL1Name} onChange={e=>setAddL1Name(e.target.value)} onKeyDown={e=>{if(e.key==='Enter')addL1();if(e.key==='Escape'){setShowAddL1(false);setAddL1Name('');}}} placeholder={`${LABELS.l1.label} name…`}/>
           <button className="sidebar__add-confirm" onClick={addL1} disabled={!addL1Name.trim()}>Add</button>
           <button className="sidebar__add-cancel" onClick={()=>{setShowAddL1(false);setAddL1Name('');}}>✕</button>
         </div>:<button className="sidebar__add-l1-btn" onClick={()=>setShowAddL1(true)}><IC.Plus s={13}/> Add level 1</button>}
@@ -3701,7 +3701,7 @@ function App(){
   const deleteLob=lobId=>{
     setLobs(ls=>ls.filter(l=>l.id!==lobId));
     setPage('lob-overview');
-    addToast('LOB deleted','warning');
+    addToast(`${LABELS.l0.label} deleted`,'warning');
   };
   const deleteCategory=(lobId,catId)=>{
     setLobs(ls=>ls.map(l=>l.id===lobId?{...l,categories:l.categories.filter(c=>c.id!==catId)}:l));
@@ -3739,7 +3739,7 @@ function App(){
     // Build tab meta from live lob data
     const meta={
       global:{version:'1.0',score:'N/A',status:'Active'},
-      l1:{version:lob.classLv1Version||'V.1',score:`${lob.confidence}%`,status:lob.status},
+      l1:{version:lob.classL1Version||'V.1',score:`${lob.confidence}%`,status:lob.status},
     };
     lob.categories.forEach(c=>{
       meta[c.id]={version:c.activeVersion||'V.1',score:`${c.confidence}%`,status:c.status};
@@ -3850,7 +3850,7 @@ function App(){
                 <div className="cl-setup__row">
                   <label className="cl-setup__card cl-setup__card--required" onClick={e=>e.preventDefault()}>
                     <input type="checkbox" checked readOnly/>
-                    <span className="cl-setup__card-name">L1 · Document Categories</span>
+                    <span className="cl-setup__card-name">{LABELS.l1.label}</span>
                     <span className="cl-setup__card-tag cl-setup__card-tag--req">Required</span>
                   </label>
                   <label className={`cl-setup__card${cbLevels.l2?' cl-setup__card--active':''}`}>
