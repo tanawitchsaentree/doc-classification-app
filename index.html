@@ -1622,9 +1622,10 @@ Key identifiers:
 - Schadendatum (date of loss)
 - KFZ-Kennzeichen (vehicle registration for motor claims)`,
         types:[
-          {id:'ger-kfz',name:'KFZ Schaden',tags:[],prompt:'German motor vehicle damage claim. Look for: KFZ-Kennzeichen, Fahrzeugschein (vehicle registration document) references, TÜV or DEKRA assessment, Werkstatt (garage) invoice.'},
+          {id:'ger-kfz',name:'Kraft Schaden',tags:[],prompt:'German motor vehicle damage claim (Kraftfahrzeugschaden). Look for: KFZ-Kennzeichen, Fahrzeugschein references, TÜV or DEKRA assessment, Werkstatt (garage) invoice.'},
           {id:'ger-haft',name:'Haftpflicht',tags:['M'],prompt:'German liability claim (Haftpflichtschaden). Third-party damage or personal injury under liability coverage. Look for: Schadensersatzforderung (compensation demand), Haftpflichtversicherung references.'},
-          {id:'ger-gebaeude',name:'Gebäudeschaden',tags:[],prompt:'German building damage claim. Look for: property address, Gebäudeversicherung references, damage description in German (Wasserschaden, Brandschaden, Sturmschaden).'},
+          {id:'ger-gebaeude',name:'Sach Schaden',tags:[],prompt:'German property damage claim (Sachschaden). Look for: property address, Sachversicherung references, damage description (Wasserschaden, Brandschaden, Sturmschaden).'},
+          {id:'ger-rechnung',name:'Rechnung',tags:[],prompt:'German invoice submitted as part of a claim or repair. Contains: Rechnungsnummer, supplier/Werkstatt name, itemised services or parts, Mehrwertsteuer (VAT) breakdown, IBAN for payment.'},
         ]},
       {id:'ger-beschwerde',name:'Beschwerde',activeVersion:'V.1',status:'Deployed',confidence:91,trainedBy:'Clark Rai',
         prompt:
@@ -1632,9 +1633,10 @@ Key identifiers:
 
 Look for: formal complaint language ("Ich möchte Beschwerde einlegen", "unzufrieden"), BaFin references, Ombudsmann mentions, prior correspondence references.`,
         types:[
-          {id:'ger-beschwerde-std',name:'Standard Beschwerde',tags:[],prompt:'Standard written complaint to insurer. Contains: policyholder name, Versicherungsscheinnummer, specific grievance, desired resolution.'},
+          {id:'ger-beschwerde-std',name:'Einfach Beschwerde',tags:[],prompt:'Simple written complaint to insurer (einfache Beschwerde). Contains: policyholder name, Versicherungsscheinnummer, single specific grievance, desired resolution. No escalation threats or regulatory references.'},
           {id:'ger-bafin',name:'BaFin Eskalation',tags:[],prompt:'Complaint escalated to BaFin (Federal Financial Supervisory Authority). Contains: BaFin letterhead or reference, prior insurer complaint reference, regulatory escalation language.'},
           {id:'ger-ombudsmann',name:'Ombudsmann',tags:[],prompt:'Complaint referred to the Versicherungsombudsmann. Contains: Ombudsmann reference number, previously unresolved complaint history, case summary.'},
+          {id:'ger-vorstand',name:'Vorstand Beschwerde',tags:[],prompt:'Formal complaint addressed to or escalated to board level (Vorstandsebene). Look for: "Vorstand", "Geschäftsführung", prior unresolved complaint history, regulatory or legal threat language, CC to BaFin or legal counsel.'},
         ]},
       {id:'ger-vertrag',name:'Vertragsänderung',activeVersion:'V.1',status:'Deployed',confidence:92.5,trainedBy:'Clark Rai',
         prompt:
@@ -1656,9 +1658,10 @@ Key identifiers:
 - Versicherungsbeginn (policy start date)
 - Beitrag (premium amount)`,
         types:[
-          {id:'ger-kfz-police',name:'KFZ Versicherungsschein',tags:[],prompt:'German motor vehicle policy document. Contains: KFZ-Kennzeichen, Fahrzeugidentifikationsnummer (VIN), Deckungsart (coverage type: Haftpflicht, Teilkasko, Vollkasko).'},
+          {id:'ger-kfz-police',name:'Kraft Versicherungsschein',tags:[],prompt:'German motor vehicle policy (Kraftfahrtversicherungsschein). Contains: KFZ-Kennzeichen, Fahrzeugidentifikationsnummer (VIN), Deckungsart (Haftpflicht, Teilkasko, Vollkasko).'},
           {id:'ger-haft-police',name:'Haftpflicht Versicherungsschein',tags:[],prompt:'German personal or commercial liability policy. Contains: insured activities description, Deckungssumme (coverage limit), deductible (Selbstbehalt).'},
-          {id:'ger-wohngebaeude',name:'Wohngebäude Police',tags:[],prompt:'German residential buildings insurance policy. Contains: property address, Versicherungswert (insured value), Elementarschadendeckung (natural hazards coverage), Wohnfläche (floor area).'},
+          {id:'ger-wohngebaeude',name:'Sach Versicherungsschein',tags:[],prompt:'German property insurance policy (Sachversicherungsschein). Contains: property address, Versicherungswert (insured value), Elementarschadendeckung (natural hazards), Wohnfläche (floor area).'},
+          {id:'ger-privatschutz',name:'Privatschutz',tags:[],prompt:'German private coverage policy (Privatschutz). Covers personal liability, legal protection, and household contents for private individuals. Look for: "Privatschutz", "Privathaftpflicht", "Hausrat", combined private lines references.'},
         ]},
     ]
   },
