@@ -249,7 +249,7 @@ input,textarea,select{font-family:inherit}
 .workspace__more-search{width:100%;padding:8px 12px;border:none;border-bottom:1px solid #f3f4f6;font-size:12px;outline:none;font-family:inherit;color:#374151}
 .workspace__more-item{display:block;width:100%;padding:8px 14px;font-size:12px;color:#374151;background:none;border:none;text-align:left;cursor:pointer;font-family:inherit;transition:background .1s}
 .workspace__more-item:hover{background:#f9fafb}.workspace__more-item.active{color:#2563eb;background:#eff6ff;font-weight:500}
-.workspace__body{flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:14px}
+.workspace__body{flex:1;overflow-y:auto;padding:24px 20px 16px;display:flex;flex-direction:column;gap:14px}
 .workspace__body::-webkit-scrollbar{width:4px}.workspace__body::-webkit-scrollbar-thumb{background:#e5e7eb;border-radius:2px}
 .workspace__lv-header{display:flex;align-items:center;justify-content:space-between}
 .workspace__lv-title{font-size:14px;font-weight:600;color:#111827}
@@ -2548,7 +2548,7 @@ function WorkspaceTabs({l1Items,activeL1Tab,setActiveL1Tab,activeTab,setActiveTa
   );
 }
 
-function Workspace({activeL1Tab,setActiveL1Tab,activeTab,setActiveTab,l1Items,prompts,defaultPrompts,tabMeta,saveStates,onEdit,onSave,onVersion,onPreview,onTest,docs}){
+function Workspace({activeL1Tab,setActiveL1Tab,activeTab,setActiveTab,l1Items,prompts,defaultPrompts,tabMeta,saveStates,onEdit,onSave,onVersion,docs}){
   const getMeta=tabId=>{
     const base=tabMeta?.[tabId]||DEFAULT_TAB_META;
     const item=l1Items.find(i=>i.id===tabId);
@@ -2617,10 +2617,6 @@ function Workspace({activeL1Tab,setActiveL1Tab,activeTab,setActiveTab,l1Items,pr
             </div>
             <span className="char-count">{prompt.length.toLocaleString()} chars</span>
           </div>
-        </div>
-        <div className="workspace__actions">
-          <button className="workspace__preview-link" onClick={onPreview}>View full prompt</button>
-          <button className="workspace__btn primary" onClick={()=>{onSave(activeTab);onTest();}}>Test prompt</button>
         </div>
       </div>
     </main>
@@ -3382,7 +3378,7 @@ function App(){
                 prompts={prompts} defaultPrompts={defaultPrompts} tabMeta={tabMeta} saveStates={saveStates}
                 onEdit={handleEdit} onSave={handleSave}
                 docs={docs}
-                onVersion={()=>setModal('version')} onPreview={()=>setModal('preview')} onTest={()=>setModal('test')}/>
+                onVersion={()=>setModal('version')}/>
               :<div className="detail-scroll__main">
                 <div className="detail-scroll__toolbar">
                   <span className="detail-scroll__count">{promptLevel==='global'?'Global prompt':'Per-category prompts — '+l1Items.length+' categor'+(l1Items.length!==1?'ies':'y')}</span>
@@ -3428,20 +3424,6 @@ function App(){
           })()}
         </div>
         {modal==='version'&&<VersionModal lob={selectedLobFromState} onClose={()=>setModal(null)}/>}
-        {modal==='preview'&&(()=>{
-          const previewCtx=buildHierarchy('l2',l1Items,l1Items.find(i=>i.id===activeTab));
-          return <PreviewModal prompt={prompts[activeTab]||''} hierarchyContext={previewCtx} onClose={()=>setModal(null)}/>;
-        })()}
-        {modal==='test'&&promptLevel==='l2'&&(()=>{
-          const cat=l1Items.find(i=>i.id===activeTab);
-          return <TestModal
-            prompt={prompts[activeTab]||''}
-            docs={docs} onMarkTested={markTested}
-            onClose={()=>setModal(null)}
-            targets={cat?.l2||[]}
-            testTitle={`Test — ${cat?.name||activeTab}`}
-          />;
-        })()}
       </>}
 
 
