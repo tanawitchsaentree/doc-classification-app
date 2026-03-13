@@ -2159,181 +2159,6 @@ function LobOverview({lobs,onSelectLob,addToast,onOpenOutputFormat,onConfirm,onD
   );
 }
 
-/* ── Category Overview (L1 page) ── */
-function CategoryOverview({lob,onBack,onSelectCategory,onManagePrompt,addToast,onOpenOutputFormat,onConfirm,onAddCategory,onDeleteCategory}){
-  const [search,setSearch]=useState('');
-  const [statusFilter,setStatusFilter]=useState('All');
-  const [showAddCat,setShowAddCat]=useState(false);
-  const [newCatName,setNewCatName]=useState('');
-  const submitAddCat=()=>{if(!newCatName.trim())return;onAddCategory(lob.id,newCatName.trim());setNewCatName('');setShowAddCat(false);};
-  const [sortKey,setSortKey]=useState(null);
-  const [sortDir,setSortDir]=useState('asc');
-  const [page,setPage]=useState(1);
-  const [perPage,setPerPage]=useState(10);
-
-  const handleSort=key=>{
-    if(sortKey===key)setSortDir(d=>d==='asc'?'desc':'asc');
-    else{setSortKey(key);setSortDir('asc');}
-  };
-  const SortIco=({col})=><span className="sort-both">{sortKey===col?(sortDir==='asc'?'↑':'↓'):'⇅'}</span>;
-
-  const filtered=lob.categories
-    .filter(c=>statusFilter==='All'||c.status===statusFilter)
-    .filter(c=>!search||c.name.toLowerCase().includes(search.toLowerCase()));
-  const sorted=sortKey?[...filtered].sort((a,b)=>{
-    let av=a[sortKey],bv=b[sortKey];
-    if(typeof av==='string')av=av.toLowerCase();
-    if(typeof bv==='string')bv=bv.toLowerCase();
-    return sortDir==='asc'?(av>bv?1:-1):(av<bv?1:-1);
-  }):filtered;
-  const totalPages=Math.max(1,Math.ceil(sorted.length/perPage));
-  const rows=sorted.slice((page-1)*perPage,page*perPage);
-
-  const filtersActive = search || statusFilter !== 'All';
-  return(<>
-    <div className="ov-page">
-      <div className="ov-breadcrumb">
-        <button className="ov-bc-link" onClick={onBack}>Classification</button>
-        <span className="ov-bc-sep">›</span>
-        <span className="ov-bc-curr">{lob.name}</span>
-      </div>
-      <h1 className="ov-title">{LABELS.l1.plural}</h1>
-      <div className="ov-filter-row">
-        <div className="ov-search-wrap">
-          <IC.Search/>
-          <input className="ov-search" placeholder={`Search ${LABELS.l1.label}…`} value={search}
-            onChange={e=>{setSearch(e.target.value);setPage(1);}}/>
-          {search&&<button className="search-clear-btn" onClick={()=>{setSearch('');setPage(1);}}>×</button>}
-        </div>
-        <select className="ov-select" value={statusFilter}
-          onChange={e=>{setStatusFilter(e.target.value);setPage(1);}}>
-          <option>All</option><option>Deployed</option><option>Failed</option>
-        </select>
-        {filtersActive&&<button className="btn btn-outline btn-sm btn-filter-active"
-          onClick={()=>{setSearch('');setStatusFilter('All');setPage(1);}}>✕ Clear filters</button>}
-        <div style={{flex:1}}/>
-        {filtersActive&&<span style={{fontSize:'12px',color:'#6b7280'}}>{sorted.length} result{sorted.length!==1?'s':''}</span>}
-        <button className="btn btn-outline btn-sm" onClick={onOpenOutputFormat}>Browse Classification Tree</button>
-        <button className="btn btn-outline btn-sm" onClick={()=>onManagePrompt(lob,null,null)}>Edit {lob.name} prompt</button>
-        <button className="btn btn-primary btn-sm" onClick={()=>setShowAddCat(true)}><IC.Plus s={11}/> Add {LABELS.l1.label}</button>
-      </div>
-      <div className="ov-table-wrap">
-        <table className="ov-table">
-          <thead><tr>
-            <th className="sortable" onClick={()=>handleSort('name')}>{LABELS.l1.short} <SortIco col="name"/></th>
-            <th className="sortable" onClick={()=>handleSort('types')}>{LABELS.l2.short} <SortIco col="types"/></th>
-            <th className="sortable" onClick={()=>handleSort('status')}>Status <SortIco col="status"/></th>
-            <th className="sortable" onClick={()=>handleSort('confidence')}>Confidence <SortIco col="confidence"/></th>
-            <th className="sortable" onClick={()=>handleSort('trainedBy')}>Trained by <SortIco col="trainedBy"/></th>
-            <th>Action</th>
-          </tr></thead>
-          <tbody>
-            {rows.map(cat=>(
-              <tr key={cat.id} onClick={()=>onSelectCategory(lob,cat)}>
-                <td><button className="tbl-name-link" onClick={e=>{e.stopPropagation();onSelectCategory(lob,cat);}}>{cat.name}</button></td>
-                <td>{cat.types.length===0?<span className="badge-no-l2">No {LABELS.l2.plural}</span>:<span className="tbl-count-cell"><span className="tbl-count-num">{cat.types.length}</span>{cat.activeVersion&&<span className="tbl-ver-badge">{cat.activeVersion}</span>}</span>}</td>
-                <td><span className={`status-chip status-chip--${cat.status.toLowerCase()}`}>{cat.status}</span></td>
-                <td>{cat.confidence}%</td>
-                <td>{cat.trainedBy}</td>
-                <td><div className="tbl-actions" onClick={e=>e.stopPropagation()}>
-                  <button className="tbl-icon-btn" title="Edit" onClick={()=>onManagePrompt(lob,cat,null)}><IC.Edit/></button>
-                  <button className="tbl-icon-btn danger" title="Delete" onClick={()=>onConfirm({title:`Delete "${cat.name}"?`,message:`This will permanently remove this ${LABELS.l1.label} and all its ${LABELS.l2.plural.toLowerCase()}.`,confirmLabel:'Delete',onConfirm:()=>onDeleteCategory(lob.id,cat.id)})}><IC.Trash/></button>
-                </div></td>
-              </tr>
-            ))}
-            {rows.length===0&&<tr><td colSpan={6} className="tbl-empty">{filtersActive?`No ${LABELS.l1.plural.toLowerCase()} match your filters`:`No ${LABELS.l1.plural.toLowerCase()} found`}</td></tr>}
-          </tbody>
-        </table>
-        <Pagination page={page} totalPages={totalPages} perPage={perPage} setPage={setPage} setPerPage={p=>{setPerPage(p);setPage(1);}}/>
-      </div>
-    </div>
-    {showAddCat&&<div className="modal-overlay" onClick={()=>setShowAddCat(false)}>
-      <div className="modal" onClick={e=>e.stopPropagation()}>
-        <div className="modal__header"><h3>Add {LABELS.l1.label}</h3><button className="modal__close" onClick={()=>setShowAddCat(false)}>×</button></div>
-        <div className="modal__body">
-          <label className="add-modal-label">{LABELS.l1.label} name</label>
-          <input autoFocus className="add-modal-input" value={newCatName} onChange={e=>setNewCatName(e.target.value)}
-            onKeyDown={e=>{if(e.key==='Enter')submitAddCat();if(e.key==='Escape')setShowAddCat(false);}}
-            placeholder="e.g. Claim Notification"/>
-          <p className="add-modal-hint">This will be added to {lob.name} as a new Draft {LABELS.l1.label.toLowerCase()}.</p>
-        </div>
-        <div className="modal__footer">
-          <button className="btn btn-outline" onClick={()=>setShowAddCat(false)}>Cancel</button>
-          <button className="btn btn-primary" onClick={submitAddCat} disabled={!newCatName.trim()}>Add {LABELS.l1.label}</button>
-        </div>
-      </div>
-    </div>}
-  </>);
-}
-
-/* ── Types Modal (L2) ── */
-function TypesModal({lob,category,onClose,onManagePrompt,addToast,onAddType}){
-  const [showAddType,setShowAddType]=useState(false);
-  const [newTypeName,setNewTypeName]=useState('');
-  const withPrompt=category.types.filter(t=>t.prompt&&t.prompt.trim()).length;
-  const submitAddType=()=>{if(!newTypeName.trim())return;onAddType(lob.id,category.id,newTypeName.trim());setNewTypeName('');setShowAddType(false);};
-  return(
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal types" onClick={e=>e.stopPropagation()}>
-        <div className="modal__header">
-          <div>
-            <h3>{LABELS.l2.plural} — {category.name}</h3>
-            <div style={{fontSize:'11px',color:'#9ca3af',marginTop:'2px'}}>
-              {withPrompt}/{category.types.length} prompts configured
-            </div>
-          </div>
-          <button className="modal__close" onClick={onClose}>×</button>
-        </div>
-        <div className="modal__toolbar">
-          <button className="btn btn-outline btn-sm"
-            onClick={()=>{onClose();onManagePrompt(lob,category,null);}}>Edit {category.name} prompt</button>
-          <button className="btn btn-primary btn-sm" onClick={()=>setShowAddType(s=>!s)}><IC.Plus s={11}/> Add {LABELS.l2.label}</button>
-        </div>
-        {showAddType&&<div style={{padding:'10px 16px',borderBottom:'1px solid #f3f4f6',display:'flex',gap:'8px',alignItems:'center'}}>
-          <input autoFocus className="add-modal-input" style={{flex:1}} value={newTypeName}
-            onChange={e=>setNewTypeName(e.target.value)}
-            onKeyDown={e=>{if(e.key==='Enter')submitAddType();if(e.key==='Escape')setShowAddType(false);}}
-            placeholder="Type name, e.g. FNOL Report"/>
-          <button className="btn btn-primary btn-sm" onClick={submitAddType} disabled={!newTypeName.trim()}>Add</button>
-          <button className="btn btn-outline btn-sm" onClick={()=>{setShowAddType(false);setNewTypeName('');}}>Cancel</button>
-        </div>}
-        <div className="modal__body types-modal-body">
-          <table className="types-table">
-            <thead><tr>
-              <th>{LABELS.l2.short}</th>
-              <th style={{width:'90px',textAlign:'center'}}>Prompt</th>
-            </tr></thead>
-            <tbody>
-              {category.types.map(t=>(
-                <tr key={t.id}>
-                  <td>
-                    <span className={`type-prompt-dot${t.prompt&&t.prompt.trim()?' type-prompt-dot--set':' type-prompt-dot--empty'}`} title={t.prompt&&t.prompt.trim()?'Prompt configured':'No prompt set'}/>
-                    <button className="tbl-name-link"
-                      onClick={()=>{onClose();onManagePrompt(lob,category,t);}}>
-                      {t.name}
-                    </button>
-                    {t.tags.map(tag=>(
-                      <span key={tag} className={`type-tag type-tag--${tag}`}>{tag}</span>
-                    ))}
-                  </td>
-                  <td style={{textAlign:'center'}}>
-                    {t.prompt&&t.prompt.trim()
-                      ?<span style={{fontSize:'11px',color:'#16a34a',fontWeight:500}}>Configured</span>
-                      :<button className="tbl-name-link" style={{fontSize:'11px',color:'#9ca3af'}}
-                          onClick={()=>{onClose();onManagePrompt(lob,category,t);}}>Set up →</button>
-                    }
-                  </td>
-                </tr>
-              ))}
-              {category.types.length===0&&<tr><td colSpan={2} className="tbl-empty">No {LABELS.l2.plural.toLowerCase()} defined for this {LABELS.l1.label.toLowerCase()}</td></tr>}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 /* ── LOB Prompt Section (Stage 1 — L1-only scroll mode) ── */
 /* targets = l1Items passed from App so classifier knows the category targets */
 function LobPromptSection({lobName,prompt,defaultPrompt,meta,saveState,onEdit,onSave,
@@ -3432,8 +3257,6 @@ function App(){
   const {toasts,addToast,removeToast}=useToast();
   const [page,setPage]=useState('lob-overview');
   const [activeNav,setActiveNav]=useState('classification');
-  const [selectedLob,setSelectedLob]=useState(null);
-  const [typesModal,setTypesModal]=useState(null); // {lob, category}
   const [showOutputFormat,setShowOutputFormat]=useState(false);
   const [tabMeta,setTabMeta]=useState({});       // persists across modal open/close
   const [ofActiveLobId,setOfActiveLobId]=useState(null); // pre-selects LOB in tree
@@ -3499,11 +3322,7 @@ function App(){
   const delCatDoc=(catId,docId)=>{setCatDocsFor(catId,prev=>prev.filter(d=>d.id!==docId));addToast('Document removed','warning');};
   const markCatTested=(catId,docId)=>setCatDocsFor(catId,prev=>prev.map(d=>d.id===docId?{...d,status:'Tested',selected:false}:d));
 
-  const onSelectLob=lob=>{
-    setSelectedLob(lob);
-    setPage('category-overview');
-    setActiveNav('classification');
-  };
+  const onSelectLob=lob=>onManagePrompt(lob,null,null);
 
   const deleteLob=lobId=>{
     setLobs(ls=>ls.filter(l=>l.id!==lobId));
@@ -3523,10 +3342,6 @@ function App(){
     const t={id:`type-${Date.now()}`,name,tags:[],prompt:''};
     setLobs(ls=>ls.map(l=>l.id===lobId?{...l,categories:l.categories.map(c=>c.id===catId?{...c,types:[...c.types,t]}:c)}:l));
     addToast(`Type "${name}" added`);
-  };
-
-  const onSelectCategory=(lob,cat)=>{
-    setTypesModal({lob,category:cat});
   };
 
   const onManagePrompt=(lob,cat,type)=>{
@@ -3569,9 +3384,7 @@ function App(){
     setActiveNav('classification');
   };
 
-  const onBackToList=()=>{
-    setPage('category-overview');
-  };
+  const onBackToList=()=>setPage('lob-overview');
 
   const handleEdit=useCallback((tabId,value)=>{
     setPrompts(p=>({...p,[tabId]:value}));
@@ -3610,7 +3423,7 @@ function App(){
   },[activeTab,handleSave]);
 
   const closeAll=()=>{setMenusState({user:false,tenant:false,lang:false});setShowMenu(null);};
-  const selectedLobFromState=lobs.find(l=>l.id===selectedLobId)||selectedLob;
+  const selectedLobFromState=lobs.find(l=>l.id===selectedLobId);
 
   return(
     <div className="app" onClick={closeAll}>
@@ -3622,23 +3435,13 @@ function App(){
         onOpenOutputFormat={()=>{setOfActiveLobId(null);setShowOutputFormat(true);}}
         onConfirm={setConfirmState} onDeleteLob={deleteLob}/>}
 
-      {page==='category-overview'&&selectedLob&&<CategoryOverview
-        lob={lobs.find(l=>l.id===selectedLob.id)||selectedLob}
-        onBack={()=>setPage('lob-overview')}
-        onSelectCategory={onSelectCategory}
-        onManagePrompt={onManagePrompt}
-        onOpenOutputFormat={()=>{setOfActiveLobId(selectedLob.id);setShowOutputFormat(true);}}
-        onConfirm={setConfirmState}
-        onAddCategory={addCategory}
-        onDeleteCategory={deleteCategory}
-        addToast={addToast}/>}
 
       {page==='detail'&&<>
         <div className="app__sub-bar">
-          <span className="app__breadcrumb">Classification › {selectedLob?.name||''} › Prompt management</span>
+          <span className="app__breadcrumb">Classification › {l0Name} › Prompt management</span>
         </div>
         <div className="app__back-bar">
-          <button className="app__back-btn" onClick={onBackToList}><IC.Back/> Back to Categories</button>
+          <button className="app__back-btn" onClick={onBackToList}><IC.Back/> Back to Classification</button>
           <PipelineBar/>
         </div>
         {/* ── Unified layout: sidebar | main-panel | docpanel ── */}
@@ -3751,16 +3554,6 @@ function App(){
         })()}
       </>}
 
-      {typesModal&&(()=>{
-        const freshLob=lobs.find(l=>l.id===typesModal.lob.id)||typesModal.lob;
-        const freshCat=freshLob.categories.find(c=>c.id===typesModal.category.id)||typesModal.category;
-        return <TypesModal
-          lob={freshLob} category={freshCat}
-          onClose={()=>setTypesModal(null)}
-          onManagePrompt={(lob,cat,type)=>{setTypesModal(null);onManagePrompt(lob,cat,type);}}
-          onAddType={addType}
-          addToast={addToast}/>;
-      })()}
 
       {confirmState&&<div className="modal-overlay" onClick={()=>setConfirmState(null)}>
         <div className="confirm-dialog" onClick={e=>e.stopPropagation()}>
