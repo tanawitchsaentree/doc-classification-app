@@ -2629,7 +2629,7 @@ function Workspace({activeL1Tab,setActiveL1Tab,activeTab,setActiveTab,l1Items,pr
 }
 
 /* ── Document Panel ── */
-function DocumentPanel({docs,dataSets,onAddDocs,toggleSel,delDoc,addDataSet,onMarkTested,style}){
+function DocumentPanel({docs,dataSets,onAddDocs,toggleSel,delDoc,addDataSet,onMarkTested,activePromptLabel,style}){
   const [dragOver,setDragOver]=useState(false);
   const [openSets,setOpenSets]=useState(()=>Object.fromEntries((dataSets||[]).map(ds=>[ds.id,true])));
   const [pendingFiles,setPendingFiles]=useState([]);
@@ -2650,7 +2650,7 @@ function DocumentPanel({docs,dataSets,onAddDocs,toggleSel,delDoc,addDataSet,onMa
         const conf=Math.floor(62+Math.random()*33);
         const match=conf>=78;
         const pred=doc.expectedLabels[0]||'Unknown';
-        onMarkTested(doc.id,{ctx:'Prompt Test',pred,conf,match,testedAt:new Date().toISOString()});
+        onMarkTested(doc.id,{ctx:activePromptLabel||'Prompt Test',pred,conf,match,testedAt:new Date().toISOString()});
         setRunningIds(prev=>{const n=new Set(prev);n.delete(doc.id);return n;});
       },delay);
     });
@@ -2763,6 +2763,7 @@ function DocumentPanel({docs,dataSets,onAddDocs,toggleSel,delDoc,addDataSet,onMa
                 <span className="ds-group__dot" style={{background:ds.color}}/>
                 <span className="ds-group__name">{ds.name}</span>
                 <span className="ds-group__count">{setDocs.length}</span>
+                {!isOpen&&selCount>0&&<span style={{fontSize:'10px',fontWeight:700,padding:'1px 6px',borderRadius:'20px',background:'var(--a)',color:'#fff',flexShrink:0}}>●{selCount}</span>}
                 <span className={`ds-group__chev${isOpen?' ds-group__chev--open':''}`}><IC.ChevDown s={12}/></span>
               </div>
               {isOpen&&<div className="ds-group__body">
@@ -2801,8 +2802,11 @@ function DocumentPanel({docs,dataSets,onAddDocs,toggleSel,delDoc,addDataSet,onMa
         })}
         {totalSelected>0&&(
           <div className="run-bar">
-            <span className="run-bar__count">{totalSelected} doc{totalSelected!==1?'s':''} selected</span>
-            <div className="run-bar__actions">
+            <div style={{display:'flex',flexDirection:'column',gap:'2px',minWidth:0}}>
+              <span className="run-bar__count">{totalSelected} doc{totalSelected!==1?'s':''} selected</span>
+              {activePromptLabel&&<span style={{fontSize:'10px',color:'rgba(255,255,255,.75)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>Prompt: {activePromptLabel}</span>}
+            </div>
+            <div className="run-bar__actions" style={{flexShrink:0}}>
               <button className="run-bar__btn run-bar__btn--ghost" onClick={()=>docs.filter(d=>d.selected).forEach(d=>toggleSel(d.id,false))}>Clear</button>
               <button className="run-bar__btn run-bar__btn--primary" onClick={runTest}>▶ Run Test</button>
             </div>
@@ -2857,8 +2861,9 @@ function DocumentPanel({docs,dataSets,onAddDocs,toggleSel,delDoc,addDataSet,onMa
                   </div>
                   <div className="tr-row__meta">
                     {doc.size} · {ds?.name||'—'}
-                    {!running&&doc.lastTest&&<> · predicted: <strong>{doc.lastTest.pred}</strong></>}
+                    {!running&&doc.lastTest&&<> · pred: <strong>{doc.lastTest.pred}</strong></>}
                   </div>
+                  {!running&&doc.lastTest?.ctx&&<div style={{fontSize:'10px',color:'var(--a)',fontWeight:500}}>via {doc.lastTest.ctx}</div>}
                   {doc.expectedLabels.length>0&&<div style={{display:'flex',gap:'4px',flexWrap:'wrap'}}>
                     {doc.expectedLabels.map(l=><span key={l} className="expect-chip">Expected: {l}</span>)}
                   </div>}
@@ -3438,10 +3443,24 @@ function App(){
             }
           </div>
           <ResizeHandle onResize={dx=>setDocPanelW(w=>Math.min(420,Math.max(200,w-dx)))}/>
-          <DocumentPanel docs={docs} dataSets={dataSets} onAddDocs={onAddDocs}
-            toggleSel={toggleSel} delDoc={delDoc} addDataSet={addDataSet}
-            onMarkTested={markTested}
-            style={{width:docPanelW+'px',borderLeft:'1px solid var(--bdr)'}}/>
+          {(()=>{
+            const activePromptLabel=(()=>{
+              if(promptLevel==='global')return`${l0Name} · Global`;
+              if(promptLevel==='l1'){
+                const cat=l1Items.find(i=>i.id===activeCatId);
+                return cat?`${cat.name} · L1`:`${l0Name} · L1`;
+              }
+              if(activeTab==='l1')return`${l0Name} · L2 Global`;
+              const cat=l1Items.find(i=>i.id===activeTab);
+              return cat?`${cat.name} · L2`:`${l0Name} · L2`;
+            })();
+            return(
+              <DocumentPanel docs={docs} dataSets={dataSets} onAddDocs={onAddDocs}
+                toggleSel={toggleSel} delDoc={delDoc} addDataSet={addDataSet}
+                onMarkTested={markTested} activePromptLabel={activePromptLabel}
+                style={{width:docPanelW+'px',borderLeft:'1px solid var(--bdr)'}}/>
+            );
+          })()}
         </div>
         {modal==='version'&&<VersionModal lob={selectedLobFromState} onClose={()=>setModal(null)}/>}
         {modal==='preview'&&(()=>{
