@@ -1053,9 +1053,9 @@ function buildHierarchy(level,l1Items,scopedCat=null){
 
 /* ── Hierarchy level labels — change here, updates everywhere ── */
 const LABELS = {
-  l0: { short:'L0', label:'L0', full:'L0', plural:'L0' },
-  l1: { short:'L1', label:'L1', full:'L1', plural:'L1' },
-  l2: { short:'L2', label:'L2', full:'L2', plural:'L2' },
+  l0: { short:'L0', label:'L0 Class', full:'L0 Class', plural:'L0 Classes' },
+  l1: { short:'L1', label:'L1 Class', full:'L1 Class', plural:'L1 Classes' },
+  l2: { short:'L2', label:'L2 Class', full:'L2 Class', plural:'L2 Classes' },
 };
 
 const INIT_LOBS = [
@@ -2025,7 +2025,7 @@ function LobOverview({lobs,onSelectLob,addToast,onOpenOutputFormat,onConfirm,onD
 /* ── LOB Prompt Section (Stage 1 — L1-only scroll mode) ── */
 /* targets = l1Items passed from App so classifier knows the category targets */
 function LobPromptSection({lobName,prompt,defaultPrompt,meta,saveState,onEdit,onSave,
-  docs,onAddDoc,onToggleSel,onDelDoc,onMarkTested,addToast,onVersion,targets=[],hierarchyContext}){
+  docs,onAddDoc,onToggleSel,onDelDoc,onMarkTested,addToast,onVersion,targets=[],hierarchyContext,promptMode='l1'}){
   const [open,setOpen]=useState(true);
   const [showResetConfirm,setShowResetConfirm]=useState(false);
   const [showPreview,setShowPreview]=useState(false);
@@ -2062,8 +2062,9 @@ function LobPromptSection({lobName,prompt,defaultPrompt,meta,saveState,onEdit,on
         {/* Left: Prompt editor */}
         <div className="l1-prompt-sec__prompt">
           <p className="l1-prompt-sec__desc">
-            Stage 1 routes incoming documents into top-level categories.
-            Stage 2 prompts below refine classification within each category.
+            {promptMode==='global'
+              ?'Global mode — one prompt classifies documents directly to final L1 + L2 Class in a single AI call.'
+              :'L1 Class mode — this prompt routes incoming documents to the correct L1 Class category.'}
           </p>
           <div className="sec-ver-card">
             <div className="sec-ver-item"><span className="sec-ver-lbl">Version</span><span className="sec-ver-val">{m.version}</span></div>
@@ -2075,8 +2076,8 @@ function LobPromptSection({lobName,prompt,defaultPrompt,meta,saveState,onEdit,on
           <div>
             <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'6px'}}>
               <div style={{display:'flex',alignItems:'center',gap:'6px'}}>
-                <span className="prompt-ctx-chip prompt-ctx-chip--l1">L1</span>
-                <span style={{fontSize:'12px',fontWeight:600,color:'#374151'}}>Classification Prompt Template</span>
+                <span className={`prompt-ctx-chip prompt-ctx-chip--${promptMode==='global'?'l1l2':'l1'}`}>{promptMode==='global'?'Global':'L1 Class'}</span>
+                <span style={{fontSize:'12px',fontWeight:600,color:'#374151'}}>{promptMode==='global'?'Global Classification Prompt':'L1 Class Routing Prompt'}</span>
                 {!missing&&<span style={{fontSize:'11px',background:'#dcfce7',color:'#16a34a',padding:'1px 7px',borderRadius:'10px',fontWeight:500}}>✓ Placeholder detected</span>}
               </div>
               <div style={{display:'flex',alignItems:'center',gap:'8px'}}>
@@ -2452,8 +2453,8 @@ function WorkspaceTabs({l1Items,activeL1Tab,setActiveL1Tab,activeTab,setActiveTa
   const recalcRef=useRef(null);
   const MORE_W=100; // px reserved for "+N more" pill
 
-  // L2 mode → single global tab + per-category tabs (each with L2 sub-tabs)
-  const allL1=[{id:'l1',label:'Global Classification',l2:[]},...l1Items.map(i=>({id:i.id,label:i.name,l2:i.l2||[]}))];
+  // L2 Class mode → one tab per L1 category (each routes to its L2 types)
+  const allL1=l1Items.map(i=>({id:i.id,label:i.name,l2:i.l2||[]}));
 
   // Always keep recalcRef current so ResizeObserver closure doesn't go stale
   recalcRef.current=()=>{
@@ -2550,16 +2551,14 @@ function WorkspaceTabs({l1Items,activeL1Tab,setActiveL1Tab,activeTab,setActiveTa
 function Workspace({activeL1Tab,setActiveL1Tab,activeTab,setActiveTab,l1Items,prompts,defaultPrompts,tabMeta,saveStates,onEdit,onSave,onVersion,onPreview,onTest,docs}){
   const getMeta=tabId=>{
     const base=tabMeta?.[tabId]||DEFAULT_TAB_META;
-    if(tabId==='l1')return{...base,title:'Global Classification Prompt'};
     const item=l1Items.find(i=>i.id===tabId);
-    if(item)return{...base,title:`${item.name} — Classification Prompt`};
+    if(item)return{...base,title:`${item.name} — L2 Class Prompt`};
     return{...base,title:tabId};
   };
   const getCtx=tabId=>{
-    if(tabId==='l1')return{level:'l1l2',chip:'L1+L2',scope:'Global — classifies into all categories and types'};
     const item=l1Items.find(i=>i.id===tabId);
-    if(item)return{level:'l2',chip:'L2',scope:`Category: ${item.name}`};
-    return{level:'l2',chip:'',scope:''};
+    if(item)return{level:'l2',chip:'L2 Class',scope:`${item.name} → routes to L2 types`};
+    return{level:'l2',chip:'L2 Class',scope:''};
   };
   const [showResetConfirm,setShowResetConfirm]=useState(false);
   useEffect(()=>setShowResetConfirm(false),[activeTab]);
@@ -2567,7 +2566,7 @@ function Workspace({activeL1Tab,setActiveL1Tab,activeTab,setActiveTab,l1Items,pr
   const ctx=getCtx(activeTab);
   const prompt=prompts[activeTab]||'';
   const ss=saveStates[activeTab];
-  const showWarn=activeTab==='l1'&&!prompt.includes('{{CLASSIFICATION_HIERARCHY}}');
+  const showWarn=!prompt.includes('{{CLASSIFICATION_HIERARCHY}}');
   const found=[...new Set(prompt.match(/\{\{[^}]+\}\}/g)||[])];
   const missing=['{{CLASSIFICATION_HIERARCHY}}'].filter(p=>!prompt.includes(p));
   const doReset=()=>{onEdit(activeTab,defaultPrompts?.[activeTab]||'');setShowResetConfirm(false);};
@@ -3284,9 +3283,8 @@ function App(){
       meta[c.id]={version:c.activeVersion||'V.1',score:`${c.confidence}%`,status:c.status};
       c.types.forEach(t=>{meta[t.id]={version:c.activeVersion||'V.1',score:`${c.confidence}%`,status:c.status};});
     });
-    // L1+L2 mode: always land on global 'l1' tab
-    // L1 only:   land on the clicked category, else first category
-    const startTab=promptLevel==='l2'?'l1':(cat?cat.id:(newL1Items[0]?.id||'l1'));
+    // L2 mode: land on first category; L1/Global: land on clicked category or first
+    const startTab=promptLevel==='l2'?(newL1Items[0]?.id||''):(cat?cat.id:(newL1Items[0]?.id||''));
     const startL1Tab=startTab;
     setSelectedLobId(lob.id);
     setL1Items(newL1Items);
@@ -3317,14 +3315,10 @@ function App(){
   const onAddDocs=newDocs=>{setDocs(prev=>[...prev,...newDocs]);addToast(`${newDocs.length} file(s) added`,'success');};
 
   useEffect(()=>{
-    if(promptLevel==='l2'){
-      if(activeTab!=='l1'){setActiveTab('l1');setActiveL1Tab('l1');}
-    } else {
-      const validIds=new Set(l1Items.map(i=>i.id));
-      if(!validIds.has(activeTab)&&l1Items.length>0){
-        const first=l1Items[0].id;
-        setActiveTab(first);setActiveL1Tab(first);
-      }
+    const validIds=new Set(l1Items.map(i=>i.id));
+    if(!validIds.has(activeTab)&&l1Items.length>0){
+      const first=l1Items[0].id;
+      setActiveTab(first);setActiveL1Tab(first);
     }
   },[l1Items,promptLevel]);
 
@@ -3409,50 +3403,21 @@ function App(){
                   addToast={addToast}
                   onVersion={()=>setModal('version')}
                   targets={l1Items}
-                  hierarchyContext={buildHierarchy(promptLevel==='global'?'global':'l1',l1Items)}/>
-                {promptLevel==='l1'&&<>
-                  {l1Items.length>0&&(
-                    <div className="stage2-label">
-                      <span className="stage2-label__badge">L1 PROMPTS</span>
-                      <span className="stage2-label__text">Per-category classification prompts ({l1Items.length} categor{l1Items.length!==1?'ies':'y'})</span>
-                    </div>
-                  )}
-                  {l1Items.length===0
-                    ?<div style={{textAlign:'center',padding:'48px',color:'#9ca3af',fontSize:'13px'}}>No categories yet — add one in the sidebar</div>
-                    :l1Items.map(item=>(
-                      <CategorySection key={item.id}
-                        catItem={item}
-                        prompt={prompts[item.id]||''}
-                        defaultPrompt={defaultPrompts[item.id]||''}
-                        meta={tabMeta[item.id]}
-                        saveState={saveStates[item.id]}
-                        onEdit={val=>handleEdit(item.id,val)}
-                        onSave={()=>handleSave(item.id)}
-                        docs={getCatDocs(item.id)}
-                        onAddDoc={doc=>addCatDoc(item.id,doc)}
-                        onToggleSel={docId=>toggleCatSel(item.id,docId)}
-                        onDelDoc={docId=>delCatDoc(item.id,docId)}
-                        onMarkTested={docId=>markCatTested(item.id,docId)}
-                        addToast={addToast}
-                        onVersion={()=>setModal('version')}
-                        hierarchyContext={buildHierarchy('l2',l1Items,item)}/>
-                    ))
-                  }
-                </>}
+                  hierarchyContext={buildHierarchy(promptLevel==='global'?'global':'l1',l1Items)}
+                  promptMode={promptLevel}/>
               </div>
             }
           </div>
           <ResizeHandle onResize={dx=>setDocPanelW(w=>Math.min(420,Math.max(200,w-dx)))}/>
           {(()=>{
             const activePromptLabel=(()=>{
-              if(promptLevel==='global')return`${l0Name} · Global`;
+              if(promptLevel==='global')return`${l0Name} · Global Class`;
               if(promptLevel==='l1'){
                 const cat=l1Items.find(i=>i.id===activeCatId);
-                return cat?`${cat.name} · L1`:`${l0Name} · L1`;
+                return cat?`${cat.name} · L1 Class`:`${l0Name} · L1 Class`;
               }
-              if(activeTab==='l1')return`${l0Name} · L2 Global`;
               const cat=l1Items.find(i=>i.id===activeTab);
-              return cat?`${cat.name} · L2`:`${l0Name} · L2`;
+              return cat?`${cat.name} · L2 Class`:`${l0Name} · L2 Class`;
             })();
             return(
               <DocumentPanel docs={docs} dataSets={dataSets} onAddDocs={onAddDocs}
@@ -3464,21 +3429,17 @@ function App(){
         </div>
         {modal==='version'&&<VersionModal lob={selectedLobFromState} onClose={()=>setModal(null)}/>}
         {modal==='preview'&&(()=>{
-          const previewCtx=activeTab==='l1'
-            ?buildHierarchy(promptLevel==='l2'?'l1':'global',l1Items)
-            :buildHierarchy('l2',l1Items,l1Items.find(i=>i.id===activeTab));
+          const previewCtx=buildHierarchy('l2',l1Items,l1Items.find(i=>i.id===activeTab));
           return <PreviewModal prompt={prompts[activeTab]||''} hierarchyContext={previewCtx} onClose={()=>setModal(null)}/>;
         })()}
         {modal==='test'&&promptLevel==='l2'&&(()=>{
-          const testTargets=activeTab==='l1'
-            ?l1Items
-            :(()=>{const cat=l1Items.find(i=>i.id===activeTab);return cat?.l2||[];})();
+          const cat=l1Items.find(i=>i.id===activeTab);
           return <TestModal
             prompt={prompts[activeTab]||''}
             docs={docs} onMarkTested={markTested}
             onClose={()=>setModal(null)}
-            targets={testTargets}
-            testTitle={activeTab==='l1'?`Test Global — ${l0Name}`:`Test — ${l1Items.find(i=>i.id===activeTab)?.name||activeTab}`}
+            targets={cat?.l2||[]}
+            testTitle={`Test — ${cat?.name||activeTab}`}
           />;
         })()}
       </>}
