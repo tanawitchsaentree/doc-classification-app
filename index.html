@@ -519,47 +519,25 @@ input,textarea,select{font-family:inherit}
 .prompt-ctx-scope{font-size:11px;color:#9ca3af;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 /* ── Output Format Modal ── */
-.of-modal{max-width:980px;width:95vw;height:82vh;display:flex;flex-direction:column}
-.of-modal .modal__body{display:flex;flex:1;overflow:hidden;padding:0!important}
-.of-tree{width:230px;min-width:230px;border-right:1px solid #e5e7eb;overflow-y:auto;background:#fafafa;flex-shrink:0}
+.of-modal{max-width:480px;width:92vw;max-height:80vh;display:flex;flex-direction:column}
+.of-modal .modal__body{flex:1;overflow:hidden;padding:0!important}
+.of-tree{width:100%;overflow-y:auto;background:#fafafa}
 .of-tree::-webkit-scrollbar{width:4px}.of-tree::-webkit-scrollbar-thumb{background:#e5e7eb;border-radius:2px}
 .of-tree__lob{border-bottom:1px solid #f0f0f0}
-.of-tree__lob-btn{width:100%;padding:8px 12px;background:none;border:none;display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:#374151;cursor:pointer;text-align:left;font-family:inherit;transition:background .1s}
+.of-tree__lob-btn{width:100%;padding:10px 16px;background:none;border:none;display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:#111827;cursor:pointer;text-align:left;font-family:inherit;transition:background .1s}
 .of-tree__lob-btn:hover{background:#f3f4f6}
-.of-tree__cat-btn{width:100%;padding:6px 12px 6px 20px;background:none;border:none;display:flex;align-items:center;gap:5px;font-size:12px;color:#4b5563;cursor:pointer;text-align:left;font-family:inherit;transition:background .1s}
+.of-tree__cat-btn{width:100%;padding:7px 16px 7px 28px;background:none;border:none;display:flex;align-items:center;gap:6px;font-size:12px;color:#374151;cursor:pointer;text-align:left;font-family:inherit;transition:background .1s}
 .of-tree__cat-btn:hover{background:#f3f4f6}
-.of-tree__type-btn{width:100%;padding:5px 10px 5px 34px;background:none;border:none;font-size:12px;color:#6b7280;cursor:pointer;text-align:left;font-family:inherit;border-radius:0;transition:all .1s;display:block}
-.of-tree__type-btn:hover{background:#eff6ff;color:#2563eb}
-.of-tree__type-btn.active{background:#eff6ff;color:#2563eb;font-weight:500;border-right:2px solid #2563eb}
-.of-schema{flex:1;display:flex;flex-direction:column;overflow:hidden;padding:16px 18px}
-.of-schema__hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;flex-shrink:0;flex-wrap:wrap;gap:8px}
-.of-schema__title{font-size:14px;font-weight:600;color:#111827}
-.of-schema__path{font-size:11px;color:#9ca3af;margin-top:2px}
-.of-schema__actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
-.of-table-wrap{flex:1;overflow-y:auto;border:1px solid #e5e7eb;border-radius:8px}
-.of-table-wrap::-webkit-scrollbar{width:4px}.of-table-wrap::-webkit-scrollbar-thumb{background:#e5e7eb;border-radius:2px}
-.of-table{width:100%;border-collapse:collapse}
-.of-table th{padding:9px 12px;font-size:11px;font-weight:600;color:#374151;text-align:left;background:#f9fafb;border-bottom:1px solid #e5e7eb;white-space:nowrap}
-.of-table td{padding:7px 8px;border-bottom:1px solid #f3f4f6;font-size:12px;vertical-align:middle}
-.of-table tbody tr:last-child td{border-bottom:none}
-.of-table tbody tr:hover td{background:#fafafa}
-.of-field-input{border:1px solid transparent;border-radius:4px;padding:4px 7px;font-size:12px;font-family:inherit;color:#111827;background:transparent;width:100%;outline:none;transition:border-color .15s}
-.of-field-input:focus{border-color:#2563eb;background:#fff;box-shadow:0 0 0 2px rgba(37,99,235,.08)}
-.of-field-input:hover:not(:focus){border-color:#d1d5db;background:#fff}
-.of-type-sel{border:1px solid transparent;border-radius:4px;padding:4px 6px;font-size:12px;font-family:inherit;color:#111827;background:transparent;outline:none;cursor:pointer;transition:border-color .15s;width:100%}
-.of-type-sel:focus,.of-type-sel:hover{border-color:#d1d5db;background:#fff}
-.of-req-cb{width:15px;height:15px;accent-color:#2563eb;cursor:pointer}
-.of-del-btn{background:none;border:none;cursor:pointer;color:#9ca3af;padding:3px;border-radius:4px;display:flex;align-items:center;transition:all .12s}
-.of-del-btn:hover{color:#dc2626;background:#fee2e2}
-.of-empty-row{text-align:center;padding:32px;color:#9ca3af;font-size:13px}
-.of-json{flex:1;overflow:auto;background:#1e1e2e;border-radius:8px;padding:16px;font-family:'Fira Code',monospace,sans-serif;font-size:12px;color:#cdd6f4;line-height:1.6;white-space:pre;margin:0}
-.of-json::-webkit-scrollbar{width:5px}.of-json::-webkit-scrollbar-thumb{background:#45475a;border-radius:2px}
-.of-no-sel{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;color:#9ca3af;font-size:13px;gap:8px;text-align:center}
-.import-dd{position:relative}
-.import-dd__menu{position:absolute;top:calc(100% + 4px);right:0;background:#fff;border:1px solid #e5e7eb;border-radius:8px;box-shadow:0 10px 15px rgba(0,0,0,.1);z-index:20;min-width:140px;overflow:hidden}
-.import-dd__item{display:block;width:100%;padding:8px 14px;font-size:12px;color:#111827;background:none;border:none;text-align:left;cursor:pointer;font-family:inherit;transition:background .1s}
-.import-dd__item:hover{background:#f3f4f6}
-.of-type-badge{display:inline-block;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:600;background:#eff6ff;color:#2563eb;margin-left:4px}
+.of-tree__type-row{padding:5px 16px 5px 44px;display:flex;align-items:center;gap:6px;font-size:12px;color:#6b7280;border-bottom:1px solid #f9fafb}
+.of-tree__type-row:last-child{border-bottom:none}
+.of-tree__no-l2{padding:5px 16px 7px 44px;font-size:11px;color:#d1d5db;font-style:italic}
+.of-tree__empty{padding:24px 16px;font-size:12px;color:#9ca3af;text-align:center}
+.of-tree__chev{font-size:10px;opacity:.6;flex-shrink:0;width:10px}
+.of-tree__count{margin-left:auto;font-size:10px;color:#9ca3af;font-weight:400;flex-shrink:0}
+.of-tree__level-tag{font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px;flex-shrink:0;letter-spacing:.3px}
+.of-tree__level-tag:not(.l1):not(.l2){background:#eff6ff;color:#2563eb}
+.of-tree__level-tag.l1{background:#f0fdf4;color:#15803d}
+.of-tree__level-tag.l2{background:#faf5ff;color:#7c3aed}
 
 /* ══════════════════════════════════════════════════════
    Theme v4 · Spotify Light × Allianz Blue
@@ -923,9 +901,8 @@ body{font-family:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI'
 .prompt-ctx-chip--l1{background:var(--a-d4);color:var(--a-h)}
 .prompt-ctx-chip--l1l2{background:linear-gradient(135deg,var(--a-d4),#d1fae5);color:var(--a-h);border-color:var(--a-mid)}
 
-/* Overview tree */
-.of-tree__type-btn{transition:all var(--tf) var(--smooth)}
-.of-tree__type-btn:hover{background:var(--a-lt);color:var(--a)}
+/* Classification tree */
+.of-tree__lob-btn,.of-tree__cat-btn{transition:background var(--tf) var(--smooth)}
 
 /* Schema badge */
 .schema-badge{background:var(--a-lt);color:var(--a);border-color:var(--a-mid)}
@@ -2147,7 +2124,7 @@ function LobOverview({lobs,onSelectLob,addToast,onOpenOutputFormat,onConfirm,onD
         <div style={{flex:1}}/>
         {filtersActive&&<span style={{fontSize:'12px',color:'#6b7280'}}>{sorted.length} result{sorted.length!==1?'s':''}</span>}
         <button className="btn btn-outline btn-sm"
-          onClick={onOpenOutputFormat}>Output format</button>
+          onClick={onOpenOutputFormat}>Browse Classification Tree</button>
       </div>
       <div className="ov-table-wrap">
         <table className="ov-table">
@@ -2236,7 +2213,7 @@ function CategoryOverview({lob,onBack,onSelectCategory,onManagePrompt,addToast,o
           onClick={()=>{setSearch('');setStatusFilter('All');setPage(1);}}>✕ Clear filters</button>}
         <div style={{flex:1}}/>
         {filtersActive&&<span style={{fontSize:'12px',color:'#6b7280'}}>{sorted.length} result{sorted.length!==1?'s':''}</span>}
-        <button className="btn btn-outline btn-sm" onClick={onOpenOutputFormat}>Output format</button>
+        <button className="btn btn-outline btn-sm" onClick={onOpenOutputFormat}>Browse Classification Tree</button>
         <button className="btn btn-outline btn-sm" onClick={()=>onManagePrompt(lob,null,null)}>Edit {lob.name} prompt</button>
         <button className="btn btn-primary btn-sm" onClick={()=>setShowAddCat(true)}><IC.Plus s={11}/> Add {LABELS.l1.label}</button>
       </div>
@@ -2628,14 +2605,12 @@ function PipelineBar(){
 }
 
 /* ── Readiness Checklist ── */
-function ReadinessChecklist({l1Items,ofSchemas,docs}){
+function ReadinessChecklist({l1Items,docs}){
   const typesOk=l1Items.some(i=>i.l2.length>0);
-  const fieldsOk=Object.values(ofSchemas||{}).some(fields=>Array.isArray(fields)&&fields.length>0);
   const testOk=(docs||[]).some(d=>d.status==='Tested');
   const validationOk=false;
   const checks=[
     {label:'Doc types defined',ok:typesOk},
-    {label:'Fields mapped',ok:fieldsOk},
     {label:'Validation rules',ok:validationOk},
     {label:'Test run',ok:testOk},
   ];
@@ -2887,7 +2862,7 @@ function WorkspaceTabs({l1Items,activeL1Tab,setActiveL1Tab,activeTab,setActiveTa
   );
 }
 
-function Workspace({activeL1Tab,setActiveL1Tab,activeTab,setActiveTab,l1Items,prompts,defaultPrompts,tabMeta,saveStates,onEdit,onSave,onVersion,onPreview,onTest,cbLevels,ofSchemas,docs}){
+function Workspace({activeL1Tab,setActiveL1Tab,activeTab,setActiveTab,l1Items,prompts,defaultPrompts,tabMeta,saveStates,onEdit,onSave,onVersion,onPreview,onTest,cbLevels,docs}){
   const getMeta=tabId=>{
     const base=tabMeta?.[tabId]||DEFAULT_TAB_META;
     // L1+L2 mode → single global prompt tab
@@ -2930,17 +2905,8 @@ function Workspace({activeL1Tab,setActiveL1Tab,activeTab,setActiveTab,l1Items,pr
           <div className="workspace__ver-item"><span className="workspace__ver-lbl">Confidence score</span><span className="workspace__ver-val">{meta.score}</span></div>
           <div className="workspace__ver-div"/>
           <div className="workspace__ver-item"><span className="workspace__ver-lbl">Status</span><span className={`workspace__status ${meta.status.toLowerCase()}`}>{meta.status}</span></div>
-          {(()=>{
-            const fields=ofSchemas?.[activeTab];
-            const count=Array.isArray(fields)?fields.length:0;
-            return(<><div className="workspace__ver-div"/>
-              <div className="workspace__ver-item">
-                <span className="workspace__ver-lbl">Output fields</span>
-                <span className={`schema-badge${count===0?' schema-badge--empty':''}`}>{count===0?'Not mapped':`${count} field${count===1?'':'s'}`}</span>
-              </div></>);
-          })()}
         </div>
-        <ReadinessChecklist l1Items={l1Items} ofSchemas={ofSchemas} docs={docs}/>
+        <ReadinessChecklist l1Items={l1Items} docs={docs}/>
         {showWarn&&<div className="workspace__warn"><IC.Warn/><span>The <code>{'{{CLASSIFICATION_HIERARCHY}}'}</code> placeholder is required</span></div>}
         <div className="workspace__prompt-sec">
           <div className="workspace__prompt-hdr">
@@ -3377,224 +3343,68 @@ function TestModal({prompt,docs,onMarkTested,onClose,targets=[],testTitle='Test 
   </div></div>);
 }
 
-/* ── Output Format Modal ── */
-const OF_FIELD_TYPES=['string','number','boolean','date','array','object'];
-const OF_TEMPLATES={
-  Invoice:[
-    {name:'invoice_number',type:'string',required:true, description:'Unique invoice identifier'},
-    {name:'date',          type:'date',  required:true, description:'Invoice date'},
-    {name:'vendor_name',   type:'string',required:false,description:'Vendor or supplier name'},
-    {name:'total_amount',  type:'number',required:true, description:'Total invoice amount'},
-    {name:'line_items',    type:'array', required:false,description:'List of individual line items'},
-  ],
-  Claim:[
-    {name:'claim_number',  type:'string',required:true, description:'Claim identifier'},
-    {name:'policy_number', type:'string',required:true, description:'Related policy number'},
-    {name:'date_of_loss',  type:'date',  required:true, description:'Date when loss occurred'},
-    {name:'claim_type',    type:'string',required:false,description:'Type of claim'},
-    {name:'amount',        type:'number',required:false,description:'Claimed amount'},
-  ],
-  Contract:[
-    {name:'contract_id',   type:'string',required:true, description:'Contract identifier'},
-    {name:'parties',       type:'array', required:true, description:'Contracting parties'},
-    {name:'effective_date',type:'date',  required:false,description:'Contract start date'},
-    {name:'expiry_date',   type:'date',  required:false,description:'Contract end date'},
-    {name:'value',         type:'number',required:false,description:'Contract monetary value'},
-  ],
-  Policy:[
-    {name:'policy_number', type:'string',required:true, description:'Policy identifier'},
-    {name:'insured_name',  type:'string',required:true, description:'Name of insured party'},
-    {name:'coverage_type', type:'string',required:false,description:'Type of coverage'},
-    {name:'premium',       type:'number',required:true, description:'Premium amount'},
-    {name:'effective_date',type:'date',  required:false,description:'Policy effective date'},
-  ],
-};
-
-function OutputFormatModal({lobs,schemas:initSchemas,onSave,activeLobId,onClose}){
-  // Auto-expand: use activeLobId if provided, else first LOB that has types
+/* ── Browse Classification Tree Modal ── */
+function ClassificationTreeModal({lobs,activeLobId,onClose}){
+  const scopedLobs=activeLobId?lobs.filter(l=>l.id===activeLobId):lobs;
   const [expandedLobs,setExpandedLobs]=useState(()=>{
     const e={};
-    const target=activeLobId
-      ?lobs.find(l=>l.id===activeLobId)
-      :lobs.find(l=>l.categories.some(c=>c.types.length>0));
-    if(target)e[target.id]=true;
+    if(activeLobId){e[activeLobId]=true;}
+    else if(scopedLobs[0]){e[scopedLobs[0].id]=true;}
     return e;
   });
   const [expandedCats,setExpandedCats]=useState(()=>{
-    // Auto-expand first category with types in the target LOB
     const e={};
-    const target=activeLobId?lobs.find(l=>l.id===activeLobId):lobs.find(l=>l.categories.some(c=>c.types.length>0));
-    if(target){const cat=target.categories.find(c=>c.types.length>0);if(cat)e[cat.id+target.id]=true;}
+    const target=activeLobId?lobs.find(l=>l.id===activeLobId):scopedLobs[0];
+    if(target&&target.categories[0])e[target.categories[0].id+target.id]=true;
     return e;
   });
-  const [sel,setSel]=useState(null); // {lobId,catId,typeId,lobName,catName,typeName}
-  const [schemas,setSchemas]=useState(initSchemas||{});  // initialized from persisted state
-  const [jsonMode,setJsonMode]=useState(false);
-  const [showImport,setShowImport]=useState(false);
-
   const toggleLob=id=>setExpandedLobs(e=>({...e,[id]:!e[id]}));
   const toggleCat=id=>setExpandedCats(e=>({...e,[id]:!e[id]}));
-  const getSchema=tid=>schemas[tid]||[];
-  const setSchema=(tid,fields)=>setSchemas(s=>({...s,[tid]:fields}));
-
-  const selectType=(lob,cat,type)=>{
-    setSel({lobId:lob.id,catId:cat.id,typeId:type.id,lobName:lob.name,catName:cat.name,typeName:type.name});
-    setJsonMode(false);setShowImport(false);
-  };
-
-  const addField=()=>{
-    if(!sel)return;
-    setSchema(sel.typeId,[...getSchema(sel.typeId),{id:Date.now().toString(),name:'',type:'string',required:false,description:''}]);
-  };
-  const updateField=(tid,fid,key,val)=>setSchema(tid,getSchema(tid).map(f=>f.id===fid?{...f,[key]:val}:f));
-  const deleteField=(tid,fid)=>setSchema(tid,getSchema(tid).filter(f=>f.id!==fid));
-  const importTemplate=name=>{
-    if(!sel)return;
-    setSchema(sel.typeId,OF_TEMPLATES[name].map(f=>({...f,id:Date.now().toString()+Math.random()})));
-    setShowImport(false);
-  };
-
-  const toJson=()=>{
-    if(!sel)return `// Select a ${LABELS.l2.label.toLowerCase()} from the tree`;
-    const fields=getSchema(sel.typeId);
-    if(!fields.length)return '// No fields defined yet\n// Click "+ Add field" or import a template';
-    const schema=Object.fromEntries(fields.filter(f=>f.name).map(f=>[f.name,{
-      type:f.type,...(f.required?{required:true}:{}),...(f.description?{description:f.description}:{})
-    }]));
-    return JSON.stringify({document_type:sel.typeName,schema},null,2);
-  };
-
-  const fields=sel?getSchema(sel.typeId):[];
-  // Scope tree: if opened from a specific LOB, show only that LOB; otherwise show all
-  const scopedLobs=activeLobId
-    ?lobs.filter(l=>l.id===activeLobId)
-    :lobs.filter(l=>l.categories.some(c=>c.types.length>0));
 
   return(
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal of-modal" onClick={e=>e.stopPropagation()}>
         <div className="modal__header">
-          <h3>Output Format{activeLobId&&scopedLobs[0]?` — ${scopedLobs[0].name}`:''}</h3>
+          <h3>Browse Classification Tree{activeLobId&&scopedLobs[0]?` — ${scopedLobs[0].name}`:''}</h3>
           <button className="modal__close" onClick={onClose}>×</button>
         </div>
         <div className="modal__body">
-          {/* ── Left tree ── */}
           <div className="of-tree">
-            {scopedLobs.length===0&&<div style={{padding:'12px',fontSize:'12px',color:'#9ca3af'}}>No {LABELS.l2.plural.toLowerCase()} defined</div>}
+            {scopedLobs.length===0&&<div className="of-tree__empty">No classification data defined</div>}
             {scopedLobs.map(lob=>(
               <div key={lob.id} className="of-tree__lob">
-                <button className="of-tree__lob-btn" onClick={()=>toggleLob(lob.id)}
-                  style={activeLobId?{cursor:'default',fontWeight:600}:{}}>
-                  {!activeLobId&&<span style={{fontSize:'10px',opacity:.7}}>{expandedLobs[lob.id]?'▾':'▸'}</span>}
+                <button className="of-tree__lob-btn" onClick={()=>!activeLobId&&toggleLob(lob.id)}>
+                  {!activeLobId&&<span className="of-tree__chev">{expandedLobs[lob.id]?'▾':'▸'}</span>}
+                  <span className="of-tree__level-tag">{LABELS.l0.short}</span>
                   {lob.name}
+                  <span className="of-tree__count">{lob.categories.length} {LABELS.l1.short}</span>
                 </button>
-                {expandedLobs[lob.id]&&lob.categories.filter(c=>c.types.length>0).map(cat=>(
+                {(activeLobId||expandedLobs[lob.id])&&lob.categories.map(cat=>(
                   <div key={cat.id}>
                     <button className="of-tree__cat-btn" onClick={()=>toggleCat(cat.id+lob.id)}>
-                      <span style={{fontSize:'10px',opacity:.7}}>{expandedCats[cat.id+lob.id]?'▾':'▸'}</span>
+                      <span className="of-tree__chev">{expandedCats[cat.id+lob.id]?'▾':'▸'}</span>
+                      <span className="of-tree__level-tag l1">{LABELS.l1.short}</span>
                       {cat.name}
+                      {cat.types.length>0&&<span className="of-tree__count">{cat.types.length} {LABELS.l2.short}</span>}
                     </button>
-                    {expandedCats[cat.id+lob.id]&&cat.types.map(type=>(
-                      <button key={type.id}
-                        className={`of-tree__type-btn${sel?.typeId===type.id?' active':''}`}
-                        onClick={()=>selectType(lob,cat,type)}>
-                        {type.name}
-                        {schemas[type.id]?.length>0&&<span className="of-type-badge">{schemas[type.id].length}</span>}
-                      </button>
-                    ))}
+                    {expandedCats[cat.id+lob.id]&&(
+                      cat.types.length===0
+                        ?<div className="of-tree__no-l2">No {LABELS.l2.short} defined</div>
+                        :cat.types.map(type=>(
+                          <div key={type.id} className="of-tree__type-row">
+                            <span className="of-tree__level-tag l2">{LABELS.l2.short}</span>
+                            {type.name}
+                          </div>
+                        ))
+                    )}
                   </div>
                 ))}
               </div>
             ))}
           </div>
-
-          {/* ── Right schema panel ── */}
-          <div className="of-schema" onClick={()=>setShowImport(false)}>
-            {!sel?(
-              <div className="of-no-sel">
-                <span style={{fontSize:'32px'}}>🗂️</span>
-                <span>Select a {LABELS.l2.label.toLowerCase()} from the tree<br/>to define its extraction schema</span>
-              </div>
-            ):(
-              <>
-                <div className="of-schema__hdr">
-                  <div>
-                    <div className="of-schema__title">{sel.typeName}</div>
-                    <div className="of-schema__path">{sel.lobName} › {sel.catName} › {sel.typeName}</div>
-                  </div>
-                  <div className="of-schema__actions">
-                    <button className={`btn btn-sm${jsonMode?' btn-primary':' btn-outline'}`}
-                      onClick={()=>setJsonMode(m=>!m)}>
-                      {jsonMode?'Field view':'JSON view'}
-                    </button>
-                    {!jsonMode&&<>
-                      <div className="import-dd" onClick={e=>e.stopPropagation()}>
-                        <button className="btn btn-outline btn-sm"
-                          onClick={()=>setShowImport(s=>!s)}>
-                          Import template ▾
-                        </button>
-                        {showImport&&(
-                          <div className="import-dd__menu">
-                            {Object.keys(OF_TEMPLATES).map(t=>(
-                              <button key={t} className="import-dd__item" onClick={()=>importTemplate(t)}>{t}</button>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                      <button className="btn btn-primary btn-sm" onClick={addField}><IC.Plus s={11}/> Add field</button>
-                    </>}
-                  </div>
-                </div>
-                {jsonMode?(
-                  <pre className="of-json">{toJson()}</pre>
-                ):(
-                  <div className="of-table-wrap">
-                    <table className="of-table">
-                      <thead><tr>
-                        <th style={{width:'22%'}}>Field name</th>
-                        <th style={{width:'15%'}}>Data type</th>
-                        <th style={{width:'9%',textAlign:'center'}}>Required</th>
-                        <th>Description</th>
-                        <th style={{width:'36px'}}></th>
-                      </tr></thead>
-                      <tbody>
-                        {fields.length===0?(
-                          <tr><td colSpan={5} className="of-empty-row">
-                            No fields yet — click "+ Add field" or import a template
-                          </td></tr>
-                        ):fields.map(f=>(
-                          <tr key={f.id}>
-                            <td><input className="of-field-input" placeholder="field_name" value={f.name}
-                              onChange={e=>updateField(sel.typeId,f.id,'name',e.target.value)}/></td>
-                            <td>
-                              <select className="of-type-sel" value={f.type}
-                                onChange={e=>updateField(sel.typeId,f.id,'type',e.target.value)}>
-                                {OF_FIELD_TYPES.map(t=><option key={t} value={t}>{t}</option>)}
-                              </select>
-                            </td>
-                            <td style={{textAlign:'center'}}>
-                              <input type="checkbox" className="of-req-cb" checked={f.required}
-                                onChange={e=>updateField(sel.typeId,f.id,'required',e.target.checked)}/>
-                            </td>
-                            <td><input className="of-field-input" placeholder="Field description…" value={f.description}
-                              onChange={e=>updateField(sel.typeId,f.id,'description',e.target.value)}/></td>
-                            <td>
-                              <button className="of-del-btn" title="Remove field"
-                                onClick={()=>deleteField(sel.typeId,f.id)}><IC.Trash/></button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-              </>
-            )}
-          </div>
         </div>
         <div className="modal__footer">
-          <button className="btn btn-outline" onClick={onClose}>Discard</button>
-          <button className="btn btn-primary" onClick={()=>onSave(schemas)}>Save schema</button>
+          <button className="btn btn-primary" onClick={onClose}>Close</button>
         </div>
       </div>
     </div>
@@ -3625,7 +3435,6 @@ function App(){
   const [selectedLob,setSelectedLob]=useState(null);
   const [typesModal,setTypesModal]=useState(null); // {lob, category}
   const [showOutputFormat,setShowOutputFormat]=useState(false);
-  const [ofSchemas,setOfSchemas]=useState({});
   const [tabMeta,setTabMeta]=useState({});       // persists across modal open/close
   const [ofActiveLobId,setOfActiveLobId]=useState(null); // pre-selects LOB in tree
   const [menus,setMenusState]=useState({user:false,tenant:false,lang:false});
@@ -3868,7 +3677,7 @@ function App(){
               ?<Workspace activeL1Tab={activeL1Tab} setActiveL1Tab={setActiveL1Tab} activeTab={activeTab} setActiveTab={setActiveTab} l1Items={l1Items}
                 prompts={prompts} defaultPrompts={defaultPrompts} tabMeta={tabMeta} saveStates={saveStates}
                 onEdit={handleEdit} onSave={handleSave} cbLevels={cbLevels}
-                ofSchemas={ofSchemas} docs={docs}
+                docs={docs}
                 onVersion={()=>setModal('version')} onPreview={()=>setModal('preview')} onTest={()=>setModal('test')}/>
               :<div className="detail-scroll__main">
                 <div className="detail-scroll__toolbar">
@@ -3965,8 +3774,7 @@ function App(){
         </div>
       </div>}
 
-      {showOutputFormat&&<OutputFormatModal lobs={lobs} schemas={ofSchemas}
-        onSave={saved=>{setOfSchemas(saved);addToast('Output format saved');setShowOutputFormat(false);}}
+      {showOutputFormat&&<ClassificationTreeModal lobs={lobs}
         activeLobId={ofActiveLobId} onClose={()=>setShowOutputFormat(false)}/>}
 
       <ToastContainer toasts={toasts} removeToast={removeToast}/>
