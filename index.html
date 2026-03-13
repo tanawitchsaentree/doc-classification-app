@@ -2154,7 +2154,6 @@ function LobOverview({lobs,onSelectLob,addToast,onOpenOutputFormat,onConfirm,onD
           <thead><tr>
             <th className="sortable" onClick={()=>handleSort('name')}>{LABELS.l0.short} <SortIco col="name"/></th>
             <th className="sortable" onClick={()=>handleSort('categories')}>{LABELS.l1.short} <SortIco col="categories"/></th>
-            <th>{LABELS.l2.short}</th>
             <th className="sortable" onClick={()=>handleSort('status')}>Status <SortIco col="status"/></th>
             <th className="sortable" onClick={()=>handleSort('confidence')}>Confidence <SortIco col="confidence"/></th>
             <th className="sortable" onClick={()=>handleSort('trainedBy')}>Trained by <SortIco col="trainedBy"/></th>
@@ -2165,7 +2164,6 @@ function LobOverview({lobs,onSelectLob,addToast,onOpenOutputFormat,onConfirm,onD
               <tr key={lob.id} onClick={()=>onSelectLob(lob)}>
                 <td><button className="tbl-name-link" onClick={e=>{e.stopPropagation();onSelectLob(lob);}}>{lob.name}</button></td>
                 <td><span className="tbl-count-cell"><span className="tbl-count-num">{lob.categories.length||'—'}</span>{lob.classL1Version&&<span className="tbl-ver-badge">{lob.classL1Version}</span>}</span></td>
-                <td>{(()=>{const n=lob.categories.reduce((s,c)=>s+c.types.length,0);return n===0?<span className="badge-no-l2">No {LABELS.l2.plural}</span>:<span className="tbl-count-cell"><span className="tbl-count-num">{n}</span>{lob.classL2Version&&<span className="tbl-ver-badge">{lob.classL2Version}</span>}</span>;})()}</td>
                 <td><span className={`status-chip status-chip--${lob.status.toLowerCase()}`}>{lob.status}</span></td>
                 <td>{lob.confidence}%</td>
                 <td>{lob.trainedBy}</td>
@@ -2175,7 +2173,7 @@ function LobOverview({lobs,onSelectLob,addToast,onOpenOutputFormat,onConfirm,onD
                 </div></td>
               </tr>
             ))}
-            {rows.length===0&&<tr><td colSpan={7} className="tbl-empty">{filtersActive?`No ${LABELS.l0.label} match your filters`:`No ${LABELS.l0.label} found`}</td></tr>}
+            {rows.length===0&&<tr><td colSpan={6} className="tbl-empty">{filtersActive?`No ${LABELS.l0.label} match your filters`:`No ${LABELS.l0.label} found`}</td></tr>}
           </tbody>
         </table>
         <Pagination page={page} totalPages={totalPages} perPage={perPage} setPage={setPage} setPerPage={p=>{setPerPage(p);setPage(1);}}/>
