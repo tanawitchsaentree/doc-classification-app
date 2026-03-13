@@ -396,12 +396,25 @@ input,textarea,select{font-family:inherit}
 .tr-list{display:flex;flex-direction:column;gap:0;padding:0 10px 8px}
 .tr-row{display:flex;flex-direction:column;gap:4px;padding:8px 0;border-bottom:1px solid var(--bdr)}
 .tr-row:last-child{border-bottom:none}
+.tr-row--running{opacity:.55}
 .tr-row__top{display:flex;align-items:center;gap:6px}
 .tr-row__name{font-size:11px;font-weight:600;color:var(--tx1);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 .tr-row__result{font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;white-space:nowrap;flex-shrink:0}
 .tr-row__result--match{background:#dcfce7;color:#15803d;border:1px solid #bbf7d0}
 .tr-row__result--mismatch{background:#fee2e2;color:#b91c1c;border:1px solid #fecaca}
 .tr-row__meta{font-size:10px;color:var(--tx3)}
+.tr-row__spinner{width:12px;height:12px;border:2px solid var(--bdr);border-top-color:var(--a);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+.tr-summary{display:flex;align-items:center;gap:10px;padding:6px 0 8px;border-bottom:1px solid var(--bdr);margin-bottom:2px;flex-shrink:0}
+.tr-summary__stat{font-size:11px;font-weight:700}
+.tr-summary__stat--total{color:var(--tx2)}
+.tr-summary__stat--match{color:#15803d}
+.tr-summary__stat--mismatch{color:#b91c1c}
+.run-bar{position:sticky;bottom:0;background:var(--a);padding:8px 10px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-shrink:0;animation:fadeUp .15s ease}
+.run-bar__count{font-size:11px;font-weight:600;color:#fff;white-space:nowrap}
+.run-bar__actions{display:flex;gap:6px}
+.run-bar__btn{font-size:11px;font-weight:600;padding:4px 11px;border-radius:var(--r);border:none;cursor:pointer;font-family:inherit;transition:all var(--tf) var(--smooth)}
+.run-bar__btn--primary{background:#fff;color:var(--a)}.run-bar__btn--primary:hover{background:var(--a-lt)}
+.run-bar__btn--ghost{background:rgba(255,255,255,.15);color:#fff}.run-bar__btn--ghost:hover{background:rgba(255,255,255,.25)}
 /* Save row at bottom of prompt */
 .prompt-save-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0 4px;margin-top:4px;border-top:1px solid var(--bdr)}
 .prompt-save-row__state{font-size:11px;color:var(--tx3)}
@@ -2616,13 +2629,32 @@ function Workspace({activeL1Tab,setActiveL1Tab,activeTab,setActiveTab,l1Items,pr
 }
 
 /* ── Document Panel ── */
-function DocumentPanel({docs,dataSets,onAddDocs,toggleSel,delDoc,addDataSet,style}){
+function DocumentPanel({docs,dataSets,onAddDocs,toggleSel,delDoc,addDataSet,onMarkTested,style}){
   const [dragOver,setDragOver]=useState(false);
   const [openSets,setOpenSets]=useState(()=>Object.fromEntries((dataSets||[]).map(ds=>[ds.id,true])));
   const [pendingFiles,setPendingFiles]=useState([]);
-  const [dpTab,setDpTab]=useState('datasets'); // 'datasets' | 'results'
+  const [dpTab,setDpTab]=useState('datasets');
+  const [runningIds,setRunningIds]=useState(new Set());
   const testedDocs=docs.filter(d=>d.status==='Tested');
+  const totalSelected=docs.filter(d=>d.selected).length;
   const fileRef=useRef(null);
+
+  const runTest=()=>{
+    const sel=docs.filter(d=>d.selected);
+    if(!sel.length)return;
+    setDpTab('results');
+    setRunningIds(new Set(sel.map(d=>d.id)));
+    sel.forEach((doc,i)=>{
+      const delay=900+i*500+Math.random()*300;
+      setTimeout(()=>{
+        const conf=Math.floor(62+Math.random()*33);
+        const match=conf>=78;
+        const pred=doc.expectedLabels[0]||'Unknown';
+        onMarkTested(doc.id,{ctx:'Prompt Test',pred,conf,match,testedAt:new Date().toISOString()});
+        setRunningIds(prev=>{const n=new Set(prev);n.delete(doc.id);return n;});
+      },delay);
+    });
+  };
 
   const processRawFiles=files=>{
     const valid=Array.from(files).filter(f=>['image/jpeg','image/png','application/pdf'].includes(f.type)&&f.size<=5*1024*1024);
@@ -2716,7 +2748,7 @@ function DocumentPanel({docs,dataSets,onAddDocs,toggleSel,delDoc,addDataSet,styl
       </div>
 
       {/* Datasets tab */}
-      {dpTab==='datasets'&&<div className="doc-panel__sets">
+      {dpTab==='datasets'&&<div className="doc-panel__sets" style={{paddingBottom: totalSelected>0?'0':'8px'}}>
         <div className="doc-panel__sets-hdr">
           <span className="doc-panel__sets-title">Data Sets</span>
           <button className="doc-panel__new-set" onClick={()=>{const n=window.prompt('New Data Set name:');if(n?.trim())addDataSet(n.trim());}}>+ New set</button>
@@ -2767,32 +2799,67 @@ function DocumentPanel({docs,dataSets,onAddDocs,toggleSel,delDoc,addDataSet,styl
             </div>
           );
         })}
+        {totalSelected>0&&(
+          <div className="run-bar">
+            <span className="run-bar__count">{totalSelected} doc{totalSelected!==1?'s':''} selected</span>
+            <div className="run-bar__actions">
+              <button className="run-bar__btn run-bar__btn--ghost" onClick={()=>docs.filter(d=>d.selected).forEach(d=>toggleSel(d.id,false))}>Clear</button>
+              <button className="run-bar__btn run-bar__btn--primary" onClick={runTest}>▶ Run Test</button>
+            </div>
+          </div>
+        )}
       </div>}
 
       {/* Testing Results tab */}
       {dpTab==='results'&&<div className="doc-panel__sets">
         <div className="doc-panel__sets-hdr">
           <span className="doc-panel__sets-title">Testing Results</span>
-          <span style={{fontSize:'10px',color:'var(--tx3)'}}>{testedDocs.length} tested</span>
+          {runningIds.size>0&&<span style={{fontSize:'10px',color:'var(--a)',fontWeight:600}}>⟳ Running…</span>}
         </div>
-        {testedDocs.length===0
+        {(testedDocs.length>0||runningIds.size>0)&&(()=>{
+          const matchCount=testedDocs.filter(d=>d.lastTest?.match).length;
+          const mismatchCount=testedDocs.filter(d=>d.lastTest&&!d.lastTest.match).length;
+          return(
+            <div className="tr-summary">
+              <span className="tr-summary__stat tr-summary__stat--total">{testedDocs.length} tested</span>
+              {matchCount>0&&<span className="tr-summary__stat tr-summary__stat--match">✓ {matchCount}</span>}
+              {mismatchCount>0&&<span className="tr-summary__stat tr-summary__stat--mismatch">✗ {mismatchCount}</span>}
+              {runningIds.size>0&&<span className="tr-summary__stat" style={{color:'var(--a)'}}>⟳ {runningIds.size} running</span>}
+            </div>
+          );
+        })()}
+        {testedDocs.length===0&&runningIds.size===0
           ?<div className="ds-empty" style={{paddingTop:'32px'}}>No documents tested yet</div>
           :<div className="tr-list">
+            {/* Running docs (not yet in testedDocs) */}
+            {docs.filter(d=>runningIds.has(d.id)&&d.status!=='Tested').map(doc=>(
+              <div key={doc.id} className="tr-row tr-row--running">
+                <div className="tr-row__top">
+                  <span className="tr-row__name" title={doc.name}>{doc.name}</span>
+                  <div className="tr-row__spinner"/>
+                </div>
+                <div className="tr-row__meta">{doc.size} · classifying…</div>
+              </div>
+            ))}
             {testedDocs.map(doc=>{
               const ds=dataSets.find(s=>s.id===doc.dataSetId);
+              const running=runningIds.has(doc.id);
               return(
-                <div key={doc.id} className="tr-row">
+                <div key={doc.id} className={`tr-row${running?' tr-row--running':''}`}>
                   <div className="tr-row__top">
                     <span className="tr-row__name" title={doc.name}>{doc.name}</span>
-                    {doc.lastTest&&<span className={`tr-row__result tr-row__result--${doc.lastTest.match?'match':'mismatch'}`}>
-                      {doc.lastTest.match?'✓ Match':'✗ Mismatch'} · {doc.lastTest.conf}%
-                    </span>}
+                    {running
+                      ?<div className="tr-row__spinner"/>
+                      :doc.lastTest&&<span className={`tr-row__result tr-row__result--${doc.lastTest.match?'match':'mismatch'}`}>
+                        {doc.lastTest.match?'✓ Match':'✗ Mismatch'} · {doc.lastTest.conf}%
+                      </span>
+                    }
                   </div>
                   <div className="tr-row__meta">
                     {doc.size} · {ds?.name||'—'}
-                    {doc.lastTest&&<> · via <strong>{doc.lastTest.ctx}</strong> · predicted: <strong>{doc.lastTest.pred}</strong></>}
+                    {!running&&doc.lastTest&&<> · predicted: <strong>{doc.lastTest.pred}</strong></>}
                   </div>
-                  {doc.expectedLabels.length>0&&<div style={{display:'flex',gap:'4px'}}>
+                  {doc.expectedLabels.length>0&&<div style={{display:'flex',gap:'4px',flexWrap:'wrap'}}>
                     {doc.expectedLabels.map(l=><span key={l} className="expect-chip">Expected: {l}</span>)}
                   </div>}
                 </div>
@@ -3373,6 +3440,7 @@ function App(){
           <ResizeHandle onResize={dx=>setDocPanelW(w=>Math.min(420,Math.max(200,w-dx)))}/>
           <DocumentPanel docs={docs} dataSets={dataSets} onAddDocs={onAddDocs}
             toggleSel={toggleSel} delDoc={delDoc} addDataSet={addDataSet}
+            onMarkTested={markTested}
             style={{width:docPanelW+'px',borderLeft:'1px solid var(--bdr)'}}/>
         </div>
         {modal==='version'&&<VersionModal lob={selectedLobFromState} onClose={()=>setModal(null)}/>}
