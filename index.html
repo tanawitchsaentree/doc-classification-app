@@ -1033,769 +1033,605 @@ const LABELS = {
 
 const INIT_LOBS = [
   {
-    id:'motor', name:'Motor',
-    classL1Version:'V.3', classL2Version:'V.2',
-    status:'Deployed', confidence:95, trainedBy:'Arlene Wilson',
+    id:'schaden', name:'Schaden',
+    classL1Version:'V.2', classL2Version:'V.1',
+    status:'Deployed', confidence:92, trainedBy:'Arlene Wilson',
     lobPrompt:
-`You are classifying Motor Insurance documents.
+`You are classifying Schaden (Claims) documents.
 
-This L0 covers vehicle insurance: claims, policies, quotations, registrations, and legal documentation.
+This L0 covers all claim-related documents: first notifications, assessments, expert reports, and settlement letters.
 
 {{CLASSIFICATION_HIERARCHY}}
 
 Key identifiers:
-- Vehicle registration numbers, chassis/VIN numbers
-- Policy numbers starting with "MOT-" or "MTR-"
-- Garage/repairer letterheads and approval numbers
-- FNOL reference numbers (CLM-, FNOL-)
-- Traffic police report numbers and crime reference numbers`,
+- Claim reference numbers (SCH-, CLM-, FNOL-)
+- "Schadenmeldung", "Schadenanzeige", "Schadennummer"
+- Loss date, incident description, policyholder details
+- Third-party information and witness statements`,
     versions:[
-      {v:'V.3',date:'2025-02-18',status:'Active',  score:'95%',note:'Improved FNOL and repair invoice accuracy. Reduced false positives on estimate vs invoice.',createdBy:'Arlene Wilson'},
-      {v:'V.2',date:'2025-01-05',status:'Archived',score:'91%',note:'Added underwriting inspection classifier. Expanded complaint sub-types.',createdBy:'Jennie Cooper'},
-      {v:'V.1',date:'2024-11-20',status:'Archived',score:'87%',note:'Initial Motor L0 release.',createdBy:'Arlene Wilson'},
+      {v:'V.2',date:'2025-02-10',status:'Active',  score:'92%',note:'Improved FNOL and assessment accuracy.',createdBy:'Arlene Wilson'},
+      {v:'V.1',date:'2024-12-01',status:'Archived',score:'88%',note:'Initial Schaden L0 release.',createdBy:'Jennie Cooper'},
     ],
     categories:[
-      {id:'complaint',name:'Complaint',activeVersion:'V.3',status:'Failed',confidence:81.2,trainedBy:'Evan Flores',
+      {id:'sch-meldung',name:'Schadenmeldung',activeVersion:'V.2',status:'Deployed',confidence:93,trainedBy:'Arlene Wilson',
         prompt:
-`Classify complaint documents for Motor Insurance.
+`Classify first notification of loss (FNOL) documents.
 
 Look for:
-- Customer dissatisfaction language ("I am writing to complain", "unacceptable")
-- Reference to policy numbers and/or claim numbers
-- Escalation language (ombudsman, FCA, regulatory bodies)
-- Board-level vs standard complaints
-
-Types: Simple Complaint, Massive Complaint, Board Complaint, No Complaint`,
+- "Schadenmeldung", "Schadenanzeige", "Erstmeldung"
+- Incident date, time, and location
+- Policyholder signature and date of submission
+- Claim reference number (SCH-, FNOL-)`,
         types:[
-          {id:'simple-complaint',name:'Simple Complaint',tags:['M'],prompt:'A single customer complaint resolvable at first contact. Standard complaint language, no escalation threats or legal references. Usually 1 page, single issue.'},
-          {id:'massive-complaint',name:'Massive Complaint',tags:[],prompt:'Multi-issue or group complaint. Indicators: multiple policy references, group signatures, CC to regulatory bodies, or more than 3 distinct grievances in a single document.'},
-          {id:'board-complaint',name:'Board Complaint',tags:[],prompt:'Formal complaint addressed to or escalated to board level. Look for: "Chief Executive", "Board of Directors", prior unresolved complaint history, FCA/regulatory body references.'},
-          {id:'no-complaint',name:'No Complaint',tags:[],prompt:'Document that appears as a complaint but is actually a general inquiry, service feedback, or compliment. No resolution demand or compensation claim present.'},
+          {id:'sch-fnol',name:'FNOL Formular',tags:[],prompt:'Structured first notification of loss form. Contains policyholder details, incident date/time/location, description of loss, and claim number.'},
+          {id:'sch-zeugen',name:'Zeugenaussage',tags:[],prompt:'Witness statement accompanying a claim. Contains witness name, contact details, and account of the incident.'},
         ]},
-      {id:'quotation',name:'Quotation',activeVersion:'V.1',status:'Deployed',confidence:95,trainedBy:'Arlene Wilson',
+      {id:'sch-pruefung',name:'Schadenprüfung',activeVersion:'V.1',status:'Deployed',confidence:89,trainedBy:'Evan Flores',
         prompt:
-`Classify Motor Insurance quotation documents.
+`Classify claim assessment and investigation documents.
 
-Key identifiers:
-- Quote reference numbers (QT-, QUOT-)
-- Vehicle details: make, model, year, registration
-- Premium calculations and coverage breakdown
-- Validity period (usually 30–60 days)
-- No policy number yet — pre-binding stage`,
+Look for:
+- Adjuster or expert report letterhead
+- Assessment date and reference to claim number
+- Coverage decision language ("gedeckt", "abgelehnt")
+- Itemised damage list with cost estimates`,
         types:[
-          {id:'new-vehicle-quote',name:'New Vehicle Quote',tags:[],prompt:'Quote for a brand-new or first-time insured vehicle. Indicators: no prior claim history, new registration mark, dealership letterhead or manufacturer references.'},
-          {id:'renewal-quote',name:'Renewal Quote',tags:[],prompt:'Quote for renewing an existing policy. Must have: existing policy number, renewal effective date, prior year premium for comparison, no-claims discount history.'},
-          {id:'amendment-quote',name:'Amendment Quote',tags:[],prompt:'Mid-term quote for changes to an existing policy (add driver, change vehicle, update address). Contains original policy number plus "amendment" or "endorsement" language.'},
-          {id:'fleet-quote',name:'Fleet Quote',tags:['M'],prompt:'Quote covering 3 or more vehicles. Look for: fleet ID number, list of vehicles/registrations, aggregate premium, fleet discount applied.'},
-          {id:'temp-cover',name:'Temporary Cover',tags:[],prompt:'Short-term cover note (1–30 days). Indicators: specific short-duration start/end dates, cover note number, "temporary" or "short-term" language.'},
+          {id:'sch-gutachten',name:'Schadengutachten',tags:[],prompt:'Expert damage assessment report. Contains adjuster name, inspection date, itemised damage, and repair cost estimate.'},
+          {id:'sch-foto',name:'Fotodokumentation',tags:[],prompt:'Photo documentation of damage. Usually a PDF with images, captions, and claim reference.'},
         ]},
-      {id:'policy-app',name:'Policy Application',activeVersion:'V.1',status:'Deployed',confidence:92.1,trainedBy:'Jennie Cooper',
+      {id:'sch-abschluss',name:'Schadenabschluss',activeVersion:'V.1',status:'Draft',confidence:0,trainedBy:'',
         prompt:
-`Policy application and proposal forms for Motor Insurance.
+`Classify claim settlement and closure documents.
 
-Key identifiers:
-- Applicant personal details (full name, DOB, address, driving licence number)
-- Vehicle details and declared usage
-- Driver history declarations (previous claims, convictions)
-- Signature and date fields
-- "Proposal form" or "Application form" header
-- No policy number yet — pre-issuance stage`,
-        types:[
-          {id:'new-app',name:'New Application',tags:[],prompt:'First-time application for a new policy. No existing policy number. Contains all personal, vehicle, and driving history declaration fields.'},
-          {id:'reinstate',name:'Reinstatement',tags:[],prompt:'Application to reinstate a lapsed or cancelled policy. References a prior policy number. Contains arrears payment or lapse reason declaration.'},
-          {id:'transfer',name:'Transfer',tags:[],prompt:'Application to transfer an existing policy to a new vehicle or new policyholder. References original policy number and reason for transfer.'},
-          {id:'joint-app',name:'Joint Application',tags:['M'],prompt:'Application with two or more named applicants (e.g. couple or business partners). Multiple signature fields and declarations for each applicant.'},
-        ]},
-      {id:'vehicle-reg',name:'Vehicle Registration',activeVersion:'V.1',status:'Failed',confidence:90.4,trainedBy:'Philip Steward',
-        prompt:
-`Vehicle registration and ownership documents.
-
-Key identifiers:
-- Official DVLA / government agency header
-- Vehicle Identification Number (VIN / chassis number)
-- Registered keeper name and address
-- Registration mark (number plate)
-- Engine capacity, fuel type, first registration date`,
-        types:[
-          {id:'new-reg',name:'New Registration',tags:[],prompt:'New vehicle registration document (V5C). First registration date is recent. Dealer or manufacturer as previous keeper. New registration mark.'},
-          {id:'trans-own',name:'Transfer of Ownership',tags:[],prompt:'V5C or equivalent showing change of registered keeper. Previous and new keeper details both present. Date of transfer recorded.'},
-        ]},
-      {id:'underwriting',name:'Underwriting Inspection',activeVersion:'V.3',status:'Deployed',confidence:86.4,trainedBy:'John Doe',
-        prompt:
-`Vehicle inspection reports produced for underwriting purposes.
-
-Key identifiers:
-- Inspector name and accreditation number
-- Vehicle photos or photo reference numbers
-- Condition ratings (Excellent / Good / Fair / Poor)
-- Modifications or damage noted
-- Inspection date and location
-- Surveyor stamp or authorised signature`,
-        types:[
-          {id:'std-insp',name:'Standard Inspection',tags:[],prompt:'Standard pre-insurance or post-accident vehicle condition inspection. Single vehicle. Structured condition ratings per section (bodywork, interior, mechanical). Inspector credentials present.'},
-          {id:'fleet-insp',name:'Fleet Inspection',tags:['M'],prompt:'Bulk inspection report covering multiple vehicles in a single document. Fleet registration list, aggregated condition summary, fleet risk rating.'},
-        ]},
-      {id:'policy-sched',name:'Policy Schedule',activeVersion:'V.2',status:'Deployed',confidence:95,trainedBy:'Jane Doe',
-        prompt:
-`Motor Insurance policy schedule documents (the policy certificate).
-
-Key identifiers:
-- Policy number (MOT-XXXX or MTR-XXXX format)
-- Insured name and address
-- Period of insurance: start and end dates
-- Vehicle details and cover level (Comprehensive / TPF&T / TP Only)
-- Premium paid and excess amounts
-- Named drivers list
-- Insurer authorised signature and stamp`,
-        types:[
-          {id:'annual',name:'Annual Schedule',tags:[],prompt:'Standard 12-month policy schedule. Start and end dates exactly 12 months apart. Single annual premium amount. No mid-term changes noted.'},
-          {id:'midterm',name:'Mid-term Schedule',tags:[],prompt:'Policy schedule issued mid-policy following an amendment (e.g. add driver, change vehicle). References original policy number and shows effective change date.'},
-          {id:'cancel',name:'Cancellation',tags:[],prompt:'Policy cancellation notice or confirmation. Contains: effective cancellation date, reason for cancellation, pro-rata refund calculation (if applicable), return premium amount.'},
-          {id:'endorse',name:'Endorsement',tags:[],prompt:'Policy endorsement document adding or amending specific terms. References parent policy number. Clearly states the endorsed change (e.g. "Young Driver", "Business Use", "Named Driver Only").'},
-          {id:'cert',name:'Certificate of Insurance',tags:[],prompt:'Statutory insurance certificate (required for road use). Compact document: policy number, insured name, vehicle registration, period, class of use. Usually separate from full schedule.'},
-        ]},
-      {id:'claim-notif',name:'Claim Notification',activeVersion:'V.2',status:'Deployed',confidence:93,trainedBy:'Jorge Black',
-        prompt:
-`First notice of loss and claim notification documents.
-
-Key identifiers:
-- Claim reference number (CLM-, FNOL-)
-- Date and time of incident
-- Description of loss / damage
-- Third party details if applicable
-- Witness information
-- Vehicle damage description
-- "I wish to make a claim" or equivalent language`,
-        types:[
-          {id:'fnol',name:'FNOL',tags:[],prompt:'First Notice of Loss. Must contain: incident date and time, policyholder details, vehicle involved, brief incident description. May be handwritten or a structured form.'},
-          {id:'claim-update',name:'Claim Update',tags:[],prompt:'Subsequent correspondence on an existing claim. References existing claim number. Contains status update, additional evidence, or revised repair estimate.'},
-          {id:'claim-settlement',name:'Settlement Letter',tags:[],prompt:'Final settlement document for a closed claim. States agreed settlement amount, deductions (excess, depreciation), payment method, and claimant acceptance signature.'},
-        ]},
-      {id:'accident-ev',name:'Accident Evidence',activeVersion:'V.1',status:'Failed',confidence:87.5,trainedBy:'Mariya Baesldina',
-        prompt:
-`Evidence documents submitted with Motor claims.
-
-Covers: police reports, photographs, witness statements, dashcam references, medical reports for personal injury claims.`,
-        types:[
-          {id:'police-rep',name:'Police Report',tags:[],prompt:'Official police accident or incident report. Look for: police station header, officer badge/shoulder number, incident CAD reference, official stamp, date and time logged.'},
-          {id:'ev-photos',name:'Photos',tags:['M'],prompt:'Photographic evidence submission. Printed photos with timestamps, or a photo submission form referencing image files. Vehicle damage visible, scene context, multiple angles.'},
-          {id:'witness-stmt',name:'Witness Statement',tags:[],prompt:'Written statement from a third-party witness. Contains: witness name, contact details, declaration of truth ("I confirm the above is true"), dated signature.'},
-          {id:'medical-rep',name:'Medical Report',tags:[],prompt:'Medical evidence for personal injury element of a claim. Includes: doctor or hospital letterhead, injury description, treatment received, prognosis, and reference to road traffic incident.'},
-        ]},
-      {id:'repair-garage',name:'Repair & Garage',activeVersion:'V.2',status:'Deployed',confidence:92,trainedBy:'Clark Rai',
-        prompt:
-`Repair and garage documents for Motor claims.
-
-Key identifiers:
-- Garage/workshop name and approved repairer number
-- Vehicle registration and VIN
-- Labour hours breakdown and parts list
-- VAT registration number
-- Repair authorisation number from insurer`,
-        types:[
-          {id:'repair-inv',name:'Repair Invoice',tags:[],prompt:'Final invoice from approved garage. Contains: completed work description, parts replaced with OEM/aftermarket designation, total cost, VAT breakdown, payment terms. Repair is complete.'},
-          {id:'estimate',name:'Estimate',tags:[],prompt:'Pre-repair cost estimate. Not yet authorised. Contains: proposed parts, labour estimate hours, "subject to inspection" or "estimate only" language. No repair completion date.'},
-          {id:'garage-cert',name:'Approved Garage Certificate',tags:[],prompt:'Certificate confirming a garage is an approved repairer on the insurer\'s network. Contains: garage trading name, approval number, validity period, insurer logo.'},
-          {id:'parts-rec',name:'Parts Receipt',tags:[],prompt:'Receipt for parts purchased separately from main repair. Contains: parts supplier name, part numbers, prices. Usually accompanies a repair invoice as supplementary evidence.'},
-        ]},
+Look for:
+- "Abfindungserklärung", "Schadenabschluss", "Entschädigungszahlung"
+- Payment amount and bank details
+- Claimant signature confirming settlement
+- Closure date and claim reference`,
+        types:[]},
     ]
   },
   {
-    id:'property', name:'Property',
-    classL1Version:'V.3', classL2Version:'V.2',
-    status:'Failed', confidence:81.2, trainedBy:'Evan Flores',
+    id:'sach', name:'Sach',
+    classL1Version:'V.2', classL2Version:'V.1',
+    status:'Deployed', confidence:90, trainedBy:'Philip Steward',
     lobPrompt:
-`You are classifying Property Insurance documents.
+`You are classifying Sach (Property) documents.
 
-This L0 covers residential and commercial property insurance including claims, surveys, contractor invoices, and policy documents.
+This L0 covers property insurance documents: claims, policies, surveys, and repair invoices.
 
 {{CLASSIFICATION_HIERARCHY}}
 
 Key identifiers:
 - Property address (street, city, postcode)
-- Policy numbers starting with "PROP-" or "HME-"
-- Loss adjuster reference numbers
-- Building or contents claim references
-- Surveyor / assessor RICS credentials`,
+- Policy numbers starting with "SAC-" or "PHH-"
+- "Gebäudeversicherung", "Hausratversicherung", "Sachversicherung"
+- Building survey or valuation reference numbers`,
     versions:[
-      {v:'V.3',date:'2025-02-01',status:'Active',  score:'81%',note:'Retraining for water damage sub-type accuracy. Storm damage added as new type.',createdBy:'Evan Flores'},
-      {v:'V.2',date:'2024-12-10',status:'Archived',score:'78%',note:'Added contractor invoice classifier. Improved survey report detection.',createdBy:'Evan Flores'},
-      {v:'V.1',date:'2024-09-15',status:'Archived',score:'74%',note:'Initial Property L0 release.',createdBy:'Philip Steward'},
+      {v:'V.2',date:'2025-01-20',status:'Active',  score:'90%',note:'Improved property survey and claim accuracy.',createdBy:'Philip Steward'},
+      {v:'V.1',date:'2024-09-15',status:'Archived',score:'74%',note:'Initial Sach L0 release.',createdBy:'Philip Steward'},
     ],
     categories:[
-      {id:'prop-claim',name:'Property Claim',activeVersion:'V.2',status:'Failed',confidence:78,trainedBy:'Evan Flores',
+      {id:'sach-schaden',name:'Sachschaden',activeVersion:'V.2',status:'Failed',confidence:78,trainedBy:'Evan Flores',
         prompt:
-`Property damage claim documents.
+`Classify property damage claim documents.
 
 Look for:
-- Type of damage (fire, water, storm, theft, subsidence)
-- Property address affected
-- Loss adjuster appointment references
-- Damage assessment reports
-- Emergency repair authorisation`,
+- "Sachschaden", "Gebäudeschaden", "Wasserschaden", "Feuerschaden"
+- Property address and description of damage
+- Photos or survey report reference
+- Repair cost estimate or contractor quote`,
         types:[
-          {id:'fire-dmg',name:'Fire Damage',tags:[],prompt:'Fire and smoke damage claim. Indicators: fire brigade reference number, fire investigation report, smoke damage assessment, total loss / partial loss determination, soot and structural damage description.'},
-          {id:'water-dmg',name:'Water Damage',tags:[],prompt:'Water ingress, flood, or burst pipe claim. Look for: plumber report, damp meter readings, restoration company invoice, dehumidification equipment references, drying timeline.'},
-          {id:'theft',name:'Theft',tags:['M'],prompt:'Theft and burglary claim. Must have: police crime reference number, itemised list of stolen goods with approximate values, evidence of forced entry, inventory or proof of ownership.'},
-          {id:'storm-dmg',name:'Storm Damage',tags:[],prompt:'Storm, wind, or hail damage claim. Look for: Met Office weather report reference, roofing contractor estimate, aerial/satellite dish damage, fallen tree or structural damage from wind.'},
-          {id:'subsidence',name:'Subsidence',tags:[],prompt:'Ground movement and subsidence claim. Indicators: structural engineer report, soil survey results, crack mapping photographs, NHBC warranty references, drainage investigation.'},
+          {id:'sach-wasser',name:'Wasserschaden',tags:[],prompt:'Water damage claim document. Contains source of water ingress, affected rooms, drying/repair estimate, and claim reference.'},
+          {id:'sach-feuer',name:'Feuerschaden',tags:[],prompt:'Fire damage claim. Contains fire brigade report reference, extent of damage, and salvage details.'},
+          {id:'sach-einbruch',name:'Einbruchschaden',tags:[],prompt:'Burglary/break-in damage claim. Contains police report number, list of stolen/damaged items, and entry point description.'},
         ]},
-      {id:'prop-survey',name:'Survey Report',activeVersion:'V.3',status:'Deployed',confidence:88,trainedBy:'Evan Flores',
+      {id:'sach-gutachten',name:'Sachgutachten',activeVersion:'V.1',status:'Deployed',confidence:85,trainedBy:'Philip Steward',
         prompt:
-`Property survey and valuation reports for underwriting.
+`Classify property survey and valuation reports.
 
-Key identifiers:
-- RICS (Royal Institution of Chartered Surveyors) accreditation number
+Look for:
+- Surveyor credentials and accreditation
 - Property address and full description
-- Sum insured recommendations
-- Risk features noted (flat roof, subsidence history, listed building status, flood zone)`,
+- Rebuild cost or market value figure
+- Survey date and reference number`,
         types:[
-          {id:'rics-survey',name:'RICS Valuation',tags:[],prompt:'Full RICS-accredited rebuild cost valuation. Contains: surveyor RICS number, rebuild cost figure, methodology, property description, date of inspection.'},
-          {id:'drone-survey',name:'Drone Survey Report',tags:[],prompt:'Aerial inspection report using drone/UAV. Contains: drone operator certification, aerial images, roof condition assessment, inaccessible area findings.'},
-          {id:'rebuild-val',name:'Rebuild Valuation',tags:[],prompt:'Standalone rebuild cost calculation document. May be produced by BCIS or similar service. Contains: total rebuild cost, regional adjustment factor, professional fees estimate.'},
+          {id:'sach-bewertung',name:'Bewertungsbericht',tags:[],prompt:'Property valuation report for underwriting. Contains rebuild cost, market value, construction type, and risk assessment.'},
+          {id:'sach-landlord',name:'Vermieterobjekt',tags:[],prompt:'Landlord/rented property policy or survey. Contains "Vermieter" or "vermietetes Objekt" language, rental income references.'},
         ]},
-      {id:'prop-invoice',name:'Contractor Invoice',activeVersion:'V.2',status:'Failed',confidence:77.6,trainedBy:'Evan Flores',
+      {id:'sach-police',name:'Sachpolice',activeVersion:'V.1',status:'Deployed',confidence:90,trainedBy:'Jane Doe',
         prompt:
-`Contractor and repair invoices for Property claims.
+`Classify property insurance policy documents.
 
-Key identifiers:
-- Contractor VAT registration and company number
-- Works completed description
-- Insurer authorisation reference
-- Materials and labour cost breakdown
-- Completion certificate or sign-off`,
+Look for:
+- "Versicherungsschein", "Police", policy number (SAC-, PHH-)
+- Insured property address
+- Sum insured and premium details
+- Policy period start and end dates`,
         types:[
-          {id:'builder-inv',name:'Builder Invoice',tags:[],prompt:'General building and construction invoice. Contains: schedule of works completed, materials list, day-rate or fixed-price labour, site address, builder\'s company registration number.'},
-          {id:'electrician-inv',name:'Electrician Invoice',tags:[],prompt:'Electrical repair or rewiring invoice. Contains: NICEIC or NAPIT registration number, circuit description, Part P certification, test certificate reference.'},
-          {id:'plumber-inv',name:'Plumber Invoice',tags:[],prompt:'Plumbing repair invoice. Contains: Gas Safe registration (if gas work), work description (e.g. pipe repair, re-routing), material costs, call-out charge.'},
-          {id:'restoration-inv',name:'Restoration Invoice',tags:[],prompt:'Specialist restoration and drying invoice. Contains: equipment hire (dehumidifiers, air movers), monitoring visit log, drying completion certificate, restoration company accreditation.'},
-        ]},
-      {id:'prop-policy',name:'Property Policy',activeVersion:'V.1',status:'Deployed',confidence:90,trainedBy:'Jane Doe',
-        prompt:
-`Property insurance policy documents.
-
-Key identifiers:
-- Policy number (PROP- or HME- prefix)
-- Property address as the insured location
-- Buildings sum insured and/or contents sum insured
-- Policy excess amounts
-- Listed perils or All Risks coverage statement
-- Renewal date`,
-        types:[
-          {id:'buildings-pol',name:'Buildings Policy',tags:[],prompt:'Buildings-only property insurance policy. Sum insured relates to rebuild cost. Covers structure, fixtures, and fittings. Contents sum insured is absent or zero.'},
-          {id:'contents-pol',name:'Contents Policy',tags:[],prompt:'Contents-only insurance policy. Sum insured relates to personal possessions, furniture, and valuables. No buildings sum insured. May include high-value items schedule.'},
-          {id:'combined-pol',name:'Combined Buildings & Contents',tags:[],prompt:'Combined policy covering both buildings and contents in a single document. Two separate sum insured figures present. Usually single policy number.'},
-          {id:'landlord-pol',name:'Landlord Policy',tags:[],prompt:'Property policy for a rented-out premises. Key indicators: "landlord" or "let property" language, loss of rent cover, tenant liability references, rental income protection.'},
+          {id:'sach-wohngebaeude',name:'Wohngebäude',tags:[],prompt:'Residential building (Wohngebäude) policy. Contains building sum insured, postcode, construction year, and cover type.'},
+          {id:'sach-hausrat',name:'Hausrat',tags:[],prompt:'Household contents (Hausrat) policy. Contains contents sum insured, insured address, and listed valuables.'},
         ]},
     ]
   },
   {
-    id:'health', name:'Health',
-    classL1Version:'V.2', classL2Version:'V.1',
+    id:'kraft', name:'Kraft',
+    classL1Version:'V.3', classL2Version:'V.2',
+    status:'Deployed', confidence:95, trainedBy:'Arlene Wilson',
+    lobPrompt:
+`You are classifying Kraft (Motor) documents.
+
+This L0 covers motor insurance: claims, policies, quotations, and legal documentation.
+
+{{CLASSIFICATION_HIERARCHY}}
+
+Key identifiers:
+- Vehicle registration numbers, chassis/VIN numbers
+- Policy numbers starting with "KFZ-" or "KRA-"
+- "Kraftfahrzeugversicherung", "Kfz-Haftpflicht", "Vollkasko"
+- Garage/repairer letterheads and approval numbers
+- FNOL reference numbers (SCH-, FNOL-)`,
+    versions:[
+      {v:'V.3',date:'2025-02-18',status:'Active',  score:'95%',note:'Improved FNOL and repair invoice accuracy.',createdBy:'Arlene Wilson'},
+      {v:'V.2',date:'2025-01-05',status:'Archived',score:'91%',note:'Added inspection classifier, expanded complaint sub-types.',createdBy:'Jennie Cooper'},
+      {v:'V.1',date:'2024-11-20',status:'Archived',score:'87%',note:'Initial Kraft L0 release.',createdBy:'Arlene Wilson'},
+    ],
+    categories:[
+      {id:'kraft-schaden',name:'Kraft Schaden',activeVersion:'V.3',status:'Deployed',confidence:94,trainedBy:'Arlene Wilson',
+        prompt:
+`Classify Kraft (Motor) claim documents.
+
+Look for:
+- Vehicle registration number and make/model
+- Incident date and location
+- Third-party details and police report reference
+- FNOL or claim reference (SCH-, KFZ-)`,
+        types:[
+          {id:'kraft-fnol',name:'FNOL Formular',tags:[],prompt:'Motor first notification of loss. Contains vehicle details, incident description, third-party information, and claim reference.'},
+          {id:'kraft-reparatur',name:'Reparaturrechnung',tags:[],prompt:'Garage repair invoice for motor claim. Contains garage name, vehicle registration, itemised repair costs, and parts list.'},
+          {id:'kraft-polizei',name:'Polizeibericht',tags:[],prompt:'Police report for motor incident. Contains crime/accident reference number, officer details, and incident summary.'},
+        ]},
+      {id:'kraft-beschwerde',name:'Einfach Beschwerde',activeVersion:'V.2',status:'Failed',confidence:81,trainedBy:'Evan Flores',
+        prompt:
+`Classify standard complaint documents for Kraft (Motor).
+
+Look for:
+- Customer dissatisfaction language
+- Reference to policy or claim number
+- Escalation language (ombudsman, regulator)`,
+        types:[
+          {id:'kraft-std-beschwerde',name:'Standard Beschwerde',tags:[],prompt:'Standard customer complaint letter. Contains complaint description, policy reference, and desired resolution.'},
+          {id:'kraft-vorstand-beschwerde',name:'Vorstand Beschwerde',tags:[],prompt:'Board-level escalated complaint. Addressed to Vorstand/management, high urgency language, regulatory references.'},
+        ]},
+      {id:'kraft-police',name:'Kraft Versicherungsschein',activeVersion:'V.2',status:'Deployed',confidence:93,trainedBy:'Jennie Cooper',
+        prompt:
+`Classify Kraft (Motor) policy documents.
+
+Look for:
+- "Versicherungsschein", "Kraftfahrzeugschein"
+- Vehicle registration, make, model, and year
+- Policy number (KFZ-, KRA-)
+- Cover type: Haftpflicht, Teilkasko, Vollkasko`,
+        types:[
+          {id:'kraft-haftpflicht',name:'Kfz-Haftpflicht',tags:[],prompt:'Motor third-party liability policy. Contains vehicle details, coverage limits, and "Haftpflicht" designation.'},
+          {id:'kraft-vollkasko',name:'Vollkasko',tags:[],prompt:'Comprehensive motor policy. Contains "Vollkasko" coverage, vehicle value, and excess/deductible details.'},
+        ]},
+      {id:'kraft-rechnung',name:'Rechnung',activeVersion:'V.1',status:'Deployed',confidence:88,trainedBy:'Philip Steward',
+        prompt:
+`Classify invoices related to Kraft (Motor) insurance.
+
+Look for:
+- Garage or supplier letterhead
+- VAT number and invoice number
+- Itemised parts and labour costs
+- Vehicle registration number`,
+        types:[
+          {id:'kraft-garagerechnung',name:'Werkstattrechnung',tags:[],prompt:'Workshop/garage invoice. Contains labour hours, parts list, VAT breakdown, and vehicle registration.'},
+        ]},
+    ]
+  },
+  {
+    id:'rechnung', name:'Rechnung',
+    classL1Version:'V.1', classL2Version:'V.1',
+    status:'Deployed', confidence:88, trainedBy:'Philip Steward',
+    lobPrompt:
+`You are classifying Rechnung (Invoice) documents.
+
+This L0 covers all invoice and billing documents submitted across insurance lines.
+
+{{CLASSIFICATION_HIERARCHY}}
+
+Key identifiers:
+- "Rechnung", "Faktura", "Invoice"
+- Invoice number and date
+- VAT number (Steuernummer / USt-IdNr.)
+- Supplier/vendor name and address
+- Itemised services or goods with amounts`,
+    versions:[
+      {v:'V.1',date:'2025-01-15',status:'Active',score:'88%',note:'Initial Rechnung L0 release.',createdBy:'Philip Steward'},
+    ],
+    categories:[
+      {id:'rech-reparatur',name:'Reparaturrechnung',activeVersion:'V.1',status:'Deployed',confidence:90,trainedBy:'Philip Steward',
+        prompt:
+`Classify repair invoices.
+
+Look for:
+- Workshop or contractor letterhead
+- Itemised labour and parts
+- Vehicle registration or property address reference
+- Claim or job reference number`,
+        types:[
+          {id:'rech-kfz',name:'Kfz-Reparatur',tags:[],prompt:'Motor vehicle repair invoice. Contains vehicle registration, garage details, parts list, and labour charges.'},
+          {id:'rech-gebaeude',name:'Gebäudereparatur',tags:[],prompt:'Building repair invoice. Contains property address, contractor details, scope of works, and total cost.'},
+        ]},
+      {id:'rech-gutachter',name:'Gutachterrechnung',activeVersion:'V.1',status:'Deployed',confidence:86,trainedBy:'Evan Flores',
+        prompt:
+`Classify expert/assessor invoices.
+
+Look for:
+- Expert or assessor firm letterhead
+- Reference to inspection or report number
+- Assessment fee and travel expenses
+- Claim reference number`,
+        types:[
+          {id:'rech-sachverstaendiger',name:'Sachverständigenrechnung',tags:[],prompt:'Independent expert invoice. Contains assessor accreditation, inspection date, fee schedule, and report reference.'},
+        ]},
+      {id:'rech-anwalt',name:'Anwaltsrechnung',activeVersion:'V.1',status:'Draft',confidence:0,trainedBy:'',
+        prompt:
+`Classify legal/solicitor invoices.
+
+Look for:
+- Law firm letterhead with "Rechtsanwalt" or "Kanzlei"
+- Hourly rate and billable hours
+- Case or file reference number
+- RVG (Rechtsanwaltsvergütungsgesetz) fee references`,
+        types:[]},
+    ]
+  },
+  {
+    id:'einfach', name:'Einfach',
+    classL1Version:'V.1', classL2Version:null,
+    status:'Deployed', confidence:85, trainedBy:'Jennie Cooper',
+    lobPrompt:
+`You are classifying Einfach (Simple/Standard) documents.
+
+This L0 covers routine, low-complexity documents: standard letters, acknowledgements, and simple requests.
+
+{{CLASSIFICATION_HIERARCHY}}
+
+Key identifiers:
+- Simple one-page correspondence
+- Standard acknowledgement language ("Bestätigung", "Eingangsbestätigung")
+- No complex claim or legal content
+- Routine policyholder enquiries`,
+    versions:[
+      {v:'V.1',date:'2025-01-10',status:'Active',score:'85%',note:'Initial Einfach L0 release.',createdBy:'Jennie Cooper'},
+    ],
+    categories:[
+      {id:'ein-beschwerde',name:'Einfach Beschwerde',activeVersion:'V.1',status:'Deployed',confidence:87,trainedBy:'Jennie Cooper',
+        prompt:
+`Classify standard (simple) complaint letters.
+
+Look for:
+- Routine dissatisfaction language
+- Single issue complaint (delay, communication)
+- No regulatory escalation language
+- Policy or claim number reference`,
+        types:[
+          {id:'ein-std',name:'Standardbeschwerde',tags:[],prompt:'Standard complaint with single issue. Contains policyholder name, policy number, complaint description, and desired outcome.'},
+        ]},
+      {id:'ein-anfrage',name:'Standardanfrage',activeVersion:'V.1',status:'Deployed',confidence:83,trainedBy:'Jennie Cooper',
+        prompt:
+`Classify standard policyholder enquiry letters.
+
+Look for:
+- Question or information request tone
+- Policy or claim number reference
+- No urgency or legal language
+- Routine topics: address change, coverage query, payment query`,
+        types:[
+          {id:'ein-adresse',name:'Adressänderung',tags:[],prompt:'Address change request. Contains current and new address, policy number, and policyholder signature.'},
+          {id:'ein-auskunft',name:'Auskunftsanfrage',tags:[],prompt:'Information request about policy or claim status. Contains policy/claim reference and specific question.'},
+        ]},
+    ]
+  },
+  {
+    id:'vorstand', name:'Vorstand',
+    classL1Version:'V.1', classL2Version:null,
+    status:'Deployed', confidence:91, trainedBy:'Evan Flores',
+    lobPrompt:
+`You are classifying Vorstand (Board-level) documents.
+
+This L0 covers escalated, board-level correspondence: senior complaints, regulatory escalations, and management decisions.
+
+{{CLASSIFICATION_HIERARCHY}}
+
+Key identifiers:
+- Addressed to "Vorstand", "Geschäftsführung", "Management"
+- Regulatory body references (BaFin, Ombudsmann)
+- High-urgency or legal threat language
+- Senior signatory on both sender and recipient side`,
+    versions:[
+      {v:'V.1',date:'2025-01-20',status:'Active',score:'91%',note:'Initial Vorstand L0 release.',createdBy:'Evan Flores'},
+    ],
+    categories:[
+      {id:'vor-beschwerde',name:'Vorstand Beschwerde',activeVersion:'V.1',status:'Deployed',confidence:92,trainedBy:'Evan Flores',
+        prompt:
+`Classify board-level escalated complaint documents.
+
+Look for:
+- Addressed to Vorstand or Geschäftsführung
+- Prior complaint reference (already escalated once)
+- Ombudsmann or BaFin reference
+- Legal threat or litigation language`,
+        types:[
+          {id:'vor-bafin',name:'BaFin-Beschwerde',tags:[],prompt:'Complaint referencing or copied to BaFin (German financial regulator). Contains BaFin reference, escalation history, and regulatory language.'},
+          {id:'vor-ombuds',name:'Ombudsmann-Beschwerde',tags:[],prompt:'Complaint submitted to or via the insurance ombudsman (Ombudsmann). Contains case number and ombudsman letterhead.'},
+        ]},
+      {id:'vor-entscheid',name:'Vorstandsentscheidung',activeVersion:'V.1',status:'Draft',confidence:0,trainedBy:'',
+        prompt:
+`Classify board-level decision and approval documents.
+
+Look for:
+- Internal memo or board minute format
+- Decision language ("beschlossen", "genehmigt")
+- Board member signatures
+- Reference to policy or claim case`,
+        types:[]},
+    ]
+  },
+  {
+    id:'vertragsaenderung', name:'Vertragsänderung',
+    classL1Version:'V.1', classL2Version:null,
+    status:'Deployed', confidence:87, trainedBy:'Jane Doe',
+    lobPrompt:
+`You are classifying Vertragsänderung (Policy Change) documents.
+
+This L0 covers all mid-term policy amendments: coverage changes, vehicle/property updates, and endorsements.
+
+{{CLASSIFICATION_HIERARCHY}}
+
+Key identifiers:
+- "Vertragsänderung", "Nachtrag", "Endorsement", "Änderungsantrag"
+- Policy number and effective date of change
+- Description of what is being changed (old vs new value)
+- Policyholder signature and date`,
+    versions:[
+      {v:'V.1',date:'2025-02-01',status:'Active',score:'87%',note:'Initial Vertragsänderung L0 release.',createdBy:'Jane Doe'},
+    ],
+    categories:[
+      {id:'vta-antrag',name:'Änderungsantrag',activeVersion:'V.1',status:'Deployed',confidence:88,trainedBy:'Jane Doe',
+        prompt:
+`Classify policy change request documents.
+
+Look for:
+- "Änderungsantrag", "Antrag auf Vertragsänderung"
+- Current policy details and requested change
+- Effective date of requested change
+- Policyholder signature`,
+        types:[
+          {id:'vta-fahrzeug',name:'Fahrzeugwechsel',tags:[],prompt:'Vehicle substitution request. Contains old and new vehicle registration, make/model, and requested effective date.'},
+          {id:'vta-deckung',name:'Deckungsänderung',tags:[],prompt:'Coverage change request. Contains current cover level, requested new level (e.g. Haftpflicht → Vollkasko), and reason.'},
+          {id:'vta-adresse',name:'Adress-/Risikoänderung',tags:[],prompt:'Change of insured address or risk location. Contains old and new address, postcode, and effective date.'},
+        ]},
+      {id:'vta-bestaetigung',name:'Änderungsbestätigung',activeVersion:'V.1',status:'Deployed',confidence:86,trainedBy:'Jane Doe',
+        prompt:
+`Classify policy change confirmation documents (endorsements).
+
+Look for:
+- "Nachtrag", "Änderungsbestätigung", endorsement number
+- Updated policy schedule reflecting the change
+- Insurer stamp or digital signature
+- Revised premium (if applicable)`,
+        types:[
+          {id:'vta-nachtrag',name:'Nachtrag',tags:[],prompt:'Policy endorsement / mid-term adjustment confirmation. Contains endorsement number, changed fields, and updated premium.'},
+        ]},
+    ]
+  },
+  {
+    id:'privatschutz', name:'Privatschutz',
+    classL1Version:'V.1', classL2Version:null,
     status:'Deployed', confidence:89, trainedBy:'Jennie Cooper',
     lobPrompt:
-`You are classifying Health Insurance documents.
+`You are classifying Privatschutz (Private Coverage) documents.
 
-This L0 covers private medical insurance, dental, optical, and critical illness claims and policies.
+This L0 covers personal lines private insurance: household, personal liability, legal protection, and life cover.
 
 {{CLASSIFICATION_HIERARCHY}}
 
 Key identifiers:
-- Patient name and date of birth
-- GP or consultant referral letters
-- Hospital / clinic letterheads
-- ICD-10 diagnosis codes
-- Pre-authorisation reference numbers (PA-)
-- Policy numbers starting with "HLT-" or "PMI-"`,
+- "Privathaftpflicht", "Hausrat", "Rechtsschutz", "Lebensversicherung"
+- Individual policyholder name and home address
+- Policy numbers starting with "PRI-" or "PRV-"
+- Personal risk details (family size, property type)`,
     versions:[
-      {v:'V.2',date:'2025-01-20',status:'Active',  score:'89%',note:'Improved pre-auth vs in-progress claim distinction. Added physiotherapy sub-type.',createdBy:'Jennie Cooper'},
-      {v:'V.1',date:'2024-10-01',status:'Archived',score:'83%',note:'Initial Health L0 release.',createdBy:'Jennie Cooper'},
+      {v:'V.1',date:'2025-01-25',status:'Active',score:'89%',note:'Initial Privatschutz L0 release.',createdBy:'Jennie Cooper'},
     ],
     categories:[
-      {id:'health-claim',name:'Medical Claim',activeVersion:'V.2',status:'Deployed',confidence:91,trainedBy:'Jennie Cooper',
+      {id:'pri-haftpflicht',name:'Privathaftpflicht',activeVersion:'V.1',status:'Deployed',confidence:91,trainedBy:'Jennie Cooper',
         prompt:
-`Medical treatment claim documents.
+`Classify private liability insurance documents.
 
 Look for:
-- Treatment date(s) and provider details
-- ICD-10 or CPT procedure codes
-- Invoice or receipt from hospital or clinic
-- Pre-authorisation reference (if applicable)
-- Patient policy number
-- Diagnosis and treatment description`,
+- "Privathaftpflicht", "PHV"
+- Individual or family policyholder details
+- Liability limit and deductible
+- Covered persons (family members, pets)`,
         types:[
-          {id:'inpatient-claim',name:'Inpatient Claim',tags:[],prompt:'Overnight hospital stay claim. Must show: admission and discharge dates, ward/room details, surgeon and anaesthetist fees, hospital accommodation charges, discharge summary.'},
-          {id:'outpatient-claim',name:'Outpatient Claim',tags:[],prompt:'Day case or outpatient consultation claim. No overnight stay. Contains: consultation fee, diagnostic test fees, prescription costs. Single visit date.'},
-          {id:'dental-claim',name:'Dental Claim',tags:[],prompt:'Dental treatment claim. Contains: GDC (General Dental Council) registration number, tooth reference numbers (FDI or Palmer notation), procedure codes, dental practice letterhead.'},
-          {id:'optical-claim',name:'Optical Claim',tags:[],prompt:'Optical / vision care claim. Contains: optometrist name and GOC registration, prescription values (sphere, cylinder, axis), frame and lens costs, sight test fee.'},
-          {id:'physio-claim',name:'Physiotherapy Claim',tags:[],prompt:'Physiotherapy treatment claim. Contains: physiotherapist HCPC registration number, session count and dates, treatment description (e.g. shoulder mobilisation), discharge note or ongoing plan.'},
+          {id:'pri-single',name:'Einzelperson',tags:[],prompt:'Private liability policy for a single person. Contains individual name, address, and single-person premium.'},
+          {id:'pri-familie',name:'Familientarif',tags:[],prompt:'Family private liability policy. Contains policyholder and listed family members, family premium rate.'},
         ]},
-      {id:'health-preauth',name:'Pre-Authorisation',activeVersion:'V.1',status:'Deployed',confidence:88,trainedBy:'Jennie Cooper',
+      {id:'pri-rechtsschutz',name:'Rechtsschutz',activeVersion:'V.1',status:'Deployed',confidence:88,trainedBy:'Philip Steward',
         prompt:
-`Pre-authorisation request documents for planned medical treatment.
-
-Key identifiers:
-- "Prior Authorisation" or "Pre-auth" language
-- Consultant referral letter from GP
-- Proposed treatment plan (not yet performed)
-- ICD-10 diagnosis code
-- No invoice amount yet — treatment not yet performed`,
-        types:[
-          {id:'preauth-request',name:'Pre-auth Request',tags:[],prompt:'Initial pre-authorisation request. Contains: consultant name and specialty, proposed procedure, ICD-10 code, expected cost estimate, hospital to be used. PA reference not yet assigned.'},
-          {id:'preauth-approval',name:'Pre-auth Approval',tags:[],prompt:'Insurer-issued pre-authorisation approval. Contains: PA reference number, approved procedure, approved facility, monetary limit approved, validity period for the approval.'},
-          {id:'referral-letter',name:'GP Referral Letter',tags:[],prompt:'GP referral letter to a specialist or hospital. Contains: GP letterhead and GMC number, patient name and DOB, reason for referral, relevant medical history, referral destination.'},
-        ]},
-      {id:'health-policy',name:'Health Policy',activeVersion:'V.1',status:'Deployed',confidence:92,trainedBy:'Philip Steward',
-        prompt:
-`Health insurance policy documents.
-
-Key identifiers:
-- Policy number (HLT- or PMI- prefix)
-- Member names and listed dependants
-- Benefit schedule (inpatient limit, outpatient limit, dental/optical add-ons)
-- Exclusions list
-- Approved hospital network or provider list`,
-        types:[
-          {id:'individual-health',name:'Individual Plan',tags:[],prompt:'Single-member health policy. One insured name. No dependant schedule. Premium based on single-person rate.'},
-          {id:'family-health',name:'Family Plan',tags:[],prompt:'Family health policy covering policyholder plus dependants. Named dependants listed with ages. Family premium or composite rate applied.'},
-          {id:'group-health',name:'Group / Corporate Plan',tags:['M'],prompt:'Employer-sponsored group health policy. Company name as policyholder. Member schedule listing employees. Premium per head or aggregate. HR/benefits manager named as contact.'},
-        ]},
-      {id:'health-critical',name:'Critical Illness',activeVersion:'V.1',status:'Draft',confidence:74,trainedBy:'',
-        prompt:
-`Critical illness claim and policy documents.
+`Classify legal protection insurance documents.
 
 Look for:
-- Listed critical conditions (cancer, heart attack, stroke, major organ failure)
-- Medical diagnosis confirmation from specialist
-- Lump-sum payment request
-- Survival period declaration (usually 14–30 days post-diagnosis)
-- Policy number starting with "CI-"`,
+- "Rechtsschutzversicherung", "RSV"
+- Legal area covered (Arbeitsrecht, Mietrecht, Verkehrsrecht)
+- Waiting period clause references
+- Law firm panel or free choice of lawyer clause`,
         types:[
-          {id:'ci-claim',name:'CI Claim',tags:[],prompt:'Critical illness claim submission. Contains: specialist diagnosis letter, ICD-10 code for covered condition, survival period confirmation, claim form signed by claimant.'},
-          {id:'ci-policy',name:'CI Policy',tags:[],prompt:'Critical illness policy schedule. Contains: CI- policy number, covered conditions list, sum assured (lump sum), exclusions, waiting period clause.'},
+          {id:'pri-arbeitsrecht',name:'Arbeitsrechtsschutz',tags:[],prompt:'Employment law protection policy. Contains "Arbeitsrecht" cover, employment status of insured, and waiting period.'},
+          {id:'pri-mietrecht',name:'Mietrechtsschutz',tags:[],prompt:'Tenancy law protection policy. Contains "Mietrecht" cover, rental address, and tenant/landlord role.'},
         ]},
-    ]
-  },
-  {
-    id:'marine', name:'Marine',
-    classL1Version:'V.2', classL2Version:'V.1',
-    status:'Deployed', confidence:88, trainedBy:'Jorge Black',
-    lobPrompt:
-`You are classifying Marine Insurance documents.
-
-This L0 covers cargo, hull, and marine liability insurance for shipping and freight operations.
-
-{{CLASSIFICATION_HIERARCHY}}
-
-Key identifiers:
-- Bill of Lading number (B/L) or Airway Bill (AWB)
-- Vessel name and IMO number
-- Port of loading and port of discharge
-- Commodity description and HS tariff code
-- Classification society references (Lloyd's Register, Bureau Veritas, DNV)
-- Policy numbers starting with "MAR-" or "CARGO-"`,
-    versions:[
-      {v:'V.2',date:'2025-02-10',status:'Active',  score:'88%',note:'Added pollution liability sub-type. Improved cargo vs hull distinction.',createdBy:'Jorge Black'},
-      {v:'V.1',date:'2025-01-10',status:'Archived',score:'82%',note:'Initial Marine L0 release.',createdBy:'Jorge Black'},
-    ],
-    categories:[
-      {id:'cargo',name:'Cargo',activeVersion:'V.2',status:'Deployed',confidence:90,trainedBy:'Jorge Black',
+      {id:'pri-hausrat',name:'Hausrat',activeVersion:'V.1',status:'Draft',confidence:0,trainedBy:'',
         prompt:
-`Cargo insurance documents.
-
-Key identifiers:
-- Bill of Lading or Airway Bill number
-- Commodity type and packing details
-- Voyage route (port-to-port)
-- Packing list and commercial invoice references
-- Institute Cargo Clauses (A, B, or C) reference`,
-        types:[
-          {id:'cargo-claim',name:'Cargo Claim',tags:[],prompt:'Cargo damage or loss claim. Contains: B/L number, surveyor\'s damage report, shortage certificate, commercial invoice value, packing list, outturn report from receiver.'},
-          {id:'cargo-cert',name:'Cargo Certificate',tags:[],prompt:'Open cover cargo insurance certificate for a specific shipment. Contains: CARGO- policy number, commodity, value, vessel name, voyage, Institute Cargo Clauses reference.'},
-          {id:'survey-report',name:'Marine Survey Report',tags:[],prompt:'Independent marine surveyor\'s report. Contains: surveyor\'s IIMS accreditation, vessel or cargo details, condition assessment, cause of loss determination, recommended action.'},
-        ]},
-      {id:'hull',name:'Hull & Machinery',activeVersion:'V.1',status:'Deployed',confidence:85,trainedBy:'Jorge Black',
-        prompt:
-`Hull and machinery insurance documents for vessel owners.
-
-Key identifiers:
-- IMO number and vessel classification society
-- Classification certificate references
-- Dry dock inspection reports
-- Machinery damage assessment from marine engineer`,
-        types:[
-          {id:'hull-policy',name:'Hull Policy',tags:[],prompt:'Hull and machinery insurance policy. Contains: vessel name and IMO number, agreed value or market value, classification society, Institute Time Clauses — Hulls reference, coverage period.'},
-          {id:'hull-claim',name:'Hull Claim',tags:[],prompt:'Hull damage or total loss claim. Contains: incident description (collision, grounding, fire), damage survey report, repair yard estimate, class notation implications.'},
-        ]},
-      {id:'marine-liability',name:'Marine Liability',activeVersion:'V.1',status:'Draft',confidence:79,trainedBy:'',
-        prompt:
-`Marine liability insurance documents covering P&I, pollution, and third-party claims.
+`Classify household contents insurance documents.
 
 Look for:
-- P&I Club (Protection & Indemnity) references
-- Third-party bodily injury or property damage
-- Pollution incident reports and clean-up cost estimates
-- Crew injury or death claims`,
-        types:[
-          {id:'pi-club',name:'P&I Club Notice',tags:[],prompt:'Protection and Indemnity club correspondence. Contains: club name (e.g. Britannia, West of England), call reference, vessel name, incident description, club instructions.'},
-          {id:'pollution-claim',name:'Pollution Claim',tags:[],prompt:'Marine pollution incident claim. Contains: type of pollutant (bunkers, cargo), quantity spilled, clean-up authority (coast guard, port authority), MARPOL reference.'},
-        ]},
+- "Hausratversicherung", "Hausrat"
+- Insured address and sum insured for contents
+- Listed high-value items (Wertsachen)
+- Burglary, fire, and water damage cover sections`,
+        types:[]},
     ]
   },
   {
-    id:'cafes', name:'Cafes',
-    classL1Version:'V.2', classL2Version:'V.1',
-    status:'Deployed', confidence:92.1, trainedBy:'Jennie Cooper',
-    lobPrompt:
-`You are classifying documents for the Cafes & Food Service business line.
-
-This covers small food business insurance: public liability, employers liability, stock, equipment, and premises.
-
-{{CLASSIFICATION_HIERARCHY}}
-
-Key identifiers:
-- Food business registration number (local authority)
-- Environmental Health Officer (EHO) inspection references
-- Food hygiene rating certificate
-- Public liability policy references (PLI-)
-- Food Safety and Hygiene (England) Regulations 2013 compliance references`,
-    versions:[
-      {v:'V.2',date:'2025-02-20',status:'Active',  score:'92%',note:'Added food hygiene and compliance document types. Improved liability sub-type accuracy.',createdBy:'Jennie Cooper'},
-      {v:'V.1',date:'2025-01-08',status:'Archived',score:'87%',note:'Initial Cafes L0 release.',createdBy:'Clark Rai'},
-    ],
-    categories:[
-      {id:'cafe-liability',name:'Liability',activeVersion:'V.1',status:'Deployed',confidence:93,trainedBy:'Clark Rai',
-        prompt:
-`Liability claims for cafe and food service businesses.
-
-Look for:
-- Customer injury incidents (slips, trips, food poisoning, allergic reaction)
-- Third-party property damage (e.g. customer belongings)
-- Employers liability (staff injury at work)
-- Product liability (food product causing harm)`,
-        types:[
-          {id:'public-liab',name:'Public Liability Claim',tags:[],prompt:'Customer or third-party injury claim against the cafe. Contains: incident description, injured person details, date and location of incident, witness names, medical attention sought.'},
-          {id:'employers-liab',name:'Employers Liability Claim',tags:[],prompt:'Staff injury claim. Contains: employee name and job role, incident date and description, RIDDOR reference (if applicable), medical report, lost earnings calculation.'},
-          {id:'product-liab',name:'Product Liability Claim',tags:[],prompt:'Claim arising from a food product causing illness or injury. Contains: product description, lot/batch number, date consumed, medical evidence of harm, allergen declaration references.'},
-        ]},
-      {id:'cafe-property',name:'Premises & Equipment',activeVersion:'V.1',status:'Deployed',confidence:91,trainedBy:'Clark Rai',
-        prompt:
-`Property and equipment claims for cafe businesses.
-
-Covers commercial kitchen equipment, fixtures, furniture, and premises damage.`,
-        types:[
-          {id:'equipment-claim',name:'Equipment Breakdown',tags:[],prompt:'Commercial kitchen equipment failure claim. Contains: equipment make/model/serial number, failure description, engineer\'s diagnostic report, repair or replacement cost.'},
-          {id:'contents-claim',name:'Contents Claim',tags:[],prompt:'Cafe contents and stock claim (theft, fire, flood). Contains: itemised contents list with purchase values, evidence of loss, police report reference (if theft).'},
-          {id:'premises-damage',name:'Premises Damage',tags:[],prompt:'Physical damage to the cafe premises. Contains: damage description, contractor estimate, landlord notification (if leasehold), business interruption period.'},
-        ]},
-      {id:'cafe-compliance',name:'Compliance Documents',activeVersion:'V.1',status:'Deployed',confidence:94,trainedBy:'Jennie Cooper',
-        prompt:
-`Compliance and regulatory documents for food service businesses.
-
-Covers EHO inspections, food hygiene certificates, allergen declarations, and fire safety certificates.`,
-        types:[
-          {id:'eho-report',name:'EHO Inspection Report',tags:[],prompt:'Environmental Health Officer inspection report. Contains: local authority header, food hygiene rating (1–5), improvement notices, critical/major/minor non-conformances.'},
-          {id:'food-hygiene',name:'Food Hygiene Certificate',tags:[],prompt:'Individual food hygiene training certificate. Contains: trainee name, RSPH/CIEH awarding body, qualification level (Level 2 or 3), date of award, certificate number.'},
-          {id:'fire-safety',name:'Fire Safety Certificate',tags:[],prompt:'Premises fire safety assessment. Contains: responsible person named, fire risk assessment date, fire detection equipment listed, means of escape confirmed.'},
-          {id:'allergen-decl',name:'Allergen Declaration',tags:[],prompt:'Allergen information document for food products. Contains: the 14 major allergens (EU Regulation 1169/2011), "may contain" cross-contamination notices, product name.'},
-        ]},
-      {id:'cafe-license',name:'Licensing',activeVersion:'V.1',status:'Deployed',confidence:94,trainedBy:'Jennie Cooper',
-        prompt:
-`Licensing documents for food and drink service premises.
-
-Key identifiers:
-- Premises licence number (issued by local authority)
-- Designated Premises Supervisor (DPS) name
-- Licensable activities listed
-- Trading hours
-- Licensing Act 2003 references`,
-        types:[
-          {id:'premises-licence',name:'Premises Licence',tags:[],prompt:''},
-          {id:'food-reg',name:'Food Business Registration',tags:[],prompt:''},
-        ]},
-    ]
-  },
-  {
-    id:'media', name:'Media & Entertainment',
-    classL1Version:'V.2', classL2Version:'V.1',
-    status:'Failed', confidence:83.4, trainedBy:'Philip Steward',
-    lobPrompt:
-`You are classifying Media and Entertainment industry documents.
-
-This L0 covers production insurance, errors & omissions, intellectual property, and rights licensing.
-
-{{CLASSIFICATION_HIERARCHY}}
-
-Key identifiers:
-- Production company name and registered number
-- Production title and production code
-- Rights clearance references (MCPS, PRS, MPAA)
-- Completion bond references
-- Distribution agreement references`,
-    versions:[
-      {v:'V.2',date:'2025-01-15',status:'Active',  score:'83%',note:'Added errors & omissions sub-types.',createdBy:'Philip Steward'},
-      {v:'V.1',date:'2024-10-20',status:'Archived',score:'77%',note:'Initial Media L0 release.',createdBy:'Philip Steward'},
-    ],
-    categories:[
-      {id:'media-prod',name:'Production Insurance',activeVersion:'V.2',status:'Failed',confidence:82,trainedBy:'Philip Steward',
-        prompt:
-`Production insurance documents covering film, TV, and media production risks.
-
-Look for: production title, shooting schedule, cast/crew list, production budget, completion guarantee, equipment schedule.`,
-        types:[
-          {id:'prod-policy',name:'Production Policy',tags:[],prompt:''},
-          {id:'prod-claim',name:'Production Claim',tags:[],prompt:''},
-          {id:'cast-insurance',name:'Cast Insurance',tags:[],prompt:''},
-          {id:'equip-claim',name:'Equipment Claim',tags:[],prompt:''},
-        ]},
-      {id:'media-eo',name:'Errors & Omissions',activeVersion:'V.1',status:'Failed',confidence:79,trainedBy:'Philip Steward',
-        prompt:
-`Errors and Omissions (E&O) documents for media companies.
-
-Look for: copyright clearance certificates, rights chain documentation, E&O policy number, distribution deal references.`,
-        types:[
-          {id:'eo-policy',name:'E&O Policy',tags:[],prompt:''},
-          {id:'eo-claim',name:'E&O Claim',tags:[],prompt:''},
-          {id:'rights-chain',name:'Rights Chain Document',tags:[],prompt:''},
-        ]},
-      {id:'media-lic',name:'Rights & Licensing',activeVersion:'V.1',status:'Deployed',confidence:91.8,trainedBy:'Philip Steward',
-        prompt:`Rights licensing and clearance documents. Look for: rights territory, duration of licence, exclusivity clause, royalty rate, MCPS/PRS licence reference.`,
-        types:[
-          {id:'music-lic',name:'Music Licence',tags:[],prompt:''},
-          {id:'sync-lic',name:'Sync Licence',tags:[],prompt:''},
-          {id:'distrib-agree',name:'Distribution Agreement',tags:[],prompt:''},
-        ]},
-    ]
-  },
-  {
-    id:'ins-ger', name:'Germany',
-    classL1Version:'V.2', classL2Version:'V.1',
-    status:'Deployed', confidence:92, trainedBy:'Clark Rai',
-    lobPrompt:
-`Sie sind ein Klassifizierungsassistent für deutsche Versicherungsdokumente.
-
-You are classifying insurance documents for the German market (primarily German-language documents).
-
-{{CLASSIFICATION_HIERARCHY}}
-
-Key identifiers:
-- Versicherungsscheinnummer (policy number)
-- Aktenzeichen (file/case reference number)
-- German insurer letterhead (Allianz, AXA, Zurich Deutschland, HUK-Coburg)
-- GDV (Gesamtverband der Deutschen Versicherungswirtschaft) format compliance
-- German regulatory references (BaFin, VVG — Versicherungsvertragsgesetz)`,
-    versions:[
-      {v:'V.2',date:'2025-02-05',status:'Active',  score:'92%',note:'Improved German OCR handling for umlauts and ß. Added BaFin escalation sub-type.',createdBy:'Clark Rai'},
-      {v:'V.1',date:'2024-12-01',status:'Archived',score:'87%',note:'Initial Germany L0 release.',createdBy:'Clark Rai'},
-    ],
-    categories:[
-      {id:'ger-schaden',name:'Schaden',activeVersion:'V.2',status:'Deployed',confidence:93,trainedBy:'Clark Rai',
-        prompt:
-`German damage and loss claim documents (Schadenmeldung).
-
-Key identifiers:
-- "Schadenmeldung" or "Schadenformular" header
-- Schadennummer (claim reference number)
-- Schadendatum (date of loss)
-- KFZ-Kennzeichen (vehicle registration for motor claims)`,
-        types:[
-          {id:'ger-kfz',name:'Kraft Schaden',tags:[],prompt:'German motor vehicle damage claim (Kraftfahrzeugschaden). Look for: KFZ-Kennzeichen, Fahrzeugschein references, TÜV or DEKRA assessment, Werkstatt (garage) invoice.'},
-          {id:'ger-haft',name:'Haftpflicht',tags:['M'],prompt:'German liability claim (Haftpflichtschaden). Third-party damage or personal injury under liability coverage. Look for: Schadensersatzforderung (compensation demand), Haftpflichtversicherung references.'},
-          {id:'ger-gebaeude',name:'Sach Schaden',tags:[],prompt:'German property damage claim (Sachschaden). Look for: property address, Sachversicherung references, damage description (Wasserschaden, Brandschaden, Sturmschaden).'},
-          {id:'ger-rechnung',name:'Rechnung',tags:[],prompt:'German invoice submitted as part of a claim or repair. Contains: Rechnungsnummer, supplier/Werkstatt name, itemised services or parts, Mehrwertsteuer (VAT) breakdown, IBAN for payment.'},
-        ]},
-      {id:'ger-beschwerde',name:'Beschwerde',activeVersion:'V.1',status:'Deployed',confidence:91,trainedBy:'Clark Rai',
-        prompt:
-`German customer complaint documents (Beschwerden).
-
-Look for: formal complaint language ("Ich möchte Beschwerde einlegen", "unzufrieden"), BaFin references, Ombudsmann mentions, prior correspondence references.`,
-        types:[
-          {id:'ger-beschwerde-std',name:'Einfach Beschwerde',tags:[],prompt:'Simple written complaint to insurer (einfache Beschwerde). Contains: policyholder name, Versicherungsscheinnummer, single specific grievance, desired resolution. No escalation threats or regulatory references.'},
-          {id:'ger-bafin',name:'BaFin Eskalation',tags:[],prompt:'Complaint escalated to BaFin (Federal Financial Supervisory Authority). Contains: BaFin letterhead or reference, prior insurer complaint reference, regulatory escalation language.'},
-          {id:'ger-ombudsmann',name:'Ombudsmann',tags:[],prompt:'Complaint referred to the Versicherungsombudsmann. Contains: Ombudsmann reference number, previously unresolved complaint history, case summary.'},
-          {id:'ger-vorstand',name:'Vorstand Beschwerde',tags:[],prompt:'Formal complaint addressed to or escalated to board level (Vorstandsebene). Look for: "Vorstand", "Geschäftsführung", prior unresolved complaint history, regulatory or legal threat language, CC to BaFin or legal counsel.'},
-        ]},
-      {id:'ger-vertrag',name:'Vertragsänderung',activeVersion:'V.1',status:'Deployed',confidence:92.5,trainedBy:'Clark Rai',
-        prompt:
-`German policy change and amendment documents.
-
-Look for: "Nachtrag", "Änderung", "Vertragsänderung", original Versicherungsscheinnummer, new effective date (Änderungsdatum).`,
-        types:[
-          {id:'ger-nachtrag',name:'Nachtrag',tags:[],prompt:'German policy endorsement/addendum. Contains: Nachtrag number, reference to original Versicherungsschein, specific change described (Fahrzeugwechsel, Fahrerwechsel).'},
-          {id:'ger-kuendigung',name:'Kündigung',tags:[],prompt:'German policy cancellation notice. Contains: Kündigungsschreiben language, reason for cancellation, effective cancellation date, confirmation of receipt required.'},
-        ]},
-      {id:'ger-police',name:'Police (Versicherungsschein)',activeVersion:'V.1',status:'Deployed',confidence:91.5,trainedBy:'Clark Rai',
-        prompt:
-`German insurance policy documents (Versicherungspolice / Versicherungsschein).
-
-Key identifiers:
-- "Versicherungsschein" or "Police" header
-- Versicherungsscheinnummer
-- Versicherungsnehmer (policyholder name)
-- Versicherungsbeginn (policy start date)
-- Beitrag (premium amount)`,
-        types:[
-          {id:'ger-kfz-police',name:'Kraft Versicherungsschein',tags:[],prompt:'German motor vehicle policy (Kraftfahrtversicherungsschein). Contains: KFZ-Kennzeichen, Fahrzeugidentifikationsnummer (VIN), Deckungsart (Haftpflicht, Teilkasko, Vollkasko).'},
-          {id:'ger-haft-police',name:'Haftpflicht Versicherungsschein',tags:[],prompt:'German personal or commercial liability policy. Contains: insured activities description, Deckungssumme (coverage limit), deductible (Selbstbehalt).'},
-          {id:'ger-wohngebaeude',name:'Sach Versicherungsschein',tags:[],prompt:'German property insurance policy (Sachversicherungsschein). Contains: property address, Versicherungswert (insured value), Elementarschadendeckung (natural hazards), Wohnfläche (floor area).'},
-          {id:'ger-privatschutz',name:'Privatschutz',tags:[],prompt:'German private coverage policy (Privatschutz). Covers personal liability, legal protection, and household contents for private individuals. Look for: "Privatschutz", "Privathaftpflicht", "Hausrat", combined private lines references.'},
-        ]},
-    ]
-  },
-  {
-    id:'travel', name:'Travel',
+    id:'kuendigung', name:'Kündigung',
     classL1Version:'V.1', classL2Version:null,
-    status:'Draft', confidence:0, trainedBy:'',
+    status:'Deployed', confidence:90, trainedBy:'Arlene Wilson',
     lobPrompt:
-`You are classifying Travel Insurance documents.
+`You are classifying Kündigung (Cancellation) documents.
 
-This L0 covers travel insurance including claims, policies, medical emergencies, cancellations, and baggage loss.
+This L0 covers all policy cancellation and termination documents from both policyholder and insurer side.
 
 {{CLASSIFICATION_HIERARCHY}}
 
 Key identifiers:
-- Policy numbers starting with "TRV-" or "TI-"
-- Trip dates, destination country, departure/return dates
-- Booking reference numbers
-- Medical certificate or hospital letterhead (overseas)
-- "Travel Insurance" header or insurer travel logo`,
+- "Kündigung", "Vertragsauflösung", "Kündigung zum nächstmöglichen Termin"
+- Policy number and cancellation effective date
+- Reason for cancellation (optional)
+- Registered letter (Einschreiben) references`,
     versions:[
-      {v:'V.1',date:'2025-03-01',status:'Active',score:'—',note:'Initial Travel L0 setup. L1 configured, L2 pending.',createdBy:'Jennie Cooper'},
+      {v:'V.1',date:'2025-02-05',status:'Active',score:'90%',note:'Initial Kündigung L0 release.',createdBy:'Arlene Wilson'},
     ],
     categories:[
-      {id:'trv-cancellation',name:'Trip Cancellation',activeVersion:'V.1',status:'Draft',confidence:0,trainedBy:'',
+      {id:'kuend-vh',name:'Versicherungsnehmer-Kündigung',activeVersion:'V.1',status:'Deployed',confidence:91,trainedBy:'Arlene Wilson',
         prompt:
-`Classify Trip Cancellation documents for Travel Insurance.
+`Classify cancellation letters sent BY the policyholder.
 
 Look for:
-- Cancellation reason (illness, bereavement, natural disaster, airline bankruptcy)
-- Booking confirmation and cancellation confirmation pair
-- Refund amount claimed vs original booking cost
-- Supporting evidence (doctor certificate, death certificate, airline notice)`,
-        types:[]},
-      {id:'trv-medical',name:'Medical Emergency',activeVersion:'V.1',status:'Draft',confidence:0,trainedBy:'',
+- Policyholder as sender
+- "Ich kündige", "hiermit kündige ich"
+- Policy number and requested cancellation date
+- Reason: premium increase, found better cover, no longer needed`,
+        types:[
+          {id:'kuend-ordentlich',name:'Ordentliche Kündigung',tags:[],prompt:'Standard annual cancellation at policy renewal date. Contains policy number, renewal date, and policyholder signature.'},
+          {id:'kuend-sonder',name:'Sonderkündigung',tags:[],prompt:'Special cancellation right triggered by premium increase or claim. Contains trigger event reference and cancellation date.'},
+        ]},
+      {id:'kuend-vers',name:'Versicherer-Kündigung',activeVersion:'V.1',status:'Deployed',confidence:89,trainedBy:'Evan Flores',
         prompt:
-`Classify overseas medical emergency documents.
+`Classify cancellation notices sent BY the insurer.
 
 Look for:
-- Hospital or clinic letterhead (non-UK)
-- Diagnosis, treatment dates, itemised costs
-- Emergency repatriation or evacuation references
-- Treating physician name and registration number
-- "Guarantee of Payment" or "Medical Assistance" reference`,
-        types:[]},
-      {id:'trv-baggage',name:'Baggage & Personal Effects',activeVersion:'V.1',status:'Draft',confidence:0,trainedBy:'',
+- Insurer letterhead as sender
+- "Wir kündigen", "Kündigung des Versicherungsvertrages"
+- Reason: non-payment, fraud, risk change
+- Notice period stated`,
+        types:[
+          {id:'kuend-nichtzahlung',name:'Kündigung wegen Nichtzahlung',tags:[],prompt:'Insurer cancellation due to non-payment of premium. Contains outstanding amount, reminder references, and final cancellation date.'},
+          {id:'kuend-betrug',name:'Kündigung wegen Obliegenheitsverletzung',tags:[],prompt:'Insurer cancellation due to breach of duty or misrepresentation. Contains reason statement and legal basis.'},
+        ]},
+      {id:'kuend-bestaetigung',name:'Kündigungsbestätigung',activeVersion:'V.1',status:'Draft',confidence:0,trainedBy:'',
         prompt:
-`Classify baggage loss, damage, or delay claims.
+`Classify cancellation confirmation documents.
 
 Look for:
-- Property Irregularity Report (PIR) from airline
-- Receipt or proof of ownership for claimed items
-- Delay duration (hours) and compensation calculation
-- Carrier liability reference number`,
-        types:[]},
-      {id:'trv-policy',name:'Travel Policy Document',activeVersion:'V.1',status:'Draft',confidence:0,trainedBy:'',
-        prompt:
-`Travel insurance policy schedules and certificates.
-
-Key identifiers:
-- Policy number (TRV- / TI-)
-- Insured names and travel dates
-- Destination region/country
-- Cover levels: Single trip vs Annual multi-trip
-- Sum insured per section (medical, cancellation, baggage)`,
-        types:[]},
-      {id:'trv-delay',name:'Travel Delay',activeVersion:'V.1',status:'Draft',confidence:0,trainedBy:'',
-        prompt:
-`Travel delay and missed departure documents.
-
-Look for:
-- Official delay notification from carrier (letter or stamp)
-- Departure and actual departure time comparison
-- Delay duration exceeding policy threshold (usually 4–12 hrs)
-- Additional expenses receipts (meals, accommodation)`,
+- "Kündigungsbestätigung", "Wir bestätigen die Kündigung"
+- Policy number and confirmed cancellation date
+- Pro-rata refund amount (if applicable)
+- Insurer stamp or digital signature`,
         types:[]},
     ]
   },
 ];
 
 const DOC_NAMES = [
-  /* Motor */
-  'Motor_Claim_FNOL_CLM-00392.pdf','Policy_Schedule_MOT-8821-Annual.pdf','Repair_Invoice_AutoFix_Garage.pdf',
-  'Quotation_NewVehicle_Renault_2025.pdf','Police_Report_RTC_CAD-4421.pdf','Renewal_Quote_MOT-2291-2025.pdf',
-  'Complaint_Letter_ClaimDelay_MOT.pdf','Vehicle_Registration_V5C_New.pdf','Underwriting_Inspection_Fleet_A7.pdf',
-  'Accident_Photos_03Feb_4angles.jpg','Endorsement_AddDriver_MOT-8821.pdf','Fleet_Quote_22Vehicles_LogisticsCo.pdf',
-  'FNOL_Form_ClaimRef_CLM-00921.pdf','Estimate_BumperRepair_GarageB.pdf','Mid_Term_Adjustment_MOT-1102.pdf',
-  'Certificate_of_Insurance_MTR-3310.pdf','Witness_Statement_RTC-4421.pdf','Parts_Receipt_OEM_BumperKit.pdf',
-  'Cancellation_Notice_MOT-7712.pdf','Transfer_Ownership_V5C_MOT.pdf',
-  /* Property */
-  'Property_Survey_RICS_12OakLane.pdf','Fire_Damage_Claim_PROP-0391.pdf','Contractor_Invoice_Roofer_StormDmg.pdf',
-  'Water_Damage_Assessment_BurstPipe.pdf','Burglary_Claim_CrimeRef_2024PD4421.pdf','Buildings_Policy_PROP-8812-Annual.pdf',
-  'Rebuild_Valuation_2025_BCIS.pdf','Plumber_Invoice_LeakRepair.pdf','Landlord_Policy_HME-2210-Annual.pdf',
-  'Storm_Damage_Photos_Roof.jpg','Subsidence_Report_StructuralEng.pdf','Restoration_Invoice_DryingService.pdf',
-  'Electrician_Invoice_Rewire_Part P.pdf','Contents_Claim_Theft_PROP-4451.pdf',
-  /* Health */
-  'Inpatient_Claim_StThomas_Hospital.pdf','Pre_Auth_Request_MRI_Scan_PA-2201.pdf','GP_Referral_Orthopaedics_Consultant.pdf',
-  'Dental_Claim_CrownReplacement_PMI.pdf','Health_Policy_PMI-4431-Family.pdf','Physio_Invoice_6Sessions_HCPC.pdf',
-  'Outpatient_Claim_Dermatology.pdf','Critical_Illness_Claim_CI-0021.pdf','Pre_Auth_Approval_PA-2201.pdf',
-  'Optical_Claim_NewGlasses_GOC.pdf','Group_Health_Policy_Corporate_HLT.pdf',
-  /* Marine */
-  'Bill_of_Lading_HLCU3920441B.pdf','Cargo_Claim_Container_MAEU8821.pdf','Marine_Survey_MV_Pacific_Star.pdf',
-  'Hull_Claim_Collision_IMO9234561.pdf','Cargo_Certificate_CARGO-0391.pdf','PI_Club_Notice_Britannia_Ref.pdf',
-  /* Cafes */
-  'EHO_Inspection_CafeDeluxe_2025.pdf','Public_Liability_Claim_CustomerSlip.pdf','Food_Hygiene_Cert_Level2_RSPH.pdf',
-  'Equipment_Breakdown_CoffeeMachine.pdf','Employers_Liability_StaffInjury.pdf','Allergen_Declaration_Menu2025.pdf',
-  'Fire_Safety_Assessment_Cafe.pdf','Premises_Licence_CafeDeluxe.pdf',
-  /* Germany */
-  'Schadenmeldung_KFZ_B-MN3421.pdf','Versicherungsschein_Haftpflicht_2025.pdf','Beschwerde_Regulierungsverzoegerung.pdf',
-  'Nachtrag_Fahrerwechsel_Police-8821.pdf','Kuendigung_KFZ_Versicherung.pdf','Wohngebaeude_Police_DE-4421.pdf',
+  /* Schaden */
+  'Schadenmeldung_FNOL_SCH-00392.pdf','Zeugenaussage_Unfall_RTC-4421.pdf','Schadengutachten_Kfz_Sachverstaendiger.pdf',
+  'Fotodokumentation_Wasserschaden_2025.jpg','Abfindungserklaerung_SCH-00392.pdf','Schadenmeldung_Einbruch_SCH-00501.pdf',
+  /* Sach */
+  'Sachgutachten_Wohngebaeude_RICS.pdf','Sachschaden_Wasserschaden_SAC-0391.pdf','Reparaturrechnung_Dachdecker_Sturmschaden.pdf',
+  'Wohngebaeude_Police_SAC-8812.pdf','Bewertungsbericht_Neuwert_2025.pdf','Hausrat_Police_PHH-4421.pdf',
+  'Einbruchschaden_Fotos_Fenster.jpg','Feuerschaden_Bericht_FW-Ref.pdf',
+  /* Kraft */
+  'FNOL_Formular_SCH-00921_KFZ.pdf','Reparaturrechnung_Werkstatt_B-MN3421.pdf','Polizeibericht_Unfall_CAD-4421.pdf',
+  'Kfz_Versicherungsschein_KFZ-8821.pdf','Einfach_Beschwerde_Regulierungsverzoegerung.pdf','Vorstand_Beschwerde_BaFin-Ref.pdf',
+  'Vollkasko_Police_KFZ-3310.pdf','Zeugenaussage_Unfall_RTC-0021.pdf','Werkstattrechnung_OEM-Teile.pdf',
+  /* Rechnung */
+  'Reparaturrechnung_Kfz_Garage_AutoFix.pdf','Gebäudereparatur_Rechnung_Dachdecker.pdf','Sachverstaendigenrechnung_Gutachter.pdf',
+  'Anwaltsrechnung_Kanzlei_RVG.pdf',
+  /* Einfach */
+  'Standardbeschwerde_Bearbeitungszeit.pdf','Adressaenderung_Antrag_PRV-4431.pdf','Auskunftsanfrage_Deckungsumfang.pdf',
+  /* Vorstand */
+  'Vorstand_Beschwerde_Ombudsmann.pdf','BaFin_Beschwerde_Eskalation.pdf',
+  /* Vertragsänderung */
+  'Aenderungsantrag_Fahrzeugwechsel_KFZ-8821.pdf','Deckungsaenderung_Haftpflicht_Vollkasko.pdf',
+  'Nachtrag_Adressaenderung_SAC-4421.pdf','Aenderungsbestaetigung_Nachtrag-0012.pdf',
+  /* Privatschutz */
+  'Privathaftpflicht_Police_PRI-2291.pdf','Familientarif_PHV_Familie_Müller.pdf',
+  'Rechtsschutz_Arbeitsrecht_RSV-0391.pdf','Mietrechtsschutz_Police_RSV-1102.pdf',
+  /* Kündigung */
+  'Kuendigung_Ordentlich_KFZ-7712.pdf','Sonderkuendigung_Praemienerhoehung.pdf',
+  'Versicherer_Kuendigung_Nichtzahlung.pdf','Kuendigungsbestaetigung_SAC-8812.pdf',
 ];
 /* ── Data Sets ── */
 const INIT_DATASETS=[
-  {id:'ds-motor',    name:'Motor Samples',      color:'#3b82f6'},
-  {id:'ds-property', name:'Property & Health',  color:'#10b981'},
-  {id:'ds-marine',   name:'Marine & Cafes',     color:'#f59e0b'},
-  {id:'ds-de',       name:'Germany Batch',      color:'#8b5cf6'},
+  {id:'ds-schaden',  name:'Schaden Batch',         color:'#ef4444'},
+  {id:'ds-sach',     name:'Sach & Kraft',           color:'#3b82f6'},
+  {id:'ds-rechnung', name:'Rechnung & Einfach',     color:'#10b981'},
+  {id:'ds-vertraege',name:'Verträge & Kündigung',   color:'#8b5cf6'},
 ];
 /* [dataSetId, expectedLabel, lastTest|null] — one entry per DOC_NAMES index */
 const INIT_DOC_META=[
-  ['ds-motor',   'Claim Notification', {ctx:'Motor',pred:'Claim Notification',conf:94,match:true}],
-  ['ds-motor',   'Repair & Garage',    null],
-  ['ds-motor',   'Policy Schedule',    null],
-  ['ds-motor',   'Policy Schedule',    null],
-  ['ds-motor',   'Accident Evidence',  {ctx:'Motor',pred:'Accident Evidence',conf:88,match:true}],
-  ['ds-motor',   'Repair & Garage',    null],
-  ['ds-motor',   'Accident Evidence',  {ctx:'Motor',pred:'Claim Notification',conf:62,match:false}],
-  ['ds-motor',   'Vehicle Registration',null],
-  ['ds-motor',   'Complaint',          null],
-  ['ds-property','Policy Schedule',    {ctx:'Property',pred:'Policy Schedule',conf:92,match:true}],
-  ['ds-property','Claim Notification', null],
-  ['ds-property','Contractor Invoice', null],
-  ['ds-property','Policy Schedule',    null],
-  ['ds-property','Medical Report',     {ctx:'Health',pred:'Medical Report',conf:87,match:true}],
-  ['ds-property','Medical Report',     null],
-  ['ds-property','GP Referral',        null],
-  ['ds-property','Critical Illness',   null],
-  ['ds-marine',  'Bill of Lading',     null],
-  ['ds-marine',  'Survey Report',      null],
-  ['ds-marine',  'Charter Party',      null],
-  ['ds-marine',  'Public Liability',   {ctx:'Cafes',pred:'Public Liability',conf:91,match:true}],
-  ['ds-marine',  'Employer Liability', null],
-  ['ds-marine',  'Fire Safety',        null],
-  ['ds-marine',  'Premises Licence',   null],
-  ['ds-marine',  'Media Liability',    {ctx:'Media',pred:'Media Liability',conf:85,match:true}],
-  ['ds-marine',  'E&O Policy',         null],
-  ['ds-marine',  'Content Contract',   null],
-  ['ds-de',      'KFZ Claim',          {ctx:'Germany',pred:'KFZ Claim',conf:93,match:true}],
-  ['ds-de',      'Policy Document',    null],
-  ['ds-de',      'Complaint',          {ctx:'Germany',pred:'Policy Document',conf:71,match:false}],
-  ['ds-de',      'Amendment',          null],
-  ['ds-de',      'Cancellation',       null],
-  ['ds-de',      'Property Policy',    null],
+  ['ds-schaden',  'Schadenmeldung',    {ctx:'Schaden',pred:'Schadenmeldung',conf:94,match:true}],
+  ['ds-schaden',  'Schadenmeldung',    null],
+  ['ds-schaden',  'Schadenprüfung',    {ctx:'Schaden',pred:'Schadenprüfung',conf:89,match:true}],
+  ['ds-schaden',  'Schadenprüfung',    null],
+  ['ds-schaden',  'Schadenabschluss',  null],
+  ['ds-schaden',  'Schadenmeldung',    {ctx:'Schaden',pred:'Schadenabschluss',conf:61,match:false}],
+  ['ds-sach',     'Sachgutachten',     {ctx:'Sach',pred:'Sachgutachten',conf:92,match:true}],
+  ['ds-sach',     'Sachschaden',       null],
+  ['ds-sach',     'Sachschaden',       null],
+  ['ds-sach',     'Sachpolice',        {ctx:'Sach',pred:'Sachpolice',conf:91,match:true}],
+  ['ds-sach',     'Sachgutachten',     null],
+  ['ds-sach',     'Sachpolice',        null],
+  ['ds-sach',     'Sachschaden',       null],
+  ['ds-sach',     'Sachschaden',       null],
+  ['ds-sach',     'Kraft Schaden',     {ctx:'Kraft',pred:'Kraft Schaden',conf:93,match:true}],
+  ['ds-sach',     'Kraft Schaden',     null],
+  ['ds-sach',     'Kraft Schaden',     null],
+  ['ds-sach',     'Kraft Versicherungsschein', null],
+  ['ds-sach',     'Einfach Beschwerde',{ctx:'Kraft',pred:'Einfach Beschwerde',conf:82,match:true}],
+  ['ds-sach',     'Vorstand Beschwerde',{ctx:'Kraft',pred:'Einfach Beschwerde',conf:68,match:false}],
+  ['ds-sach',     'Kraft Versicherungsschein', null],
+  ['ds-sach',     'Kraft Schaden',     null],
+  ['ds-sach',     'Rechnung',          null],
+  ['ds-rechnung', 'Reparaturrechnung', {ctx:'Rechnung',pred:'Reparaturrechnung',conf:91,match:true}],
+  ['ds-rechnung', 'Reparaturrechnung', null],
+  ['ds-rechnung', 'Gutachterrechnung', null],
+  ['ds-rechnung', 'Anwaltsrechnung',   null],
+  ['ds-rechnung', 'Einfach Beschwerde',{ctx:'Einfach',pred:'Einfach Beschwerde',conf:86,match:true}],
+  ['ds-rechnung', 'Standardanfrage',   null],
+  ['ds-rechnung', 'Standardanfrage',   null],
+  ['ds-vertraege','Vorstand Beschwerde',{ctx:'Vorstand',pred:'Vorstand Beschwerde',conf:90,match:true}],
+  ['ds-vertraege','Vorstand Beschwerde',null],
+  ['ds-vertraege','Änderungsantrag',   {ctx:'Vertragsänderung',pred:'Änderungsantrag',conf:88,match:true}],
+  ['ds-vertraege','Änderungsantrag',   null],
+  ['ds-vertraege','Änderungsbestätigung',null],
+  ['ds-vertraege','Änderungsbestätigung',{ctx:'Vertragsänderung',pred:'Änderungsantrag',conf:72,match:false}],
+  ['ds-vertraege','Privathaftpflicht', {ctx:'Privatschutz',pred:'Privathaftpflicht',conf:89,match:true}],
+  ['ds-vertraege','Privathaftpflicht', null],
+  ['ds-vertraege','Rechtsschutz',      null],
+  ['ds-vertraege','Rechtsschutz',      null],
+  ['ds-vertraege','Ordentliche Kündigung',{ctx:'Kündigung',pred:'Ordentliche Kündigung',conf:93,match:true}],
+  ['ds-vertraege','Sonderkündigung',   null],
+  ['ds-vertraege','Versicherer-Kündigung',null],
+  ['ds-vertraege','Kündigungsbestätigung',null],
 ];
 const MOCK_SIZES=['48 KB','112 KB','239 KB','185 KB','76 KB','320 KB','95 KB','54 KB','143 KB','88 KB','201 KB','67 KB','156 KB','93 KB','274 KB','41 KB','118 KB','209 KB','73 KB','162 KB','88 KB','311 KB','55 KB','129 KB','197 KB','84 KB','243 KB','61 KB','174 KB','92 KB','288 KB','47 KB','136 KB','215 KB','79 KB'];
 const makeDocs=()=>DOC_NAMES.map((name,i)=>{
-  const [dsId,expLabel,lastTest]=INIT_DOC_META[i]||['ds-motor','',null];
+  const [dsId,expLabel,lastTest]=INIT_DOC_META[i]||['ds-schaden','',null];
   return{id:i+1,name,size:MOCK_SIZES[i]||'100 KB',dataSetId:dsId,expectedLabels:expLabel?[expLabel]:[],
     status:lastTest?'Tested':'Pending',selected:false,
     lastTest:lastTest?{...lastTest,testedAt:'2025-03-01'}:null};
