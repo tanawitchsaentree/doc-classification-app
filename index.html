@@ -613,6 +613,31 @@ input,textarea,select{font-family:inherit}
 .tm-exp-empty{color:var(--tx3);font-size:12px;cursor:pointer;padding:2px 0}
 .tm-exp-empty:hover{color:var(--a);text-decoration:underline}
 .tm-exp-input{border:none;border-bottom:1.5px solid var(--a);outline:none;font-size:12px;font-family:inherit;color:var(--tx1);background:transparent;width:120px;padding:1px 2px}
+/* Autocomplete dropdown */
+.tm-exp-wrap{position:relative;display:inline-block}
+.tm-exp-dropdown{position:absolute;top:100%;left:0;z-index:20;background:var(--srf);border:1px solid var(--bdr);border-radius:var(--r);box-shadow:0 4px 12px rgba(0,0,0,.12);min-width:160px;max-height:160px;overflow-y:auto;margin-top:2px}
+.tm-exp-dropdown__item{padding:6px 10px;font-size:12px;cursor:pointer;color:var(--tx1)}
+.tm-exp-dropdown__item:hover{background:var(--a-lt);color:var(--a)}
+/* Filter bar */
+.tm-filter-bar{display:flex;align-items:center;gap:4px;padding:8px 20px;border-bottom:1px solid var(--bdr);background:var(--bg);flex-shrink:0;flex-wrap:wrap}
+.tm-filter-btn{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:var(--r);border:1px solid var(--bdr);background:var(--srf);font-size:11px;font-weight:500;color:var(--tx2);cursor:pointer;font-family:inherit;transition:all .15s}
+.tm-filter-btn:hover{border-color:var(--a);color:var(--a)}
+.tm-filter-btn.active{background:var(--a-lt);border-color:var(--a);color:var(--a);font-weight:700}
+.tm-filter-count{background:var(--srf2);border-radius:10px;padding:0 5px;font-size:10px;color:var(--tx3)}
+.tm-filter-btn.active .tm-filter-count{background:rgba(0,55,129,.12);color:var(--a)}
+.tm-filter-sep{width:1px;height:16px;background:var(--bdr);margin:0 4px}
+.tm-filter-ds{padding:3px 8px;border:1px solid var(--bdr);border-radius:var(--r);font-size:11px;font-family:inherit;background:var(--srf);color:var(--tx1);cursor:pointer;outline:none}
+.tm-filter-ds:focus{border-color:var(--a)}
+/* Bulk set expected in section header */
+.tm-bulk-wrap{display:inline-flex;align-items:center;gap:4px;margin-left:8px}
+.tm-bulk-input{border:none;border-bottom:1.5px solid var(--a);outline:none;font-size:11px;font-family:inherit;color:var(--tx1);background:transparent;width:130px;padding:1px 2px}
+.tm-bulk-btn{font-size:10px;font-weight:600;color:var(--a);background:none;border:none;cursor:pointer;font-family:inherit;padding:0 4px}
+.tm-bulk-btn:hover{text-decoration:underline}
+.tm-sec__set-all{font-size:10px;color:var(--tx3);background:none;border:none;cursor:pointer;font-family:inherit;margin-left:8px;padding:0}
+.tm-sec__set-all:hover{color:var(--a);text-decoration:underline}
+/* Re-run failed button */
+.tp-rerun-btn{display:flex;align-items:center;gap:5px;padding:5px 13px;border-radius:var(--r);font-size:11px;font-weight:700;border:1.5px solid #b91c1c;cursor:pointer;font-family:inherit;background:transparent;color:#b91c1c;transition:all .15s;white-space:nowrap}
+.tp-rerun-btn:hover{background:#fce8e8}
 .test-view__summary{display:flex;align-items:center;gap:14px;padding:8px 20px;background:var(--srf);border-top:1px solid var(--bdr);font-size:12px;color:var(--tx2);flex-shrink:0;flex-wrap:wrap}
 .test-view__empty{text-align:center;padding:56px 20px;font-size:13px;color:var(--tx3);line-height:1.8}
 /* Test Prompt button in toolbar */
@@ -3010,14 +3035,19 @@ function Workspace({activeL1Tab,setActiveL1Tab,activeTab,setActiveTab,l1Items,pr
 
 /* ── Test View — dedicated test mode (replaces workspace content) ── */
 const MOCK_LABELS=['Schadenmeldung','Schadenprüfung','Schadenabschluss','Sachgutachten','Kündigung','Vertrag','Rechnung'];
-function TestView({promptText,promptLabel,docs,dataSets,toggleSel,onMarkTested,onUpdateExpected,onBack}){
+function TestView({promptText,promptLabel,docs,dataSets,toggleSel,onMarkTested,onUpdateExpected,labelSuggestions=[],onBack}){
   const [runningIds,setRunningIds]=useState(new Set());
   const [promptOpen,setPromptOpen]=useState(false);
   const [editingId,setEditingId]=useState(null);
   const [editingVal,setEditingVal]=useState('');
+  const [filter,setFilter]=useState('all');       // all|untested|matched|failed
+  const [filterDs,setFilterDs]=useState('all');   // all|ds.id
+  const [bulkDsId,setBulkDsId]=useState(null);
+  const [bulkVal,setBulkVal]=useState('');
 
   const totalSelected=docs.filter(d=>d.selected).length;
   const testedDocs=docs.filter(d=>d.lastTest);
+  const failedDocs=docs.filter(d=>d.lastTest?.match===false);
   /* accuracy = only docs where match is boolean (has expected label) */
   const validatedDocs=testedDocs.filter(d=>d.lastTest.match!==null);
   const matchCount=validatedDocs.filter(d=>d.lastTest.match).length;
@@ -3027,15 +3057,13 @@ function TestView({promptText,promptLabel,docs,dataSets,toggleSel,onMarkTested,o
   const selectAll=()=>docs.forEach(d=>toggleSel(d.id,true));
   const clearSel=()=>docs.forEach(d=>toggleSel(d.id,false));
 
-  const runTest=()=>{
-    const sel=docs.filter(d=>d.selected);
+  const _runDocs=(sel)=>{
     if(!sel.length)return;
-    setRunningIds(new Set(sel.map(d=>d.id)));
+    setRunningIds(prev=>{const n=new Set(prev);sel.forEach(d=>n.add(d.id));return n;});
     sel.forEach((doc,i)=>{
       setTimeout(()=>{
         const conf=Math.floor(50+Math.random()*46);
         const expected=doc.expectedLabels?.[0];
-        /* simulate ~70% accuracy: correct or pick a different label */
         const isCorrect=Math.random()>0.3;
         const others=MOCK_LABELS.filter(l=>l!==expected);
         const pred=expected?(isCorrect?expected:others[Math.floor(Math.random()*others.length)]):MOCK_LABELS[Math.floor(Math.random()*MOCK_LABELS.length)];
@@ -3045,17 +3073,31 @@ function TestView({promptText,promptLabel,docs,dataSets,toggleSel,onMarkTested,o
       },900+i*500+Math.random()*300);
     });
   };
+  const runTest=()=>_runDocs(docs.filter(d=>d.selected));
+  const rerunFailed=()=>_runDocs(failedDocs);
 
-  /* save inline edit — also live-recalculates match if doc already tested */
-  const saveExpected=(docId,val)=>{
-    onUpdateExpected(docId,val.trim());
-    setEditingId(null);setEditingVal('');
+  /* inline expected edit */
+  const saveExpected=(docId,val)=>{onUpdateExpected(docId,val.trim());setEditingId(null);setEditingVal('');};
+  const startEdit=(doc)=>{if(runningIds.has(doc.id))return;setEditingId(doc.id);setEditingVal(doc.expectedLabels?.[0]||'');};
+
+  /* bulk set all docs in a dataset */
+  const applyBulk=(dsId,gDocs)=>{
+    const v=bulkVal.trim();
+    gDocs.forEach(d=>onUpdateExpected(d.id,v));
+    setBulkDsId(null);setBulkVal('');
   };
-  const startEdit=(doc)=>{
-    if(runningIds.has(doc.id))return;
-    setEditingId(doc.id);
-    setEditingVal(doc.expectedLabels?.[0]||'');
-  };
+
+  /* filter counts */
+  const countFilter=(f)=>f==='all'?docs.length:f==='untested'?docs.filter(d=>!d.lastTest).length:f==='matched'?docs.filter(d=>d.lastTest?.match===true).length:failedDocs.length;
+
+  /* apply filters to a doc list */
+  const applyFilters=(list)=>list
+    .filter(d=>filterDs==='all'||d.dataSetId===filterDs)
+    .filter(d=>filter==='all'||(filter==='untested'&&!d.lastTest)||(filter==='matched'&&d.lastTest?.match===true)||(filter==='failed'&&d.lastTest?.match===false));
+
+  /* label suggestions for autocomplete */
+  const allSuggestions=[...new Set([...labelSuggestions,...MOCK_LABELS])];
+  const getSuggestions=(val)=>val.trim()?allSuggestions.filter(s=>s.toLowerCase().includes(val.toLowerCase())&&s!==val):allSuggestions.slice(0,6);
 
   return(
     <div className="test-view">
@@ -3083,9 +3125,28 @@ function TestView({promptText,promptLabel,docs,dataSets,toggleSel,onMarkTested,o
         <button className="ws-test__sel-btn" onClick={selectAll}>Select all</button>
         {totalSelected>0&&<button className="ws-test__sel-btn ws-test__sel-btn--clear" onClick={clearSel}>Clear ({totalSelected})</button>}
         <span className="test-view__ctrl-info">{testedDocs.length} / {docs.length} tested</span>
+        {failedDocs.length>0&&
+          <button className="tp-rerun-btn" onClick={rerunFailed}>↺ Re-run failed ({failedDocs.length})</button>
+        }
         <button className="tp-run-btn" disabled={totalSelected===0} onClick={runTest}>
           ▶ Run Test{totalSelected>0?` (${totalSelected})`:''}
         </button>
+      </div>
+
+      {/* Filter bar */}
+      <div className="tm-filter-bar">
+        {[['all','All'],['untested','Untested'],['matched','✓ Matched'],['failed','✗ Failed']].map(([f,label])=>(
+          <button key={f} className={`tm-filter-btn${filter===f?' active':''}`} onClick={()=>setFilter(f)}>
+            {label}<span className="tm-filter-count">{countFilter(f)}</span>
+          </button>
+        ))}
+        {dataSets.length>1&&<>
+          <span className="tm-filter-sep"/>
+          <select className="tm-filter-ds" value={filterDs} onChange={e=>setFilterDs(e.target.value)}>
+            <option value="all">All datasets</option>
+            {dataSets.map(ds=><option key={ds.id} value={ds.id}>{ds.name}</option>)}
+          </select>
+        </>}
       </div>
 
       {/* Test matrix */}
@@ -3093,10 +3154,10 @@ function TestView({promptText,promptLabel,docs,dataSets,toggleSel,onMarkTested,o
         {docs.length===0
           ?<div className="test-view__empty">No documents in library.<br/>Upload documents using the right panel, then come back to test.</div>
           :(()=>{
-            /* group docs by dataset, ungrouped last */
-            const groups=dataSets.map(ds=>({ds,docs:docs.filter(d=>d.dataSetId===ds.id)})).filter(g=>g.docs.length>0);
-            const ungrouped=docs.filter(d=>!dataSets.find(s=>s.id===d.dataSetId));
+            const groups=dataSets.map(ds=>({ds,docs:applyFilters(docs.filter(d=>d.dataSetId===ds.id))})).filter(g=>g.docs.length>0);
+            const ungrouped=applyFilters(docs.filter(d=>!dataSets.find(s=>s.id===d.dataSetId)));
             if(ungrouped.length>0)groups.push({ds:{id:'__none__',name:'Ungrouped',color:'#aaa'},docs:ungrouped});
+            if(groups.length===0)return<div className="test-view__empty">No documents match the current filter.</div>;
 
             const renderDoc=(doc)=>{
               const running=runningIds.has(doc.id);
@@ -3104,8 +3165,9 @@ function TestView({promptText,promptLabel,docs,dataSets,toggleSel,onMarkTested,o
               const rowCls=running?'':match===true?'match':match===false?'mismatch':'';
               const isEditing=editingId===doc.id;
               const expLabel=doc.expectedLabels?.[0];
+              const suggestions=getSuggestions(editingVal);
               const badge=running?null:!doc.lastTest?null:match===null
-                ?<span className="result-badge result-badge--no-exp" title="Tested — no expected label">·</span>
+                ?<span className="result-badge result-badge--no-exp" title="Tested — no expected label set">·</span>
                 :match
                   ?<span className="result-badge result-badge--match">✓</span>
                   :<span className="result-badge result-badge--mismatch">✗</span>;
@@ -3115,11 +3177,21 @@ function TestView({promptText,promptLabel,docs,dataSets,toggleSel,onMarkTested,o
                   <td><span className="test-matrix__doc-name" title={doc.name}>{doc.name}</span></td>
                   <td className="tm-exp-cell" onClick={()=>!isEditing&&startEdit(doc)}>
                     {isEditing
-                      ?<input autoFocus className="tm-exp-input" value={editingVal}
-                          onChange={e=>setEditingVal(e.target.value)}
-                          onKeyDown={e=>{if(e.key==='Enter')saveExpected(doc.id,editingVal);if(e.key==='Escape'){setEditingId(null);setEditingVal('');}}}
-                          onBlur={()=>saveExpected(doc.id,editingVal)}
-                          onClick={e=>e.stopPropagation()}/>
+                      ?<div className="tm-exp-wrap">
+                          <input autoFocus className="tm-exp-input" value={editingVal}
+                            onChange={e=>setEditingVal(e.target.value)}
+                            onKeyDown={e=>{if(e.key==='Enter')saveExpected(doc.id,editingVal);if(e.key==='Escape'){setEditingId(null);setEditingVal('');}}}
+                            onBlur={e=>{if(!e.relatedTarget?.closest('.tm-exp-dropdown'))saveExpected(doc.id,editingVal);}}
+                            onClick={e=>e.stopPropagation()}/>
+                          {suggestions.length>0&&<div className="tm-exp-dropdown">
+                            {suggestions.map(s=>(
+                              <div key={s} className="tm-exp-dropdown__item"
+                                onMouseDown={e=>{e.preventDefault();saveExpected(doc.id,s);}}>
+                                {s}
+                              </div>
+                            ))}
+                          </div>}
+                        </div>
                       :expLabel
                         ?<span className="tm-exp-chip">{expLabel}
                             <span className="tm-exp-chip__rm" title="Remove" onClick={e=>{e.stopPropagation();saveExpected(doc.id,'');}}>×</span>
@@ -3152,10 +3224,10 @@ function TestView({promptText,promptLabel,docs,dataSets,toggleSel,onMarkTested,o
                   </tr>
                 </thead>
                 {groups.map(({ds,docs:gDocs})=>{
-                  const gTested=gDocs.filter(d=>d.lastTest).length;
-                  const gMatch=gDocs.filter(d=>d.lastTest?.match===true).length;
-                  const gMiss=gDocs.filter(d=>d.lastTest?.match===false).length;
-                  const gPending=gDocs.filter(d=>!d.lastTest).length;
+                  const allGDocs=docs.filter(d=>d.dataSetId===ds.id);
+                  const gTested=allGDocs.filter(d=>d.lastTest).length;
+                  const gMatch=allGDocs.filter(d=>d.lastTest?.match===true).length;
+                  const gMiss=allGDocs.filter(d=>d.lastTest?.match===false).length;
                   return(
                     <tbody key={ds.id}>
                       <tr className="tm-section">
@@ -3163,12 +3235,25 @@ function TestView({promptText,promptLabel,docs,dataSets,toggleSel,onMarkTested,o
                           <div className="tm-sec__inner">
                             <span className="tm-sec__dot" style={{background:ds.color}}/>
                             <span className="tm-sec__name">{ds.name}</span>
-                            <span className="tm-sec__count">{gDocs.length}</span>
+                            <span className="tm-sec__count">{allGDocs.length}</span>
                             <div className="tm-sec__stats">
                               {gMatch>0&&<span className="tm-sec__match">✓ {gMatch}</span>}
                               {gMiss>0&&<span className="tm-sec__miss">✗ {gMiss}</span>}
-                              {gPending>0&&<span className="tm-sec__pending">{gTested}/{gDocs.length} tested</span>}
+                              {gTested<allGDocs.length&&<span className="tm-sec__pending">{gTested}/{allGDocs.length} tested</span>}
                             </div>
+                            {/* Bulk set expected */}
+                            {bulkDsId===ds.id
+                              ?<div className="tm-bulk-wrap" onClick={e=>e.stopPropagation()}>
+                                  <input autoFocus className="tm-bulk-input" value={bulkVal} placeholder="Expected label for all…"
+                                    onChange={e=>setBulkVal(e.target.value)}
+                                    onKeyDown={e=>{if(e.key==='Enter')applyBulk(ds.id,allGDocs);if(e.key==='Escape'){setBulkDsId(null);setBulkVal('');}}}/>
+                                  <button className="tm-bulk-btn" onMouseDown={e=>{e.preventDefault();applyBulk(ds.id,allGDocs);}}>Apply all</button>
+                                  <button className="tm-bulk-btn" style={{color:'var(--tx3)'}} onClick={()=>{setBulkDsId(null);setBulkVal('');}}>×</button>
+                                </div>
+                              :<button className="tm-sec__set-all" onClick={e=>{e.stopPropagation();setBulkDsId(ds.id);setBulkVal('');}}>
+                                  + Set expected for all
+                                </button>
+                            }
                           </div>
                         </td>
                       </tr>
@@ -4015,6 +4100,7 @@ function App({devOverrides={}}){
                 <TestView promptText={currentPromptText} promptLabel={activePromptLabel}
                   docs={docs} dataSets={dataSets} toggleSel={toggleSel} onMarkTested={markTested}
                   onUpdateExpected={updateDocExpected}
+                  labelSuggestions={[...l1Items.map(i=>i.name),...l1Items.flatMap(i=>i.l2.map(l=>l.name))]}
                   onBack={()=>setTestMode(false)}/>
               );
               return promptLevel==='l2'
