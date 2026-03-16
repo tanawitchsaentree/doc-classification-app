@@ -470,6 +470,46 @@ input,textarea,select{font-family:inherit}
 .tp-footer__miss{color:#b91c1c;font-weight:600}
 .tp-footer__run{color:var(--a);font-weight:600}
 .tp-empty{text-align:center;padding:32px 12px;font-size:11px;color:var(--tx3);line-height:1.6}
+/* ── Inline Test Section (inside workspace) ── */
+.ws-test{border-top:1px solid var(--bdr);padding:14px 20px 20px;display:flex;flex-direction:column;gap:8px;flex-shrink:0}
+.ws-test__hdr{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.ws-test__hdr-left{display:flex;align-items:center;gap:6px}
+.ws-test__title{font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em}
+.ws-test__hdr-right{display:flex;align-items:center;gap:6px}
+.ws-test__sel-btn{background:none;border:none;font-size:10px;color:var(--a);font-weight:500;cursor:pointer;font-family:inherit;padding:0}
+.ws-test__sel-btn:hover{text-decoration:underline}
+.ws-test__sel-btn--clear{color:var(--tx3)}.ws-test__sel-btn--clear:hover{color:var(--tx1)}
+.ws-test__list{display:flex;flex-direction:column;gap:2px;max-height:220px;overflow-y:auto}
+.ws-test__list::-webkit-scrollbar{width:3px}.ws-test__list::-webkit-scrollbar-thumb{background:var(--bdr);border-radius:2px}
+.ws-test__doc{display:flex;align-items:flex-start;gap:7px;padding:6px 8px;border-radius:var(--r);border:1px solid transparent;cursor:pointer;transition:background var(--tf) var(--smooth)}
+.ws-test__doc:hover{background:var(--srf);border-color:var(--bdr)}
+.ws-test__doc--sel{background:var(--a-lt);border-color:var(--a-mid)}
+.ws-test__doc input[type=checkbox]{accent-color:var(--a);flex-shrink:0;width:13px;height:13px;cursor:pointer;margin-top:2px}
+.ws-test__doc-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.ws-test__doc-name{font-size:11px;font-weight:500;color:var(--tx1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ws-test__doc-meta{display:flex;align-items:center;gap:4px;flex-wrap:wrap;font-size:10px;color:var(--tx3)}
+.ws-test__doc-result{display:flex;align-items:center;flex-shrink:0;margin-top:2px}
+.ws-test__empty{font-size:11px;color:var(--tx3);padding:12px 0;text-align:center}
+/* Doc Library (simplified right panel) */
+.dlib__hdr{display:flex;align-items:center;justify-content:space-between;padding:8px 0 6px;flex-shrink:0}
+.dlib__title{font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em}
+.dlib__new-set{background:none;border:none;font-size:11px;color:var(--a);font-weight:500;cursor:pointer;font-family:inherit;padding:0}
+.dlib__new-set:hover{text-decoration:underline}
+.dlib__sets{flex:1;overflow-y:auto;padding:0 10px 8px;display:flex;flex-direction:column}
+.dlib__sets::-webkit-scrollbar{width:3px}.dlib__sets::-webkit-scrollbar-thumb{background:var(--bdr);border-radius:2px}
+.dlib__group{border:1px solid var(--bdr);border-radius:var(--r-md);overflow:hidden;margin-bottom:6px;flex-shrink:0}
+.dlib__group-hdr{display:flex;align-items:center;gap:7px;padding:7px 10px;background:var(--srf);cursor:pointer;user-select:none}
+.dlib__group-hdr:hover{background:var(--srf2)}
+.dlib__group-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.dlib__group-name{font-size:12px;font-weight:600;color:var(--tx1);flex:1}
+.dlib__group-count{font-size:11px;color:var(--tx3);background:var(--srf2);border:1px solid var(--bdr);border-radius:20px;padding:1px 7px}
+.dlib__group-chev{color:var(--tx3);transition:transform var(--tf) var(--smooth);display:flex;align-items:center}
+.dlib__group-chev--open{transform:rotate(180deg)}
+.dlib__group-body{background:var(--bg);border-top:1px solid var(--bdr)}
+.dlib__doc{display:flex;align-items:center;gap:6px;padding:5px 10px;border-bottom:1px solid var(--bdr)}
+.dlib__doc:last-child{border-bottom:none}
+.dlib__doc-name{flex:1;font-size:11px;color:var(--tx1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.dlib__doc-sub{font-size:10px;color:var(--tx3)}
 
 /* ── Keyframes ── */
 @keyframes slideDown{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
@@ -2061,27 +2101,14 @@ function LobOverview({lobs,onSelectLob,addToast,onOpenOutputFormat,onConfirm,onD
 /* ── LOB Prompt Section (Stage 1 — L1-only scroll mode) ── */
 /* targets = l1Items passed from App so classifier knows the category targets */
 function LobPromptSection({lobName,prompt,defaultPrompt,meta,saveState,onEdit,onSave,
-  docs,onAddDoc,onToggleSel,onDelDoc,onMarkTested,addToast,onVersion,targets=[],hierarchyContext,promptMode='l1'}){
+  onVersion,hierarchyContext,promptMode='l1'}){
   const [open,setOpen]=useState(true);
   const [showResetConfirm,setShowResetConfirm]=useState(false);
   const [showPreview,setShowPreview]=useState(false);
-  const [showTest,setShowTest]=useState(false);
-  const fileRef=useRef(null);
   const m=meta||{version:'V.1',score:'N/A',status:'Draft'};
   const ss=saveState;
   const missing=!prompt.includes('{{CLASSIFICATION_HIERARCHY}}');
   const found=[...new Set(prompt.match(/\{\{[^}]+\}\}/g)||[])];
-  const allCount=docs.length;
-  const testedCount=docs.filter(d=>d.status==='Tested').length;
-  const pendingCount=docs.filter(d=>d.status==='Pending').length;
-  const processFiles=files=>{
-    const all=Array.from(files);
-    const valid=all.filter(f=>['image/jpeg','image/png','application/pdf'].includes(f.type)&&f.size<=5*1024*1024);
-    valid.forEach(f=>onAddDoc({id:Date.now()+Math.random(),name:f.name,status:'Pending',selected:false}));
-    if(valid.length>0)addToast(`${valid.length} file(s) uploaded`,'success');
-    if(all.filter(f=>!['image/jpeg','image/png','application/pdf'].includes(f.type)).length>0)addToast('Some files rejected — PDF/JPG/PNG only','error');
-    if(all.filter(f=>f.type&&f.size>5*1024*1024).length>0)addToast('Some files rejected — max 5MB','error');
-  };
   return(
     <div className="l1-prompt-sec" id="cat-sec-l1">
       <div className="l1-prompt-sec__hdr" onClick={()=>setOpen(o=>!o)} style={{cursor:'pointer'}}>
@@ -2089,7 +2116,6 @@ function LobPromptSection({lobName,prompt,defaultPrompt,meta,saveState,onEdit,on
         <span className="l1-prompt-sec__badge">STAGE 1</span>
         <span className="l1-prompt-sec__title">{LABELS.l0.label} Classification Prompt — {lobName}</span>
         <div style={{display:'flex',alignItems:'center',gap:'6px',marginLeft:'auto'}}>
-          {allCount>0&&<span className="test-chip test-chip--pending" style={{fontSize:'10px'}}>{allCount} doc{allCount!==1?'s':''}</span>}
           <span className={`workspace__status ${(meta||{status:'Draft'}).status.toLowerCase()}`} style={{fontSize:'11px'}}>{(meta||{status:'Draft'}).status}</span>
           <button className="workspace__manage-btn" onClick={e=>{e.stopPropagation();onVersion();}} style={{fontSize:'11px'}}>Version</button>
         </div>
@@ -2148,47 +2174,16 @@ function LobPromptSection({lobName,prompt,defaultPrompt,meta,saveState,onEdit,on
               <button className="btn btn-primary btn-sm" onClick={onSave} disabled={ss!=='unsaved'}>Save draft</button>
             </div>
           </div>
-          <div className="test-action-zone">
-            <input ref={fileRef} type="file" accept=".jpg,.jpeg,.png,.pdf" multiple style={{display:'none'}} onChange={e=>processFiles(e.target.files)}/>
-            <div className="test-action-zone__top">
-              <span className="test-action-zone__title">🧪 Test this prompt</span>
-              <div className="test-action-zone__actions">
-                <button className="test-action-zone__add" onClick={()=>fileRef.current?.click()}>+ Add doc</button>
-                <button className="test-action-zone__btn" onClick={()=>{onSave();setShowTest(true);}}>Open test panel ↗</button>
-              </div>
-            </div>
-            <div className="test-action-zone__bottom">
-              {allCount===0
-                ?<span className="test-chip test-chip--empty">No documents yet</span>
-                :<>
-                  {testedCount>0&&<span className="test-chip test-chip--tested">✓ {testedCount} tested</span>}
-                  {pendingCount>0&&<span className="test-chip test-chip--pending">{pendingCount} pending</span>}
-                  {testedCount===0&&pendingCount===0&&<span className="test-chip test-chip--empty">{allCount} uploaded</span>}
-                </>
-              }
-              <span className="test-action-zone__hint">Pick a document → run → see output</span>
-            </div>
-          </div>
         </div>
       </div>}
       {showPreview&&<PreviewModal prompt={prompt} hierarchyContext={hierarchyContext} onClose={()=>setShowPreview(false)}/>}
-      {showTest&&<TestModal
-        prompt={prompt}
-        docs={docs}
-        onMarkTested={onMarkTested}
-        onClose={()=>setShowTest(false)}
-        targets={targets}
-        testTitle={`Test Stage 1 — ${lobName} (${LABELS.l0.label})`}
-        expectedPlaceholder={targets.length>0?`e.g. ${targets.slice(0,3).map(t=>t.name).join(', ')}`:undefined}
-        onAddDoc={onAddDoc}
-        addToast={addToast}
-      />}
     </div>
   );
 }
 
-/* ── Category Section (L1-only scroll mode) ── */
-function CategorySection({catItem,prompt,defaultPrompt,meta,saveState,onEdit,onSave,docs,onAddDoc,onToggleSel,onDelDoc,onMarkTested,addToast,onVersion,hierarchyContext}){
+/* ── Category Section — REMOVED (dead code, L2 now uses Workspace tabs) ── */
+function CategorySection(){return null;}
+function _CategorySection_UNUSED({catItem,prompt,defaultPrompt,meta,saveState,onEdit,onSave,docs,onAddDoc,onToggleSel,onDelDoc,onMarkTested,addToast,onVersion,hierarchyContext}){
   const [open,setOpen]=useState(true);
   const [showTest,setShowTest]=useState(false);
   const [showPreview,setShowPreview]=useState(false);
@@ -2584,7 +2579,7 @@ function WorkspaceTabs({l1Items,activeL1Tab,setActiveL1Tab,activeTab,setActiveTa
   );
 }
 
-function Workspace({activeL1Tab,setActiveL1Tab,activeTab,setActiveTab,l1Items,prompts,defaultPrompts,tabMeta,saveStates,onEdit,onSave,onVersion,docs}){
+function Workspace({activeL1Tab,setActiveL1Tab,activeTab,setActiveTab,l1Items,prompts,defaultPrompts,tabMeta,saveStates,onEdit,onSave,onVersion,docs,dataSets,toggleSel,onMarkTested,activePromptLabel}){
   const getMeta=tabId=>{
     const base=tabMeta?.[tabId]||DEFAULT_TAB_META;
     const item=l1Items.find(i=>i.id===tabId);
@@ -2655,16 +2650,14 @@ function Workspace({activeL1Tab,setActiveL1Tab,activeTab,setActiveTab,l1Items,pr
           </div>
         </div>
       </div>
+      <TestSection docs={docs} dataSets={dataSets} toggleSel={toggleSel} onMarkTested={onMarkTested} activePromptLabel={activePromptLabel}/>
     </main>
   );
 }
 
-/* ── Document Panel ── */
-function DocumentPanel({docs,dataSets,onAddDocs,toggleSel,delDoc,addDataSet,onMarkTested,activePromptLabel,style}){
-  const [dragOver,setDragOver]=useState(false);
-  const [pendingFiles,setPendingFiles]=useState([]);
+/* ── Test Section — inline below prompt editor ── */
+function TestSection({docs,dataSets,toggleSel,onMarkTested,activePromptLabel}){
   const [runningIds,setRunningIds]=useState(new Set());
-  const fileRef=useRef(null);
   const totalSelected=docs.filter(d=>d.selected).length;
   const allSelected=docs.length>0&&docs.every(d=>d.selected);
   const testedDocs=docs.filter(d=>d.lastTest);
@@ -2672,7 +2665,6 @@ function DocumentPanel({docs,dataSets,onAddDocs,toggleSel,delDoc,addDataSet,onMa
   const mismatchCount=testedDocs.filter(d=>d.lastTest&&!d.lastTest.match).length;
   const selectAll=()=>docs.forEach(d=>toggleSel(d.id,!allSelected));
   const clearSel=()=>docs.filter(d=>d.selected).forEach(d=>toggleSel(d.id,false));
-
   const runTest=()=>{
     const sel=docs.filter(d=>d.selected);
     if(!sel.length)return;
@@ -2682,12 +2674,73 @@ function DocumentPanel({docs,dataSets,onAddDocs,toggleSel,delDoc,addDataSet,onMa
       setTimeout(()=>{
         const conf=Math.floor(62+Math.random()*33);
         const match=conf>=78;
-        const pred=doc.expectedLabels[0]||'Unknown';
+        const pred=doc.expectedLabels?.[0]||'Unknown';
         onMarkTested(doc.id,{ctx:activePromptLabel||'Prompt Test',pred,conf,match,testedAt:new Date().toISOString()});
         setRunningIds(prev=>{const n=new Set(prev);n.delete(doc.id);return n;});
       },delay);
     });
   };
+  return(
+    <div className="ws-test">
+      <div className="ws-test__hdr">
+        <div className="ws-test__hdr-left">
+          <span className="ws-test__title">Test Documents</span>
+          {docs.length>0&&<span className="tp-header__count">{docs.length}</span>}
+        </div>
+        <div className="ws-test__hdr-right">
+          {docs.length>0&&<button className="ws-test__sel-btn" onClick={selectAll}>{allSelected?'Deselect all':'Select all'}</button>}
+          {totalSelected>0&&<button className="ws-test__sel-btn ws-test__sel-btn--clear" onClick={clearSel}>Clear</button>}
+          <button className="tp-run-btn" disabled={totalSelected===0} onClick={runTest}>
+            ▶ Run Test{totalSelected>0?` (${totalSelected})`:''}
+          </button>
+        </div>
+      </div>
+      <div className="ws-test__list">
+        {docs.length===0
+          ?<div className="ws-test__empty">Upload documents in the right panel to test this prompt</div>
+          :docs.map(doc=>{
+            const ds=dataSets.find(s=>s.id===doc.dataSetId);
+            const running=runningIds.has(doc.id);
+            return(
+              <div key={doc.id} className={`ws-test__doc${doc.selected?' ws-test__doc--sel':''}`} onClick={()=>toggleSel(doc.id)}>
+                <input type="checkbox" checked={doc.selected} onChange={()=>toggleSel(doc.id)} onClick={e=>e.stopPropagation()}/>
+                <div className="ws-test__doc-body">
+                  <span className="ws-test__doc-name" title={doc.name}>{doc.name}</span>
+                  <div className="ws-test__doc-meta">
+                    {doc.size&&<span>{doc.size}</span>}
+                    {ds&&<span className="tp-doc__batch" style={{borderLeftColor:ds.color}}>{ds.name}</span>}
+                    {doc.expectedLabels?.map(l=><span key={l} className="expect-chip">{l}</span>)}
+                  </div>
+                  {(running||doc.lastTest)&&<div className="ws-test__doc-result">
+                    {running
+                      ?<span className="tp-doc__running"><span className="tr-row__spinner"/>classifying…</span>
+                      :<span className={`trace-badge trace-badge--${doc.lastTest.match?'match':'mismatch'}`} title={`via ${doc.lastTest.ctx}`}>
+                          {doc.lastTest.match?'✓':'✗'} {doc.lastTest.conf}% · {doc.lastTest.pred}
+                        </span>
+                    }
+                  </div>}
+                </div>
+              </div>
+            );
+          })
+        }
+      </div>
+      {docs.length>0&&<div className="tp-footer">
+        <span>{docs.length} doc{docs.length!==1?'s':''}</span>
+        {matchCount>0&&<><span className="tp-footer__dot"/><span className="tp-footer__match">✓ {matchCount} matched</span></>}
+        {mismatchCount>0&&<><span className="tp-footer__dot"/><span className="tp-footer__miss">✗ {mismatchCount} missed</span></>}
+        {runningIds.size>0&&<><span className="tp-footer__dot"/><span className="tp-footer__run">⟳ {runningIds.size} running</span></>}
+      </div>}
+    </div>
+  );
+}
+
+/* ── Document Panel (Doc Library — upload & organize only) ── */
+function DocumentPanel({docs,dataSets,onAddDocs,delDoc,addDataSet,style}){
+  const [dragOver,setDragOver]=useState(false);
+  const [pendingFiles,setPendingFiles]=useState([]);
+  const [openSets,setOpenSets]=useState(()=>Object.fromEntries((dataSets||[]).map(ds=>[ds.id,true])));
+  const fileRef=useRef(null);
 
   const processRawFiles=files=>{
     const valid=Array.from(files).filter(f=>['image/jpeg','image/png','application/pdf'].includes(f.type)&&f.size<=5*1024*1024);
@@ -2706,7 +2759,7 @@ function DocumentPanel({docs,dataSets,onAddDocs,toggleSel,delDoc,addDataSet,onMa
     <aside className="doc-panel" style={style}>
       {/* Upload zone */}
       <div className="doc-panel__upload">
-        <p className="doc-panel__sec-title">Upload test document</p>
+        <p className="doc-panel__sec-title">Upload documents</p>
         <div className={`doc-panel__dropzone${dragOver?' drag-over':''}`}
           onDragOver={e=>{e.preventDefault();setDragOver(true);}} onDragLeave={()=>setDragOver(false)}
           onDrop={e=>{e.preventDefault();setDragOver(false);processRawFiles(e.dataTransfer.files);}}
@@ -2762,73 +2815,40 @@ function DocumentPanel({docs,dataSets,onAddDocs,toggleSel,delDoc,addDataSet,onMa
         ))}
       </div>
 
-      {/* Active prompt context — answers "what am I testing?" */}
-      <div className="tp-context">
-        <span className="tp-context__dot"/>
-        <span className="tp-context__label">Testing</span>
-        <span className="tp-context__prompt">{activePromptLabel||'—'}</span>
-      </div>
-
-      {/* List header: title + count + Run Test */}
-      <div className="tp-header">
-        <div className="tp-header__left">
-          <span className="tp-header__title">Documents</span>
-          {docs.length>0&&<span className="tp-header__count">{docs.length}</span>}
+      {/* Dataset library */}
+      <div className="dlib__sets">
+        <div className="dlib__hdr">
+          <span className="dlib__title">Document Library</span>
+          <button className="dlib__new-set" onClick={()=>{const n=window.prompt('New Data Set name:');if(n?.trim())addDataSet(n.trim());}}>+ New set</button>
         </div>
-        <button className="tp-run-btn" disabled={totalSelected===0} onClick={runTest}>
-          ▶ Run Test{totalSelected>0?` (${totalSelected})`:''}
-        </button>
-      </div>
-
-      {/* Select controls */}
-      <div className="tp-sel-bar">
-        <button className="tp-sel-btn" onClick={selectAll}>
-          {allSelected&&docs.length>0?'Deselect all':'Select all'}
-        </button>
-        {totalSelected>0&&<button className="tp-sel-btn tp-sel-btn--clear" onClick={clearSel}>Clear ({totalSelected})</button>}
-      </div>
-
-      {/* Flat document list — results inline per row */}
-      <div className="tp-list">
-        {docs.length===0
-          ?<div className="tp-empty">Upload documents above<br/>to start testing</div>
-          :docs.map(doc=>{
-            const ds=dataSets.find(s=>s.id===doc.dataSetId);
-            const running=runningIds.has(doc.id);
-            return(
-              <div key={doc.id} className={`tp-doc${doc.selected?' tp-doc--selected':''}`} onClick={()=>toggleSel(doc.id)}>
-                <input type="checkbox" checked={doc.selected} onChange={()=>toggleSel(doc.id)} onClick={e=>e.stopPropagation()}/>
-                <div className="tp-doc__body">
-                  <span className="tp-doc__name" title={doc.name}>{doc.name}</span>
-                  <div className="tp-doc__meta">
-                    {doc.size&&<span>{doc.size}</span>}
-                    {ds&&<span className="tp-doc__batch" style={{borderLeftColor:ds.color}}>{ds.name}</span>}
-                    {doc.expectedLabels?.map(l=><span key={l} className="expect-chip">{l}</span>)}
-                  </div>
-                  {(running||doc.lastTest)&&<div className="tp-doc__result">
-                    {running
-                      ?<span className="tp-doc__running"><span className="tr-row__spinner"/>classifying…</span>
-                      :<span className={`trace-badge trace-badge--${doc.lastTest.match?'match':'mismatch'}`}
-                          title={`via ${doc.lastTest.ctx}`}>
-                          {doc.lastTest.match?'✓':'✗'} {doc.lastTest.conf}% · {doc.lastTest.pred}
-                        </span>
-                    }
-                  </div>}
-                </div>
-                <button className="ds-doc-del" onClick={e=>{e.stopPropagation();delDoc(doc.id);}} title="Remove"><IC.Trash/></button>
+        {dataSets.map(ds=>{
+          const setDocs=docs.filter(d=>d.dataSetId===ds.id);
+          const isOpen=openSets[ds.id]!==false;
+          return(
+            <div key={ds.id} className="dlib__group">
+              <div className="dlib__group-hdr" onClick={()=>setOpenSets(o=>({...o,[ds.id]:!o[ds.id]}))}>
+                <span className="dlib__group-dot" style={{background:ds.color}}/>
+                <span className="dlib__group-name">{ds.name}</span>
+                <span className="dlib__group-count">{setDocs.length}</span>
+                <span className={`dlib__group-chev${isOpen?' dlib__group-chev--open':''}`}><IC.ChevDown s={12}/></span>
               </div>
-            );
-          })
-        }
+              {isOpen&&<div className="dlib__group-body">
+                {setDocs.length===0
+                  ?<div className="ds-empty">No documents yet</div>
+                  :setDocs.map(doc=>(
+                    <div key={doc.id} className="dlib__doc">
+                      <span className="dlib__doc-name" title={doc.name}>{doc.name}</span>
+                      {doc.size&&<span className="dlib__doc-sub">{doc.size}</span>}
+                      <button className="ds-doc-del" onClick={()=>delDoc(doc.id)} title="Remove"><IC.Trash/></button>
+                    </div>
+                  ))
+                }
+              </div>}
+            </div>
+          );
+        })}
+        {dataSets.length===0&&<div className="ds-empty" style={{paddingTop:'20px'}}>No data sets yet</div>}
       </div>
-
-      {/* Footer: overall stats */}
-      {docs.length>0&&<div className="tp-footer">
-        <span>{docs.length} doc{docs.length!==1?'s':''}</span>
-        {matchCount>0&&<><span className="tp-footer__dot"/><span className="tp-footer__match">✓ {matchCount} matched</span></>}
-        {mismatchCount>0&&<><span className="tp-footer__dot"/><span className="tp-footer__miss">✗ {mismatchCount} missed</span></>}
-        {runningIds.size>0&&<><span className="tp-footer__dot"/><span className="tp-footer__run">⟳ {runningIds.size} running</span></>}
-      </div>}
     </aside>
   );
 }
@@ -3169,15 +3189,6 @@ function App(){
   // Global docs pool
   const [docs,setDocs]=useState(makeDocs());
   const [filter,setFilter]=useState('pending');
-  // Stage 1 LOB docs — keyed by LOB id so they persist if you navigate away and back
-  const [lobDocs,setLobDocs]=useState({});
-  const getLobDocs=()=>lobDocs[selectedLobId]||[];
-  const setLobDocsFor=(updater)=>setLobDocs(prev=>({...prev,[selectedLobId]:typeof updater==='function'?updater(prev[selectedLobId]||[]):updater}));
-  const addLobDoc=doc=>setLobDocsFor(prev=>[...prev,doc]);
-  const toggleLobSel=docId=>setLobDocsFor(prev=>prev.map(d=>d.id===docId?{...d,selected:!d.selected}:d));
-  const delLobDoc=docId=>{setLobDocsFor(prev=>prev.filter(d=>d.id!==docId));addToast('Document removed','warning');};
-  const markLobTested=docId=>setLobDocsFor(prev=>prev.map(d=>d.id===docId?{...d,status:'Tested',selected:false}:d));
-
   // Sidebar active scroll target (L1-only mode)
   const [activeCatId,setActiveCatId]=useState(null);
   const scrollToCategory=id=>{
@@ -3334,55 +3345,36 @@ function App(){
               </div>
             </div>
             {/* Center content — swaps based on promptLevel */}
-            {promptLevel==='l2'
-              ?<Workspace activeL1Tab={activeL1Tab} setActiveL1Tab={setActiveL1Tab} activeTab={activeTab} setActiveTab={setActiveTab} l1Items={l1Items}
-                prompts={prompts} defaultPrompts={defaultPrompts} tabMeta={tabMeta} saveStates={saveStates}
-                onEdit={handleEdit} onSave={handleSave}
-                docs={docs}
-                onVersion={()=>setModal('version')}/>
-              :<div className="detail-scroll__main">
-                <div className="detail-scroll__toolbar">
-                  <span className="detail-scroll__count">{promptLevel==='global'?'Global prompt':'Per-category prompts — '+l1Items.length+' categor'+(l1Items.length!==1?'ies':'y')}</span>
-                </div>
-                <LobPromptSection
-                  lobName={l0Name}
-                  prompt={prompts['l1']||''}
-                  defaultPrompt={defaultPrompts['l1']||''}
-                  meta={tabMeta['l1']}
-                  saveState={saveStates['l1']}
-                  onEdit={val=>handleEdit('l1',val)}
-                  onSave={()=>handleSave('l1')}
-                  docs={getLobDocs()}
-                  onAddDoc={addLobDoc}
-                  onToggleSel={toggleLobSel}
-                  onDelDoc={delLobDoc}
-                  onMarkTested={markLobTested}
-                  addToast={addToast}
-                  onVersion={()=>setModal('version')}
-                  targets={l1Items}
-                  hierarchyContext={buildHierarchy(promptLevel==='global'?'global':'l1',l1Items)}
-                  promptMode={promptLevel}/>
-              </div>
-            }
+            {(()=>{
+              const activePromptLabel=(()=>{
+                if(promptLevel==='global')return`${l0Name} · Global Class`;
+                if(promptLevel==='l1'){const cat=l1Items.find(i=>i.id===activeCatId);return cat?`${cat.name} · L1 Class`:`${l0Name} · L1 Class`;}
+                const cat=l1Items.find(i=>i.id===activeTab);return cat?`${cat.name} · L2 Class`:`${l0Name} · L2 Class`;
+              })();
+              return promptLevel==='l2'
+                ?<Workspace activeL1Tab={activeL1Tab} setActiveL1Tab={setActiveL1Tab} activeTab={activeTab} setActiveTab={setActiveTab} l1Items={l1Items}
+                    prompts={prompts} defaultPrompts={defaultPrompts} tabMeta={tabMeta} saveStates={saveStates}
+                    onEdit={handleEdit} onSave={handleSave} onVersion={()=>setModal('version')}
+                    docs={docs} dataSets={dataSets} toggleSel={toggleSel} onMarkTested={markTested} activePromptLabel={activePromptLabel}/>
+                :<div className="detail-scroll__main">
+                    <div className="detail-scroll__toolbar">
+                      <span className="detail-scroll__count">{promptLevel==='global'?'Global prompt':'Per-category prompts — '+l1Items.length+' categor'+(l1Items.length!==1?'ies':'y')}</span>
+                    </div>
+                    <LobPromptSection
+                      lobName={l0Name} prompt={prompts['l1']||''} defaultPrompt={defaultPrompts['l1']||''}
+                      meta={tabMeta['l1']} saveState={saveStates['l1']}
+                      onEdit={val=>handleEdit('l1',val)} onSave={()=>handleSave('l1')}
+                      onVersion={()=>setModal('version')}
+                      hierarchyContext={buildHierarchy(promptLevel==='global'?'global':'l1',l1Items)}
+                      promptMode={promptLevel}/>
+                    <TestSection docs={docs} dataSets={dataSets} toggleSel={toggleSel} onMarkTested={markTested} activePromptLabel={activePromptLabel}/>
+                  </div>;
+            })()}
           </div>
           <ResizeHandle onResize={dx=>setDocPanelW(w=>Math.min(420,Math.max(200,w-dx)))}/>
-          {(()=>{
-            const activePromptLabel=(()=>{
-              if(promptLevel==='global')return`${l0Name} · Global Class`;
-              if(promptLevel==='l1'){
-                const cat=l1Items.find(i=>i.id===activeCatId);
-                return cat?`${cat.name} · L1 Class`:`${l0Name} · L1 Class`;
-              }
-              const cat=l1Items.find(i=>i.id===activeTab);
-              return cat?`${cat.name} · L2 Class`:`${l0Name} · L2 Class`;
-            })();
-            return(
-              <DocumentPanel docs={docs} dataSets={dataSets} onAddDocs={onAddDocs}
-                toggleSel={toggleSel} delDoc={delDoc} addDataSet={addDataSet}
-                onMarkTested={markTested} activePromptLabel={activePromptLabel}
-                style={{width:docPanelW+'px',borderLeft:'1px solid var(--bdr)'}}/>
-            );
-          })()}
+          <DocumentPanel docs={docs} dataSets={dataSets} onAddDocs={onAddDocs}
+            delDoc={delDoc} addDataSet={addDataSet}
+            style={{width:docPanelW+'px',borderLeft:'1px solid var(--bdr)'}}/>
         </div>
         {modal==='version'&&<VersionModal lob={selectedLobFromState} onClose={()=>setModal(null)}/>}
       </>}
