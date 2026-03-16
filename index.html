@@ -592,6 +592,16 @@ input,textarea,select{font-family:inherit}
 .result-badge--match{background:#e6f4e6;color:#006b00}
 .result-badge--mismatch{background:#fce8e8;color:#aa0000}
 .result-badge--pending{background:var(--srf2);color:var(--tx3);font-size:16px;line-height:1}
+.result-badge--no-exp{background:none;color:var(--tx3);font-size:18px;line-height:1}
+/* Expected column inline edit */
+.tm-exp-cell{cursor:pointer;min-width:80px}
+.tm-exp-chip{display:inline-flex;align-items:center;gap:4px;background:var(--srf2);border:1px solid var(--bdr);border-radius:4px;padding:2px 6px;font-size:12px;color:var(--tx1);cursor:pointer;transition:border-color .15s}
+.tm-exp-chip:hover{border-color:var(--a)}
+.tm-exp-chip__rm{color:var(--tx3);font-size:14px;line-height:1;cursor:pointer;padding:0 1px}
+.tm-exp-chip__rm:hover{color:#cc0000}
+.tm-exp-empty{color:var(--tx3);font-size:12px;cursor:pointer;padding:2px 0}
+.tm-exp-empty:hover{color:var(--a);text-decoration:underline}
+.tm-exp-input{border:none;border-bottom:1.5px solid var(--a);outline:none;font-size:12px;font-family:inherit;color:var(--tx1);background:transparent;width:120px;padding:1px 2px}
 .test-view__summary{display:flex;align-items:center;gap:14px;padding:8px 20px;background:var(--srf);border-top:1px solid var(--bdr);font-size:12px;color:var(--tx2);flex-shrink:0;flex-wrap:wrap}
 .test-view__empty{text-align:center;padding:56px 20px;font-size:13px;color:var(--tx3);line-height:1.8}
 /* Test Prompt button in toolbar */
@@ -2988,30 +2998,54 @@ function Workspace({activeL1Tab,setActiveL1Tab,activeTab,setActiveTab,l1Items,pr
 }
 
 /* ── Test View — dedicated test mode (replaces workspace content) ── */
-function TestView({promptText,promptLabel,docs,dataSets,toggleSel,onMarkTested,onBack}){
+const MOCK_LABELS=['Schadenmeldung','Schadenprüfung','Schadenabschluss','Sachgutachten','Kündigung','Vertrag','Rechnung'];
+function TestView({promptText,promptLabel,docs,dataSets,toggleSel,onMarkTested,onUpdateExpected,onBack}){
   const [runningIds,setRunningIds]=useState(new Set());
   const [promptOpen,setPromptOpen]=useState(false);
+  const [editingId,setEditingId]=useState(null);
+  const [editingVal,setEditingVal]=useState('');
+
   const totalSelected=docs.filter(d=>d.selected).length;
   const testedDocs=docs.filter(d=>d.lastTest);
-  const matchCount=testedDocs.filter(d=>d.lastTest.match).length;
-  const accuracy=testedDocs.length>0?Math.round(matchCount/testedDocs.length*100):null;
+  /* accuracy = only docs where match is boolean (has expected label) */
+  const validatedDocs=testedDocs.filter(d=>d.lastTest.match!==null);
+  const matchCount=validatedDocs.filter(d=>d.lastTest.match).length;
+  const accuracy=validatedDocs.length>0?Math.round(matchCount/validatedDocs.length*100):null;
   const avgConf=testedDocs.length>0?Math.round(testedDocs.reduce((s,d)=>s+d.lastTest.conf,0)/testedDocs.length):null;
+
   const selectAll=()=>docs.forEach(d=>toggleSel(d.id,true));
   const clearSel=()=>docs.forEach(d=>toggleSel(d.id,false));
+
   const runTest=()=>{
     const sel=docs.filter(d=>d.selected);
     if(!sel.length)return;
     setRunningIds(new Set(sel.map(d=>d.id)));
     sel.forEach((doc,i)=>{
       setTimeout(()=>{
-        const conf=Math.floor(62+Math.random()*33);
-        const match=conf>=78;
-        const pred=doc.expectedLabels?.[0]||'Unknown';
+        const conf=Math.floor(50+Math.random()*46);
+        const expected=doc.expectedLabels?.[0];
+        /* simulate ~70% accuracy: correct or pick a different label */
+        const isCorrect=Math.random()>0.3;
+        const others=MOCK_LABELS.filter(l=>l!==expected);
+        const pred=expected?(isCorrect?expected:others[Math.floor(Math.random()*others.length)]):MOCK_LABELS[Math.floor(Math.random()*MOCK_LABELS.length)];
+        const match=expected?(pred===expected):null;
         onMarkTested(doc.id,{ctx:promptLabel,pred,conf,match,testedAt:new Date().toISOString()});
         setRunningIds(prev=>{const n=new Set(prev);n.delete(doc.id);return n;});
       },900+i*500+Math.random()*300);
     });
   };
+
+  /* save inline edit — also live-recalculates match if doc already tested */
+  const saveExpected=(docId,val)=>{
+    onUpdateExpected(docId,val.trim());
+    setEditingId(null);setEditingVal('');
+  };
+  const startEdit=(doc)=>{
+    if(runningIds.has(doc.id))return;
+    setEditingId(doc.id);
+    setEditingVal(doc.expectedLabels?.[0]||'');
+  };
+
   return(
     <div className="test-view">
       {/* Header */}
@@ -3052,7 +3086,7 @@ function TestView({promptText,promptLabel,docs,dataSets,toggleSel,onMarkTested,o
               <tr>
                 <th style={{width:'28px'}}></th>
                 <th>Document</th>
-                <th>Expected</th>
+                <th>Expected <span style={{fontWeight:400,opacity:.6}}>(click to edit)</span></th>
                 <th>Predicted</th>
                 <th>Confidence</th>
                 <th style={{width:'40px'}}></th>
@@ -3062,7 +3096,16 @@ function TestView({promptText,promptLabel,docs,dataSets,toggleSel,onMarkTested,o
               {docs.map(doc=>{
                 const ds=dataSets.find(s=>s.id===doc.dataSetId);
                 const running=runningIds.has(doc.id);
-                const rowCls=running?'':doc.lastTest?(doc.lastTest.match?' match':' mismatch'):'';
+                const match=doc.lastTest?.match;
+                const rowCls=running?'':match===true?'match':match===false?'mismatch':'';
+                const isEditing=editingId===doc.id;
+                const expLabel=doc.expectedLabels?.[0];
+                /* badge: not-tested=empty, tested+no-exp=·, match=✓, mismatch=✗ */
+                const badge=running?null:!doc.lastTest?null:match===null
+                  ?<span className="result-badge result-badge--no-exp" title="No expected label set">·</span>
+                  :match
+                    ?<span className="result-badge result-badge--match">✓</span>
+                    :<span className="result-badge result-badge--mismatch">✗</span>;
                 return(
                   <tr key={doc.id} className={rowCls}>
                     <td><input type="checkbox" checked={doc.selected} onChange={()=>toggleSel(doc.id)} style={{accentColor:'var(--a)',cursor:'pointer',width:'13px',height:'13px'}}/></td>
@@ -3070,7 +3113,20 @@ function TestView({promptText,promptLabel,docs,dataSets,toggleSel,onMarkTested,o
                       <span className="test-matrix__doc-name" title={doc.name}>{doc.name}</span>
                       {ds&&<span className="test-matrix__batch" style={{borderLeftColor:ds.color}}>{ds.name}</span>}
                     </td>
-                    <td style={{color:'var(--tx2)'}}>{doc.expectedLabels?.[0]||<span style={{color:'var(--tx3)'}}>—</span>}</td>
+                    <td className="tm-exp-cell" onClick={()=>!isEditing&&startEdit(doc)}>
+                      {isEditing
+                        ?<input autoFocus className="tm-exp-input" value={editingVal}
+                            onChange={e=>setEditingVal(e.target.value)}
+                            onKeyDown={e=>{if(e.key==='Enter')saveExpected(doc.id,editingVal);if(e.key==='Escape'){setEditingId(null);setEditingVal('');}}}
+                            onBlur={()=>saveExpected(doc.id,editingVal)}
+                            onClick={e=>e.stopPropagation()}/>
+                        :expLabel
+                          ?<span className="tm-exp-chip">{expLabel}
+                              <span className="tm-exp-chip__rm" title="Remove" onClick={e=>{e.stopPropagation();saveExpected(doc.id,'');}}>×</span>
+                            </span>
+                          :<span className="tm-exp-empty">— set expected</span>
+                      }
+                    </td>
                     <td style={{fontWeight:500,color:'var(--tx1)'}}>
                       {running?<span className="tp-doc__running"><span className="tr-row__spinner"/>classifying…</span>
                         :doc.lastTest?.pred||<span style={{color:'var(--tx3)'}}>—</span>}
@@ -3078,12 +3134,7 @@ function TestView({promptText,promptLabel,docs,dataSets,toggleSel,onMarkTested,o
                     <td style={{fontWeight:700,color:!doc.lastTest||running?'var(--tx3)':doc.lastTest.conf>=80?'#006b00':doc.lastTest.conf>=60?'#92400e':'#b91c1c'}}>
                       {running?'…':doc.lastTest?`${doc.lastTest.conf}%`:'—'}
                     </td>
-                    <td>
-                      {!running&&(doc.lastTest
-                        ?<span className={`result-badge result-badge--${doc.lastTest.match?'match':'mismatch'}`}>{doc.lastTest.match?'✓':'✗'}</span>
-                        :<span className="result-badge result-badge--pending">·</span>
-                      )}
-                    </td>
+                    <td>{badge}</td>
                   </tr>
                 );
               })}
@@ -3096,7 +3147,7 @@ function TestView({promptText,promptLabel,docs,dataSets,toggleSel,onMarkTested,o
       <div className="test-view__summary">
         <span><strong>{testedDocs.length}</strong> tested</span>
         {matchCount>0&&<span style={{color:'#006b00',fontWeight:600}}>✓ {matchCount} matched</span>}
-        {testedDocs.length-matchCount>0&&<span style={{color:'#b91c1c',fontWeight:600}}>✗ {testedDocs.length-matchCount} missed</span>}
+        {validatedDocs.length-matchCount>0&&<span style={{color:'#b91c1c',fontWeight:600}}>✗ {validatedDocs.length-matchCount} missed</span>}
         {avgConf!==null&&<span>avg conf <strong>{avgConf}%</strong></span>}
         {runningIds.size>0&&<span style={{color:'var(--a)',fontWeight:600}}>⟳ {runningIds.size} running</span>}
       </div>
@@ -3837,6 +3888,13 @@ function App({devOverrides={}}){
   const toggleSel=(id,forceTo)=>setDocs(ds=>ds.map(d=>d.id===id?{...d,selected:forceTo!==undefined?forceTo:!d.selected}:d));
   const delDoc=id=>{setDocs(ds=>ds.filter(d=>d.id!==id));addToast('Document removed','warning');};
   const markTested=(id,testMeta)=>setDocs(ds=>ds.map(d=>d.id===id?{...d,status:'Tested',selected:false,lastTest:testMeta||d.lastTest}:d));
+  const updateDocExpected=(id,label)=>setDocs(ds=>ds.map(d=>{
+    if(d.id!==id)return d;
+    const newLabels=label?[label]:[];
+    /* live-recalculate match if doc already has test result */
+    const newLastTest=d.lastTest?{...d.lastTest,match:label?d.lastTest.pred===label:null}:d.lastTest;
+    return{...d,expectedLabels:newLabels,lastTest:newLastTest};
+  }));
   const onAddDocs=newDocs=>{setDocs(prev=>[...prev,...newDocs]);addToast(`${newDocs.length} file(s) added`,'success');};
 
   useEffect(()=>{
@@ -3916,6 +3974,7 @@ function App({devOverrides={}}){
               if(testMode)return(
                 <TestView promptText={currentPromptText} promptLabel={activePromptLabel}
                   docs={docs} dataSets={dataSets} toggleSel={toggleSel} onMarkTested={markTested}
+                  onUpdateExpected={updateDocExpected}
                   onBack={()=>setTestMode(false)}/>
               );
               return promptLevel==='l2'
