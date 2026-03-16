@@ -741,6 +741,24 @@ input,textarea,select{font-family:inherit}
   --btn-h-sm:  32px; --btn-px-sm:  12px; --btn-fz-sm: 11px;
   --btn-h-md:  40px; --btn-px-md:  20px; --btn-fz-md: 14px;
   --btn-h-lg:  48px; --btn-px-lg:  24px; --btn-fz-lg: 16px;
+  /* ── NDBX Input / FormField tokens ── */
+  --inp-border:         #333333;   /* default underline / box border */
+  --inp-border-focus:   #003781;   /* focus — blue underline */
+  --inp-border-error:   #cc0000;   /* error state */
+  --inp-border-dis:     #d4d4d4;   /* disabled */
+  --inp-label:          #767676;   /* floating label default */
+  --inp-label-focus:    #003781;   /* label when focused */
+  --inp-label-error:    #cc0000;   /* label in error */
+  --inp-label-dis:      #a0a0a0;   /* label disabled */
+  --inp-text:           #333333;   /* input value text */
+  --inp-text-dis:       #a0a0a0;   /* disabled text */
+  --inp-placeholder:    #a0a0a0;   /* placeholder */
+  --inp-bg:             #ffffff;   /* default bg */
+  --inp-bg-readonly:    #f5f5f5;   /* readonly bg */
+  --inp-fz:             16px;      /* input font size */
+  --inp-label-fz:       12px;      /* label font size */
+  --inp-hint-fz:        12px;      /* hint / char-count font size */
+  --inp-height:         40px;      /* single-line height */
   --sh-sm: 0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
   --sh-md: 0 4px 16px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.04);
   --sh-lg: 0 20px 48px rgba(0,0,0,.13),0 4px 12px rgba(0,0,0,.06);
@@ -1198,6 +1216,81 @@ body.dev-on .navbar{top:32px !important}
 body.dev-on .app__sub-bar{margin-top:84px !important}
 body.dev-on .page-scroll{margin-top:84px !important}
 body.dev-on .ov-page{padding-top:84px}
+
+/* ═══════════════════════════════════════════════
+   NDBX FormField + Input / Textarea
+   appearance="auto"   → underline only (default)
+   appearance="expert" → full box border
+═══════════════════════════════════════════════ */
+
+/* FormField wrapper */
+.nx-ff{display:flex;flex-direction:column;gap:4px;width:100%}
+.nx-ff__label{font-size:var(--inp-label-fz);font-weight:600;color:var(--inp-label);line-height:1.4;transition:color .15s}
+.nx-ff__label--required::after{content:' *';color:var(--inp-border-error)}
+.nx-ff__label--optional::after{content:' (Optional)';font-weight:400;color:var(--inp-label)}
+.nx-ff__req{color:var(--inp-border-error);font-weight:700}
+.nx-ff__opt{font-weight:400;color:var(--inp-label);font-size:.875em}
+.nx-ff__hint{font-size:var(--inp-hint-fz);color:var(--inp-label);margin-top:2px}
+.nx-ff__hint--error{color:var(--inp-border-error)}
+.nx-ff__error{font-size:var(--inp-hint-fz);color:var(--inp-border-error);margin-top:2px}
+.nx-ff__affix-wrap{position:relative;display:flex;align-items:center;width:100%}
+.nx-ff--error .nx-ff__label{color:var(--inp-label-error)}
+.nx-ff__char-count{font-size:var(--inp-hint-fz);color:var(--inp-label);margin-top:2px;text-align:right}
+
+/* Base input (shared by both styles) */
+.nx-input,.nx-textarea{
+  width:100%;font-family:inherit;font-size:var(--inp-fz);
+  color:var(--inp-text);background:var(--inp-bg);
+  outline:none;transition:border-color .15s;
+}
+.nx-input::placeholder,.nx-textarea::placeholder{color:var(--inp-placeholder)}
+.nx-input:disabled,.nx-textarea:disabled{color:var(--inp-text-dis);cursor:not-allowed}
+.nx-input[readonly],.nx-textarea[readonly]{background:var(--inp-bg-readonly);cursor:default}
+
+/* ── Default (underline) style ── */
+.nx-input--auto,.nx-textarea--auto{
+  border:none;border-bottom:1px solid var(--inp-border);
+  border-radius:0;padding:8px 0;
+  height:var(--inp-height);
+  background:transparent;
+}
+.nx-input--auto:focus,.nx-textarea--auto:focus{border-bottom:2px solid var(--inp-border-focus)}
+.nx-input--auto:disabled,.nx-textarea--auto:disabled{border-bottom-color:var(--inp-border-dis)}
+.nx-input--auto.nx-input--error,.nx-textarea--auto.nx-textarea--error{border-bottom-color:var(--inp-border-error)}
+.nx-textarea--auto{height:auto;min-height:80px;resize:vertical}
+
+/* ── Expert (box) style ── */
+.nx-input--expert,.nx-textarea--expert{
+  border:1px solid var(--inp-border);border-radius:var(--r);
+  padding:0 12px;height:var(--inp-height);
+}
+.nx-input--expert:focus,.nx-textarea--expert:focus{
+  border-color:var(--inp-border-focus);
+  box-shadow:0 0 0 2px var(--a-glow);
+}
+.nx-input--expert:disabled,.nx-textarea--expert:disabled{
+  border-color:var(--inp-border-dis);background:var(--inp-bg-readonly);
+}
+.nx-input--expert[readonly],.nx-textarea--expert[readonly]{
+  background:var(--inp-bg-readonly);border-color:var(--inp-border-dis);
+}
+.nx-input--expert.nx-input--error,.nx-textarea--expert.nx-textarea--error{
+  border-color:var(--inp-border-error);
+  box-shadow:0 0 0 2px rgba(204,0,0,.1);
+}
+.nx-textarea--expert{height:auto;min-height:80px;padding:8px 12px;resize:vertical}
+
+/* focused FormField — label turns blue */
+.nx-ff:focus-within .nx-ff__label{color:var(--inp-label-focus)}
+.nx-ff--error .nx-ff__label{color:var(--inp-label-error)}
+.nx-ff--disabled .nx-ff__label{color:var(--inp-label-dis)}
+
+/* Input with prefix/suffix slot */
+.nx-ff__input-wrap{position:relative;display:flex;align-items:center}
+.nx-ff__prefix{position:absolute;left:12px;color:var(--inp-label);font-size:var(--inp-fz);pointer-events:none;user-select:none}
+.nx-ff__suffix{position:absolute;right:10px;color:var(--inp-label);display:flex;align-items:center;cursor:pointer}
+.nx-ff__input-wrap .nx-input--expert.has-prefix{padding-left:28px}
+.nx-ff__input-wrap .nx-input--expert.has-suffix{padding-right:32px}
 
 </style>
 </head>
@@ -1965,6 +2058,93 @@ function Btn({variant='primary',size,block,loading,disabled,onClick,className=''
       <span style={loading?{visibility:'hidden',position:'absolute'}:{}}>{children}</span>
     </button>
   );
+}
+
+/* ── NDBX Input ──────────────────────────────────────────
+   FormField  — wrapper, maps to <nx-formfield>
+   NxInput    — <input nxInput appearance="auto|expert">
+   NxTextarea — <textarea nxInput appearance="auto|expert">
+
+   Usage:
+     <FormField label="Email" hint="We'll never share it" required>
+       <NxInput appearance="expert" placeholder="you@example.com"/>
+     </FormField>
+     <FormField label="Notes" error="Too short">
+       <NxTextarea appearance="auto" rows={3}/>
+     </FormField>
+────────────────────────────────────────────────────── */
+function FormField({label,hint,error,optional,required,charCount,maxChars,appearance='expert',className='',style,children}){
+  const hasError=!!error;
+  return(
+    <div className={['nx-ff',hasError?'nx-ff--error':'',className].filter(Boolean).join(' ')} style={style}>
+      {label&&(
+        <label className="nx-ff__label">
+          {label}
+          {required&&<span className="nx-ff__req" aria-hidden="true"> *</span>}
+          {optional&&<span className="nx-ff__opt"> (optional)</span>}
+        </label>
+      )}
+      <div className={`nx-ff__input-wrap nx-ff__input-wrap--${appearance}`}>
+        {React.Children.map(children,child=>{
+          if(!child)return null;
+          return React.cloneElement(child,{
+            appearance,
+            error:hasError,
+            'aria-invalid':hasError||undefined,
+          });
+        })}
+      </div>
+      {hasError
+        ? <span className="nx-ff__hint nx-ff__hint--error">{error}</span>
+        : hint
+          ? <span className="nx-ff__hint">{hint}</span>
+          : null
+      }
+      {maxChars!=null&&(
+        <span className="nx-ff__char-count">{charCount||0}/{maxChars}</span>
+      )}
+    </div>
+  );
+}
+
+function NxInput({appearance='expert',error,prefix,suffix,className='',style,...props}){
+  const cls=[
+    'nx-input',
+    `nx-input--${appearance}`,
+    error?'nx-input--error':'',
+    prefix?'has-prefix':'',
+    suffix?'has-suffix':'',
+    className,
+  ].filter(Boolean).join(' ');
+  if(prefix||suffix){
+    return(
+      <div className="nx-ff__affix-wrap">
+        {prefix&&<span className="nx-ff__prefix">{prefix}</span>}
+        <input className={cls} style={style} {...props}/>
+        {suffix&&<span className="nx-ff__suffix">{suffix}</span>}
+      </div>
+    );
+  }
+  return <input className={cls} style={style} {...props}/>;
+}
+
+function NxTextarea({appearance='expert',error,autoResize,className='',style,...props}){
+  const ref=React.useRef(null);
+  React.useEffect(()=>{
+    if(!autoResize||!ref.current)return;
+    const el=ref.current;
+    const resize=()=>{ el.style.height='auto'; el.style.height=el.scrollHeight+'px'; };
+    el.addEventListener('input',resize);
+    resize();
+    return()=>el.removeEventListener('input',resize);
+  },[autoResize]);
+  const cls=[
+    'nx-textarea',
+    `nx-textarea--${appearance}`,
+    error?'nx-input--error':'',
+    className,
+  ].filter(Boolean).join(' ');
+  return <textarea ref={ref} className={cls} style={style} {...props}/>;
 }
 
 /* ── Toast ── */
