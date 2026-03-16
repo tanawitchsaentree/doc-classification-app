@@ -595,8 +595,11 @@ input,textarea,select{font-family:inherit}
 .test-view__summary{display:flex;align-items:center;gap:14px;padding:8px 20px;background:var(--srf);border-top:1px solid var(--bdr);font-size:12px;color:var(--tx2);flex-shrink:0;flex-wrap:wrap}
 .test-view__empty{text-align:center;padding:56px 20px;font-size:13px;color:var(--tx3);line-height:1.8}
 /* Test Prompt button in toolbar */
-.cl-setup__test-btn{display:flex;align-items:center;gap:5px;padding:5px 14px;border-radius:var(--r);font-size:11px;font-weight:700;border:none;cursor:pointer;font-family:inherit;background:var(--a);color:#fff;transition:all var(--tf) var(--smooth);box-shadow:0 1px 3px var(--a-glow);white-space:nowrap}
+.cl-setup__test-btn{display:flex;align-items:center;gap:5px;padding:5px 14px;border-radius:var(--r);font-size:11px;font-weight:700;border:1.5px solid transparent;cursor:pointer;font-family:inherit;background:var(--a);color:#fff;transition:all var(--tf) var(--smooth);box-shadow:0 1px 3px var(--a-glow);white-space:nowrap;margin-left:auto}
 .cl-setup__test-btn:hover{background:var(--a-h);transform:translateY(-1px);box-shadow:0 3px 8px var(--a-glow)}
+.cl-setup__test-btn--back{background:transparent;color:var(--a);border-color:var(--a);box-shadow:none}
+.cl-setup__test-btn--back:hover{background:var(--a-lt);transform:none;box-shadow:none}
+.dlib__doc-size{font-size:10px;color:var(--tx3);white-space:nowrap;flex-shrink:0}
 
 /* ── Keyframes ── */
 @keyframes slideDown{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
@@ -3032,17 +3035,9 @@ function TestView({promptText,promptLabel,docs,dataSets,toggleSel,onMarkTested,o
 
       {/* Controls */}
       <div className="test-view__controls">
-        {totalSelected===docs.length&&docs.length>0
-          ?<button className="ws-test__sel-btn ws-test__sel-btn--clear" onClick={clearSel}>Deselect all</button>
-          :<button className="ws-test__sel-btn" onClick={selectAll}>Select all</button>
-        }
-        {totalSelected>0&&totalSelected<docs.length&&<button className="ws-test__sel-btn ws-test__sel-btn--clear" onClick={clearSel}>Clear ({totalSelected})</button>}
-        <span className="test-view__ctrl-info">
-          {totalSelected===0
-            ?<span style={{color:'var(--a)',fontWeight:500}}>← Tick checkboxes to select documents for testing</span>
-            :`${totalSelected} of ${docs.length} selected`
-          }
-        </span>
+        <button className="ws-test__sel-btn" onClick={selectAll}>Select all</button>
+        {totalSelected>0&&<button className="ws-test__sel-btn ws-test__sel-btn--clear" onClick={clearSel}>Clear ({totalSelected})</button>}
+        <span className="test-view__ctrl-info">{docs.length} docs in library</span>
         <button className="tp-run-btn" disabled={totalSelected===0} onClick={runTest}>
           ▶ Run Test{totalSelected>0?` (${totalSelected})`:''}
         </button>
@@ -3097,14 +3092,14 @@ function TestView({promptText,promptLabel,docs,dataSets,toggleSel,onMarkTested,o
         }
       </div>
 
-      {/* Summary bar */}
-      {(testedDocs.length>0||runningIds.size>0)&&<div className="test-view__summary">
+      {/* Summary bar — always visible */}
+      <div className="test-view__summary">
         <span><strong>{testedDocs.length}</strong> tested</span>
         {matchCount>0&&<span style={{color:'#006b00',fontWeight:600}}>✓ {matchCount} matched</span>}
         {testedDocs.length-matchCount>0&&<span style={{color:'#b91c1c',fontWeight:600}}>✗ {testedDocs.length-matchCount} missed</span>}
         {avgConf!==null&&<span>avg conf <strong>{avgConf}%</strong></span>}
         {runningIds.size>0&&<span style={{color:'var(--a)',fontWeight:600}}>⟳ {runningIds.size} running</span>}
-      </div>}
+      </div>
     </div>
   );
 }
@@ -3295,7 +3290,7 @@ function DocumentPanel({docs,dataSets,onAddDocs,delDoc,addDataSet,style}){
                     return(
                       <div key={doc.id} className="dlib__doc">
                         <span className="dlib__doc-name" title={doc.name}>{doc.name}</span>
-                        <span className={`dlib__doc-status dlib__doc-status--${st}`}>{stLabel}</span>
+                        {doc.size&&<span className="dlib__doc-size">{doc.size}</span>}
                         <button className="ds-doc-del" onClick={()=>delDoc(doc.id)} title="Remove"><IC.Trash/></button>
                       </div>
                     );
@@ -3904,7 +3899,10 @@ function App({devOverrides={}}){
                     </label>
                   ))}
                 </div>
-                {!testMode&&<button className="cl-setup__test-btn" onClick={()=>{setDocs(ds=>ds.map(d=>({...d,selected:true})));setTestMode(true);}}>▶ Test Prompt</button>}
+                {testMode
+                  ?<button className="cl-setup__test-btn cl-setup__test-btn--back" onClick={()=>setTestMode(false)}>← Edit prompt</button>
+                  :<button className="cl-setup__test-btn" onClick={()=>{setDocs(ds=>ds.map(d=>({...d,selected:true})));setTestMode(true);}}>▶ Test Prompt</button>
+                }
               </div>
             </div>
             {/* Center content — swaps based on promptLevel / testMode */}
