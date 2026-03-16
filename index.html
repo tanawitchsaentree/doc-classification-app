@@ -108,7 +108,7 @@ input,textarea,select{font-family:inherit}
 .btn{
   display:inline-flex;align-items:center;justify-content:center;gap:6px;
   height:var(--btn-h-md);padding:0 var(--btn-px-md);
-  border-radius:var(--r);border:2px solid transparent;
+  border-radius:var(--btn-r);border:2px solid transparent;
   font-family:inherit;font-size:var(--btn-fz-md);
   font-weight:var(--btn-font-weight);
   text-transform:var(--btn-text-transform);
@@ -125,14 +125,17 @@ input,textarea,select{font-family:inherit}
 /* primary */
 .btn-primary{background:var(--btn-primary);color:#fff;border-color:var(--btn-primary)}
 .btn-primary:hover:not(:disabled){background:var(--btn-primary-h);border-color:var(--btn-primary-h)}
+.btn-primary:active:not(:disabled){background:#001e57;border-color:#001e57}
 .btn-primary:disabled{background:var(--btn-primary-dis);border-color:var(--btn-primary-dis);color:#fff}
 /* secondary — outlined */
 .btn-secondary,.btn-outline{background:transparent;color:var(--btn-secondary);border-color:var(--btn-secondary)}
-.btn-secondary:hover:not(:disabled),.btn-outline:hover:not(:disabled){background:var(--btn-secondary-h)}
+.btn-secondary:hover:not(:disabled),.btn-outline:hover:not(:disabled){background:var(--btn-secondary-h);border-color:var(--btn-secondary)}
+.btn-secondary:active:not(:disabled),.btn-outline:active:not(:disabled){background:#dce6f4;border-color:var(--btn-secondary)}
 .btn-secondary:disabled,.btn-outline:disabled{border-color:var(--btn-secondary-dis);color:var(--btn-secondary-dis)}
 /* tertiary — text only */
 .btn-tertiary{background:transparent;color:var(--btn-primary);border-color:transparent}
-.btn-tertiary:hover:not(:disabled){background:var(--a-lt);border-color:transparent}
+.btn-tertiary:hover:not(:disabled){background:#eef2fb;border-color:transparent}
+.btn-tertiary:active:not(:disabled){background:#dce6f4;border-color:transparent}
 .btn-tertiary:disabled{color:var(--btn-primary-dis);border-color:transparent}
 /* emphasis — orange */
 .btn-emphasis{background:var(--btn-emphasis);color:#fff;border-color:var(--btn-emphasis)}
@@ -727,8 +730,9 @@ input,textarea,select{font-family:inherit}
   --tx1:   #121212; --tx2:#535353; --tx3:#a7a7a7;
   --r-sm:4px; --r:4px; --r-md:6px; --r-lg:8px; --r-p:999px;
   /* ── NDBX Button tokens ── */
-  --btn-primary:       #003781; --btn-primary-h:    #002d6b; --btn-primary-dis:   #8faad4;
+  --btn-primary:       #003781; --btn-primary-h:    #00266D; --btn-primary-dis:   #8faad4;
   --btn-secondary:     #003781; --btn-secondary-h:  #eef2fb; --btn-secondary-dis: #8faad4;
+  --btn-r: 8px;
   --btn-emphasis:      #c25400; --btn-emphasis-h:   #9e4500; --btn-emphasis-dis:  #e8c4a8;
   --btn-attention:     #8f1857; --btn-attention-h:  #6f1243; --btn-attention-dis: #d4a0ba;
   --btn-cta:           #197a00; --btn-cta-h:        #125c00; --btn-cta-dis:       #9dc496;
@@ -738,9 +742,9 @@ input,textarea,select{font-family:inherit}
   --btn-letter-spacing: 0.06em;
   --btn-text-transform: uppercase;
   /* ── NDBX Button sizes ── */
-  --btn-h-sm:  32px; --btn-px-sm:  12px; --btn-fz-sm: 11px;
-  --btn-h-md:  40px; --btn-px-md:  20px; --btn-fz-md: 14px;
-  --btn-h-lg:  48px; --btn-px-lg:  24px; --btn-fz-lg: 16px;
+  --btn-h-sm:  36px; --btn-px-sm:  16px; --btn-fz-sm: 12px;
+  --btn-h-md:  48px; --btn-px-md:  24px; --btn-fz-md: 14px;
+  --btn-h-lg:  56px; --btn-px-lg:  32px; --btn-fz-lg: 16px;
   /* ── NDBX Input / FormField tokens ── */
   --inp-border:         #333333;   /* default underline / box border */
   --inp-border-focus:   #003781;   /* focus — blue underline */
