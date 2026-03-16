@@ -434,6 +434,42 @@ input,textarea,select{font-family:inherit}
 .upload-pending__chip-rm{cursor:pointer;color:var(--a);font-weight:700;line-height:1}
 .upload-pending__chip-rm:hover{color:#b91c1c}
 .upload-pending__actions{display:flex;gap:6px;justify-content:flex-end;margin-top:2px}
+/* ── Test Panel ── */
+.tp-context{display:flex;align-items:center;gap:6px;padding:7px 12px;background:#eff6ff;border-bottom:1px solid #dbeafe;flex-shrink:0}
+.tp-context__dot{width:7px;height:7px;border-radius:50%;background:var(--a);flex-shrink:0}
+.tp-context__label{font-size:10px;font-weight:700;color:#93c5fd;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
+.tp-context__prompt{font-size:11px;font-weight:600;color:#1d4ed8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
+.tp-header{display:flex;align-items:center;justify-content:space-between;padding:10px 12px 0;flex-shrink:0}
+.tp-header__left{display:flex;align-items:center;gap:6px}
+.tp-header__title{font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em}
+.tp-header__count{font-size:10px;font-weight:700;padding:1px 6px;border-radius:20px;background:var(--srf2);color:var(--tx3);border:1px solid var(--bdr)}
+.tp-run-btn{display:flex;align-items:center;gap:5px;padding:5px 13px;border-radius:var(--r);font-size:11px;font-weight:700;border:none;cursor:pointer;font-family:inherit;transition:all var(--tf) var(--smooth);background:var(--a);color:#fff;box-shadow:0 1px 3px var(--a-glow)}
+.tp-run-btn:hover:not(:disabled){background:var(--a-h);transform:translateY(-1px);box-shadow:0 3px 8px var(--a-glow)}
+.tp-run-btn:disabled{background:var(--srf2);color:var(--tx3);box-shadow:none;cursor:default;border:1px solid var(--bdr)}
+.tp-sel-bar{display:flex;align-items:center;justify-content:space-between;padding:5px 12px 6px;flex-shrink:0}
+.tp-sel-btn{background:none;border:none;font-size:10px;color:var(--a);font-weight:500;cursor:pointer;font-family:inherit;padding:0}
+.tp-sel-btn:hover{text-decoration:underline}
+.tp-sel-btn--clear{color:var(--tx3)}.tp-sel-btn--clear:hover{color:var(--tx1)}
+.tp-list{flex:1;overflow-y:auto;display:flex;flex-direction:column;padding:0 10px 4px}
+.tp-list::-webkit-scrollbar{width:3px}.tp-list::-webkit-scrollbar-thumb{background:var(--bdr);border-radius:2px}
+.tp-doc{display:flex;align-items:flex-start;gap:7px;padding:7px 8px;border-radius:var(--r-md);border:1px solid transparent;cursor:pointer;transition:all var(--tf) var(--smooth);margin-bottom:2px}
+.tp-doc:hover{background:var(--srf);border-color:var(--bdr)}
+.tp-doc:hover .ds-doc-del{opacity:1}
+.tp-doc--selected{background:var(--a-lt);border-color:var(--a-mid)}
+.tp-doc--selected .ds-doc-del{opacity:1}
+.tp-doc input[type=checkbox]{accent-color:var(--a);flex-shrink:0;width:13px;height:13px;cursor:pointer;margin-top:2px}
+.tp-doc__body{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.tp-doc__name{font-size:11px;font-weight:500;color:var(--tx1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tp-doc__meta{display:flex;align-items:center;gap:4px;flex-wrap:wrap;font-size:10px;color:var(--tx3)}
+.tp-doc__batch{padding-left:5px;border-left-style:solid;border-left-width:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:80px}
+.tp-doc__result{display:flex;align-items:center;gap:4px;margin-top:2px}
+.tp-doc__running{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--a)}
+.tp-footer{display:flex;align-items:center;gap:6px;padding:7px 12px;border-top:1px solid var(--bdr);font-size:10px;color:var(--tx3);flex-shrink:0;flex-wrap:wrap}
+.tp-footer__dot{width:3px;height:3px;border-radius:50%;background:#d1d5db;flex-shrink:0}
+.tp-footer__match{color:#15803d;font-weight:600}
+.tp-footer__miss{color:#b91c1c;font-weight:600}
+.tp-footer__run{color:var(--a);font-weight:600}
+.tp-empty{text-align:center;padding:32px 12px;font-size:11px;color:var(--tx3);line-height:1.6}
 
 /* ── Keyframes ── */
 @keyframes slideDown{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
@@ -2626,18 +2662,20 @@ function Workspace({activeL1Tab,setActiveL1Tab,activeTab,setActiveTab,l1Items,pr
 /* ── Document Panel ── */
 function DocumentPanel({docs,dataSets,onAddDocs,toggleSel,delDoc,addDataSet,onMarkTested,activePromptLabel,style}){
   const [dragOver,setDragOver]=useState(false);
-  const [openSets,setOpenSets]=useState(()=>Object.fromEntries((dataSets||[]).map(ds=>[ds.id,true])));
   const [pendingFiles,setPendingFiles]=useState([]);
-  const [dpTab,setDpTab]=useState('datasets');
   const [runningIds,setRunningIds]=useState(new Set());
-  const testedDocs=docs.filter(d=>d.status==='Tested');
-  const totalSelected=docs.filter(d=>d.selected).length;
   const fileRef=useRef(null);
+  const totalSelected=docs.filter(d=>d.selected).length;
+  const allSelected=docs.length>0&&docs.every(d=>d.selected);
+  const testedDocs=docs.filter(d=>d.lastTest);
+  const matchCount=testedDocs.filter(d=>d.lastTest.match).length;
+  const mismatchCount=testedDocs.filter(d=>d.lastTest&&!d.lastTest.match).length;
+  const selectAll=()=>docs.forEach(d=>toggleSel(d.id,!allSelected));
+  const clearSel=()=>docs.filter(d=>d.selected).forEach(d=>toggleSel(d.id,false));
 
   const runTest=()=>{
     const sel=docs.filter(d=>d.selected);
     if(!sel.length)return;
-    setDpTab('results');
     setRunningIds(new Set(sel.map(d=>d.id)));
     sel.forEach((doc,i)=>{
       const delay=900+i*500+Math.random()*300;
@@ -2664,13 +2702,6 @@ function DocumentPanel({docs,dataSets,onAddDocs,toggleSel,delDoc,addDataSet,onMa
   };
   const rmExpLabel=(i,label)=>setPendingFiles(pf=>pf.map((p,j)=>j===i?{...p,expectedLabels:p.expectedLabels.filter(l=>l!==label)}:p));
 
-  const toggleSet=id=>setOpenSets(o=>({...o,[id]:!o[id]}));
-  const selAllInSet=(dsId)=>{
-    const setDocs=docs.filter(d=>d.dataSetId===dsId);
-    const allSel=setDocs.every(d=>d.selected);
-    setDocs.forEach(d=>toggleSel(d.id,!allSel));
-  };
-
   return(
     <aside className="doc-panel" style={style}>
       {/* Upload zone */}
@@ -2685,7 +2716,6 @@ function DocumentPanel({docs,dataSets,onAddDocs,toggleSel,delDoc,addDataSet,onMa
           <p className="doc-panel__dz-text">Drag here or <span className="doc-panel__browse">browse</span></p>
           <p className="doc-panel__dz-hint">PDF · JPG · PNG · max 5MB</p>
         </div>
-        {/* Inline assign form */}
         {pendingFiles.map((p,i)=>(
           <div key={i} className="upload-pending">
             <div className="upload-pending__file" title={p.file.name}>{p.file.name}</div>
@@ -2732,141 +2762,72 @@ function DocumentPanel({docs,dataSets,onAddDocs,toggleSel,delDoc,addDataSet,onMa
         ))}
       </div>
 
-      {/* Tabs */}
-      <div className="dp-tabs">
-        <button className={`dp-tab${dpTab==='datasets'?' dp-tab--active':''}`} onClick={()=>setDpTab('datasets')}>
-          Datasets <span className="dp-tab__badge">{dataSets.length}</span>
-        </button>
-        <button className={`dp-tab${dpTab==='results'?' dp-tab--active':''}`} onClick={()=>setDpTab('results')}>
-          Testing Results <span className="dp-tab__badge">{testedDocs.length}</span>
+      {/* Active prompt context — answers "what am I testing?" */}
+      <div className="tp-context">
+        <span className="tp-context__dot"/>
+        <span className="tp-context__label">Testing</span>
+        <span className="tp-context__prompt">{activePromptLabel||'—'}</span>
+      </div>
+
+      {/* List header: title + count + Run Test */}
+      <div className="tp-header">
+        <div className="tp-header__left">
+          <span className="tp-header__title">Documents</span>
+          {docs.length>0&&<span className="tp-header__count">{docs.length}</span>}
+        </div>
+        <button className="tp-run-btn" disabled={totalSelected===0} onClick={runTest}>
+          ▶ Run Test{totalSelected>0?` (${totalSelected})`:''}
         </button>
       </div>
 
-      {/* Datasets tab */}
-      {dpTab==='datasets'&&<div className="doc-panel__sets" style={{paddingBottom: totalSelected>0?'0':'8px'}}>
-        <div className="doc-panel__sets-hdr">
-          <span className="doc-panel__sets-title">Data Sets</span>
-          <button className="doc-panel__new-set" onClick={()=>{const n=window.prompt('New Data Set name:');if(n?.trim())addDataSet(n.trim());}}>+ New set</button>
-        </div>
-        {dataSets.map(ds=>{
-          const setDocs=docs.filter(d=>d.dataSetId===ds.id);
-          const isOpen=openSets[ds.id]!==false;
-          const selCount=setDocs.filter(d=>d.selected).length;
-          return(
-            <div key={ds.id} className="ds-group">
-              <div className="ds-group__hdr" onClick={()=>toggleSet(ds.id)}>
-                <span className="ds-group__dot" style={{background:ds.color}}/>
-                <span className="ds-group__name">{ds.name}</span>
-                <span className="ds-group__count">{setDocs.length}</span>
-                {!isOpen&&selCount>0&&<span style={{fontSize:'10px',fontWeight:700,padding:'1px 6px',borderRadius:'20px',background:'var(--a)',color:'#fff',flexShrink:0}}>●{selCount}</span>}
-                <span className={`ds-group__chev${isOpen?' ds-group__chev--open':''}`}><IC.ChevDown s={12}/></span>
-              </div>
-              {isOpen&&<div className="ds-group__body">
-                {setDocs.length===0?<div className="ds-empty">No documents yet</div>:(
-                  <>
-                    <div className="ds-group__sel-bar">
-                      <span style={{fontSize:'10px',color:'var(--tx3)'}}>{selCount>0?`${selCount} selected`:'\u00a0'}</span>
-                      <button className="ds-group__sel-all" onClick={()=>selAllInSet(ds.id)}>
-                        {setDocs.every(d=>d.selected)?'Deselect all':'Select all'}
-                      </button>
-                    </div>
-                    {setDocs.map(doc=>(
-                      <div key={doc.id} className={`ds-doc-row${doc.selected?' ds-doc-row--selected':''}`} onClick={()=>toggleSel(doc.id)}>
-                        <input type="checkbox" checked={doc.selected} onChange={()=>toggleSel(doc.id)} onClick={e=>e.stopPropagation()}/>
-                        <div className="ds-doc-info">
-                          <span className="ds-doc-name" title={doc.name}>{doc.name}</span>
-                          <div className="ds-doc-sub-line">
-                            <span className="ds-doc-sub">{doc.size} · {ds.name}</span>
-                            {doc.expectedLabels.map(l=><span key={l} className="expect-chip">{l}</span>)}
-                            {doc.lastTest&&(
-                              <span className={`trace-badge trace-badge--${doc.lastTest.match?'match':'mismatch'}`}
-                                title={`via ${doc.lastTest.ctx} · predicted: ${doc.lastTest.pred}`}>
-                                {doc.lastTest.match?'✓':'✗'} {doc.lastTest.conf}%
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                        <button className="ds-doc-del" onClick={e=>{e.stopPropagation();delDoc(doc.id);}} title="Remove"><IC.Trash/></button>
-                      </div>
-                    ))}
-                  </>
-                )}
-              </div>}
-            </div>
-          );
-        })}
-        {totalSelected>0&&(
-          <div className="run-bar">
-            <div style={{display:'flex',flexDirection:'column',gap:'2px',minWidth:0}}>
-              <span className="run-bar__count">{totalSelected} doc{totalSelected!==1?'s':''} selected</span>
-              {activePromptLabel&&<span style={{fontSize:'10px',color:'rgba(255,255,255,.75)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>Prompt: {activePromptLabel}</span>}
-            </div>
-            <div className="run-bar__actions" style={{flexShrink:0}}>
-              <button className="run-bar__btn run-bar__btn--ghost" onClick={()=>docs.filter(d=>d.selected).forEach(d=>toggleSel(d.id,false))}>Clear</button>
-              <button className="run-bar__btn run-bar__btn--primary" onClick={runTest}>▶ Run Test</button>
-            </div>
-          </div>
-        )}
-      </div>}
+      {/* Select controls */}
+      <div className="tp-sel-bar">
+        <button className="tp-sel-btn" onClick={selectAll}>
+          {allSelected&&docs.length>0?'Deselect all':'Select all'}
+        </button>
+        {totalSelected>0&&<button className="tp-sel-btn tp-sel-btn--clear" onClick={clearSel}>Clear ({totalSelected})</button>}
+      </div>
 
-      {/* Testing Results tab */}
-      {dpTab==='results'&&<div className="doc-panel__sets">
-        <div className="doc-panel__sets-hdr">
-          <span className="doc-panel__sets-title">Testing Results</span>
-          {runningIds.size>0&&<span style={{fontSize:'10px',color:'var(--a)',fontWeight:600}}>⟳ Running…</span>}
-        </div>
-        {(testedDocs.length>0||runningIds.size>0)&&(()=>{
-          const matchCount=testedDocs.filter(d=>d.lastTest?.match).length;
-          const mismatchCount=testedDocs.filter(d=>d.lastTest&&!d.lastTest.match).length;
-          return(
-            <div className="tr-summary">
-              <span className="tr-summary__stat tr-summary__stat--total">{testedDocs.length} tested</span>
-              {matchCount>0&&<span className="tr-summary__stat tr-summary__stat--match">✓ {matchCount}</span>}
-              {mismatchCount>0&&<span className="tr-summary__stat tr-summary__stat--mismatch">✗ {mismatchCount}</span>}
-              {runningIds.size>0&&<span className="tr-summary__stat" style={{color:'var(--a)'}}>⟳ {runningIds.size} running</span>}
-            </div>
-          );
-        })()}
-        {testedDocs.length===0&&runningIds.size===0
-          ?<div className="ds-empty" style={{paddingTop:'32px'}}>No documents tested yet</div>
-          :<div className="tr-list">
-            {/* Running docs (not yet in testedDocs) */}
-            {docs.filter(d=>runningIds.has(d.id)&&d.status!=='Tested').map(doc=>(
-              <div key={doc.id} className="tr-row tr-row--running">
-                <div className="tr-row__top">
-                  <span className="tr-row__name" title={doc.name}>{doc.name}</span>
-                  <div className="tr-row__spinner"/>
-                </div>
-                <div className="tr-row__meta">{doc.size} · classifying…</div>
-              </div>
-            ))}
-            {testedDocs.map(doc=>{
-              const ds=dataSets.find(s=>s.id===doc.dataSetId);
-              const running=runningIds.has(doc.id);
-              return(
-                <div key={doc.id} className={`tr-row${running?' tr-row--running':''}`}>
-                  <div className="tr-row__top">
-                    <span className="tr-row__name" title={doc.name}>{doc.name}</span>
+      {/* Flat document list — results inline per row */}
+      <div className="tp-list">
+        {docs.length===0
+          ?<div className="tp-empty">Upload documents above<br/>to start testing</div>
+          :docs.map(doc=>{
+            const ds=dataSets.find(s=>s.id===doc.dataSetId);
+            const running=runningIds.has(doc.id);
+            return(
+              <div key={doc.id} className={`tp-doc${doc.selected?' tp-doc--selected':''}`} onClick={()=>toggleSel(doc.id)}>
+                <input type="checkbox" checked={doc.selected} onChange={()=>toggleSel(doc.id)} onClick={e=>e.stopPropagation()}/>
+                <div className="tp-doc__body">
+                  <span className="tp-doc__name" title={doc.name}>{doc.name}</span>
+                  <div className="tp-doc__meta">
+                    {doc.size&&<span>{doc.size}</span>}
+                    {ds&&<span className="tp-doc__batch" style={{borderLeftColor:ds.color}}>{ds.name}</span>}
+                    {doc.expectedLabels?.map(l=><span key={l} className="expect-chip">{l}</span>)}
+                  </div>
+                  {(running||doc.lastTest)&&<div className="tp-doc__result">
                     {running
-                      ?<div className="tr-row__spinner"/>
-                      :doc.lastTest&&<span className={`tr-row__result tr-row__result--${doc.lastTest.match?'match':'mismatch'}`}>
-                        {doc.lastTest.match?'✓ Match':'✗ Mismatch'} · {doc.lastTest.conf}%
-                      </span>
+                      ?<span className="tp-doc__running"><span className="tr-row__spinner"/>classifying…</span>
+                      :<span className={`trace-badge trace-badge--${doc.lastTest.match?'match':'mismatch'}`}
+                          title={`via ${doc.lastTest.ctx}`}>
+                          {doc.lastTest.match?'✓':'✗'} {doc.lastTest.conf}% · {doc.lastTest.pred}
+                        </span>
                     }
-                  </div>
-                  <div className="tr-row__meta">
-                    {doc.size} · {ds?.name||'—'}
-                    {!running&&doc.lastTest&&<> · pred: <strong>{doc.lastTest.pred}</strong></>}
-                  </div>
-                  {!running&&doc.lastTest?.ctx&&<div style={{fontSize:'10px',color:'var(--a)',fontWeight:500}}>via {doc.lastTest.ctx}</div>}
-                  {doc.expectedLabels.length>0&&<div style={{display:'flex',gap:'4px',flexWrap:'wrap'}}>
-                    {doc.expectedLabels.map(l=><span key={l} className="expect-chip">Expected: {l}</span>)}
                   </div>}
                 </div>
-              );
-            })}
-          </div>
+                <button className="ds-doc-del" onClick={e=>{e.stopPropagation();delDoc(doc.id);}} title="Remove"><IC.Trash/></button>
+              </div>
+            );
+          })
         }
+      </div>
+
+      {/* Footer: overall stats */}
+      {docs.length>0&&<div className="tp-footer">
+        <span>{docs.length} doc{docs.length!==1?'s':''}</span>
+        {matchCount>0&&<><span className="tp-footer__dot"/><span className="tp-footer__match">✓ {matchCount} matched</span></>}
+        {mismatchCount>0&&<><span className="tp-footer__dot"/><span className="tp-footer__miss">✗ {mismatchCount} missed</span></>}
+        {runningIds.size>0&&<><span className="tp-footer__dot"/><span className="tp-footer__run">⟳ {runningIds.size} running</span></>}
       </div>}
     </aside>
   );
