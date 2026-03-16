@@ -650,6 +650,24 @@ input,textarea,select{font-family:inherit}
 .lps-pub-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;white-space:nowrap;flex-shrink:0}
 .lps-pub-badge--ok{background:#e6f4e6;color:#006b00;border:1px solid #b3ddb3}
 .lps-pub-badge--draft{background:#fff3e0;color:#e07000;border:1px solid #ffd699}
+/* Last test context panel in prompt editor */
+.lps-test-ctx{margin-top:10px;border:1px solid var(--bdr);border-radius:var(--r-md);overflow:hidden;font-size:12px}
+.lps-test-ctx__hdr{display:flex;align-items:center;gap:8px;padding:7px 12px;background:var(--srf);cursor:pointer;user-select:none;font-weight:600}
+.lps-test-ctx__hdr:hover{background:var(--srf2)}
+.lps-test-ctx__hdr--fail{color:#b91c1c}
+.lps-test-ctx__hdr--ok{color:#006b00}
+.lps-test-ctx__toggle{margin-left:auto;color:var(--tx3);font-size:10px}
+.lps-test-ctx__body{border-top:1px solid var(--bdr);background:var(--bg)}
+.lps-test-ctx__row{display:grid;grid-template-columns:1fr auto auto auto auto;align-items:center;gap:8px;padding:6px 12px;border-bottom:1px solid var(--bdr)}
+.lps-test-ctx__row:last-child{border-bottom:none}
+.lps-test-ctx__row--pass{opacity:.55}
+.lps-test-ctx__doc{font-weight:500;color:var(--tx1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.lps-test-ctx__exp{color:var(--tx2);white-space:nowrap;font-size:11px}
+.lps-test-ctx__arrow{color:var(--tx3);font-size:11px}
+.lps-test-ctx__pred--fail{color:#b91c1c;font-weight:600;white-space:nowrap}
+.lps-test-ctx__pred--ok{color:#006b00;font-weight:600;white-space:nowrap}
+.lps-test-ctx__conf{font-size:11px;color:var(--tx3);white-space:nowrap}
+.lps-test-ctx__empty{padding:12px;color:var(--tx3);text-align:center;font-size:12px}
 .test-view__summary{display:flex;align-items:center;gap:14px;padding:8px 20px;background:var(--srf);border-top:1px solid var(--bdr);font-size:12px;color:var(--tx2);flex-shrink:0;flex-wrap:wrap}
 .test-view__empty{text-align:center;padding:56px 20px;font-size:13px;color:var(--tx3);line-height:1.8}
 /* Test Prompt button in toolbar */
@@ -2489,10 +2507,54 @@ function LobOverview({lobs,onSelectLob,addToast,onOpenOutputFormat,onConfirm,onD
   );
 }
 
+/* ── Last Test Context Panel — shown in prompt editor after returning from TestView ── */
+function LastTestPanel({ctx}){
+  const [open,setOpen]=useState(true);
+  const [showAll,setShowAll]=useState(false);
+  if(!ctx||ctx.testedCount===0)return null;
+  const hasFail=ctx.failedDocs.length>0;
+  const rows=showAll?[...ctx.failedDocs,...ctx.passedDocs]:ctx.failedDocs;
+  return(
+    <div className="lps-test-ctx">
+      <div className={`lps-test-ctx__hdr lps-test-ctx__hdr--${hasFail?'fail':'ok'}`} onClick={()=>setOpen(o=>!o)}>
+        <span>{hasFail?'✗':'✓'}</span>
+        <span>Last test: {ctx.accuracy!==null?`${ctx.accuracy}% accuracy · `:''}
+          {ctx.failedDocs.length>0?`${ctx.failedDocs.length} failure${ctx.failedDocs.length!==1?'s':''}`:ctx.testedCount+' passed'}
+          {' · '}{ctx.testedCount} docs tested
+        </span>
+        <span className="lps-test-ctx__toggle">{open?'▴ hide':'▾ show'}</span>
+      </div>
+      {open&&<div className="lps-test-ctx__body">
+        {rows.length===0
+          ?<div className="lps-test-ctx__empty">All {ctx.testedCount} documents matched ✓</div>
+          :rows.map(d=>{
+            const isFail=ctx.failedDocs.some(f=>f.id===d.id);
+            return(
+              <div key={d.id} className={`lps-test-ctx__row${isFail?'':' lps-test-ctx__row--pass'}`}>
+                <span className="lps-test-ctx__doc" title={d.name}>{d.name}</span>
+                <span className="lps-test-ctx__exp">{d.expected||<span style={{color:'var(--tx3)'}}>no expected</span>}</span>
+                <span className="lps-test-ctx__arrow">→</span>
+                <span className={`lps-test-ctx__pred--${isFail?'fail':'ok'}`}>{d.predicted}</span>
+                <span className="lps-test-ctx__conf">{d.conf}%</span>
+              </div>
+            );
+          })
+        }
+        {ctx.passedDocs.length>0&&<div style={{padding:'5px 12px',borderTop:'1px solid var(--bdr)'}}>
+          <button style={{fontSize:'11px',color:'var(--tx3)',background:'none',border:'none',cursor:'pointer',fontFamily:'inherit'}}
+            onClick={()=>setShowAll(s=>!s)}>
+            {showAll?'▴ Hide passed docs':`▾ Show ${ctx.passedDocs.length} passed docs`}
+          </button>
+        </div>}
+      </div>}
+    </div>
+  );
+}
+
 /* ── LOB Prompt Section (Stage 1 — L1-only scroll mode) ── */
 /* targets = l1Items passed from App so classifier knows the category targets */
 function LobPromptSection({lobName,prompt,defaultPrompt,meta,saveState,onEdit,onSave,
-  onVersion,hierarchyContext,promptMode='l1',publishedSnap}){
+  onVersion,hierarchyContext,promptMode='l1',publishedSnap,lastTestCtx}){
   const [open,setOpen]=useState(true);
   const [showResetConfirm,setShowResetConfirm]=useState(false);
   const [showPreview,setShowPreview]=useState(false);
@@ -2573,6 +2635,7 @@ function LobPromptSection({lobName,prompt,defaultPrompt,meta,saveState,onEdit,on
             </div>
           </div>
         </div>
+        <LastTestPanel ctx={lastTestCtx}/>
       </div>}
       {showPreview&&<PreviewModal prompt={prompt} hierarchyContext={hierarchyContext} onClose={()=>setShowPreview(false)}/>}
     </div>
@@ -3947,6 +4010,7 @@ function App({devOverrides={}}){
   const [defaultPrompts,setDefaultPrompts]=useState(devOverrides.defaultPrompts||{});
   const [saveStates,setSaveStates]=useState(devOverrides.saveStates||{});
   const [publishedPrompts,setPublishedPrompts]=useState({});
+  const [lastTestCtx,setLastTestCtx]=useState(null);
   const saveTimers=useRef({});
   const [showMenu,setShowMenu]=useState(null);
   const [modal,setModal]=useState(null);
@@ -4053,6 +4117,29 @@ function App({devOverrides={}}){
     setPublishedPrompts(prev=>({...prev,[promptKey]:snapshot}));
     addToast('Prompt approved & published ✓','success');
   };
+  const exitTestMode=useCallback(()=>{
+    /* capture last test state before switching back to editor */
+    const tested=docs.filter(d=>d.lastTest);
+    const validated=tested.filter(d=>d.lastTest.match!==null);
+    const matched=validated.filter(d=>d.lastTest.match).length;
+    const accuracy=validated.length>0?Math.round(matched/validated.length*100):null;
+    const failedDocs=docs.filter(d=>d.lastTest?.match===false).map(d=>({
+      id:d.id,name:d.name,
+      expected:d.expectedLabels?.[0]||null,
+      predicted:d.lastTest.pred,
+      conf:d.lastTest.conf,
+    }));
+    const passedDocs=docs.filter(d=>d.lastTest?.match===true).map(d=>({
+      id:d.id,name:d.name,
+      expected:d.expectedLabels?.[0]||null,
+      predicted:d.lastTest.pred,
+      conf:d.lastTest.conf,
+    }));
+    if(tested.length>0){
+      setLastTestCtx({accuracy,matched,testedCount:tested.length,failedDocs,passedDocs,ranAt:new Date().toISOString()});
+    }
+    setTestMode(false);
+  },[docs]);
   const updateDocExpected=(id,label)=>setDocs(ds=>ds.map(d=>{
     if(d.id!==id)return d;
     const newLabels=label?[label]:[];
@@ -4123,7 +4210,7 @@ function App({devOverrides={}}){
                   ))}
                 </div>
                 {testMode
-                  ?<button className="cl-setup__test-btn cl-setup__test-btn--back" onClick={()=>setTestMode(false)}>← Edit prompt</button>
+                  ?<button className="cl-setup__test-btn cl-setup__test-btn--back" onClick={exitTestMode}>← Edit prompt</button>
                   :<button className="cl-setup__test-btn" onClick={()=>{setDocs(ds=>ds.map(d=>({...d,selected:true})));setTestMode(true);}}>▶ Test Prompt</button>
                 }
               </div>
@@ -4144,7 +4231,7 @@ function App({devOverrides={}}){
                   onUpdateExpected={updateDocExpected}
                   labelSuggestions={[...l1Items.map(i=>i.name),...l1Items.flatMap(i=>i.l2.map(l=>l.name))]}
                   promptKey={promptKey} publishedSnap={publishedSnap} onPublish={publishPrompt}
-                  onBack={()=>setTestMode(false)}/>
+                  onBack={exitTestMode}/>
               );
               return promptLevel==='l2'
                 ?<Workspace activeL1Tab={activeL1Tab} setActiveL1Tab={setActiveL1Tab} activeTab={activeTab} setActiveTab={setActiveTab} l1Items={l1Items}
@@ -4161,7 +4248,8 @@ function App({devOverrides={}}){
                       onEdit={val=>handleEdit('l1',val)} onSave={()=>handleSave('l1')}
                       onVersion={()=>setModal('version')}
                       hierarchyContext={buildHierarchy(promptLevel==='global'?'global':'l1',l1Items)}
-                      promptMode={promptLevel} publishedSnap={publishedSnap}/>
+                      promptMode={promptLevel} publishedSnap={publishedSnap}
+                      lastTestCtx={lastTestCtx}/>
                   </div>;
             })()}
           </div>
