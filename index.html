@@ -638,6 +638,18 @@ input,textarea,select{font-family:inherit}
 /* Re-run failed button */
 .tp-rerun-btn{display:flex;align-items:center;gap:5px;padding:5px 13px;border-radius:var(--r);font-size:11px;font-weight:700;border:1.5px solid #b91c1c;cursor:pointer;font-family:inherit;background:transparent;color:#b91c1c;transition:all .15s;white-space:nowrap}
 .tp-rerun-btn:hover{background:#fce8e8}
+/* Approve / Publish */
+.tp-approve-btn{display:flex;align-items:center;gap:5px;padding:5px 14px;border-radius:var(--r);font-size:11px;font-weight:700;border:none;cursor:pointer;font-family:inherit;background:#006b00;color:#fff;transition:all .15s;white-space:nowrap;margin-left:auto}
+.tp-approve-btn:hover{background:#005200}
+.tp-approve-btn--republish{background:#e07000}
+.tp-approve-btn--republish:hover{background:#b85c00}
+.tp-pub-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:3px 8px;border-radius:4px;white-space:nowrap}
+.tp-pub-badge--ok{background:#e6f4e6;color:#006b00}
+.tp-pub-badge--draft{background:#fff3e0;color:#e07000}
+/* Published badge in prompt editor header */
+.lps-pub-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;white-space:nowrap;flex-shrink:0}
+.lps-pub-badge--ok{background:#e6f4e6;color:#006b00;border:1px solid #b3ddb3}
+.lps-pub-badge--draft{background:#fff3e0;color:#e07000;border:1px solid #ffd699}
 .test-view__summary{display:flex;align-items:center;gap:14px;padding:8px 20px;background:var(--srf);border-top:1px solid var(--bdr);font-size:12px;color:var(--tx2);flex-shrink:0;flex-wrap:wrap}
 .test-view__empty{text-align:center;padding:56px 20px;font-size:13px;color:var(--tx3);line-height:1.8}
 /* Test Prompt button in toolbar */
@@ -2480,7 +2492,7 @@ function LobOverview({lobs,onSelectLob,addToast,onOpenOutputFormat,onConfirm,onD
 /* ── LOB Prompt Section (Stage 1 — L1-only scroll mode) ── */
 /* targets = l1Items passed from App so classifier knows the category targets */
 function LobPromptSection({lobName,prompt,defaultPrompt,meta,saveState,onEdit,onSave,
-  onVersion,hierarchyContext,promptMode='l1'}){
+  onVersion,hierarchyContext,promptMode='l1',publishedSnap}){
   const [open,setOpen]=useState(true);
   const [showResetConfirm,setShowResetConfirm]=useState(false);
   const [showPreview,setShowPreview]=useState(false);
@@ -2495,6 +2507,13 @@ function LobPromptSection({lobName,prompt,defaultPrompt,meta,saveState,onEdit,on
         <span className="l1-prompt-sec__badge">STAGE 1</span>
         <span className="l1-prompt-sec__title">{LABELS.l0.label} Classification Prompt — {lobName}</span>
         <div style={{display:'flex',alignItems:'center',gap:'6px',marginLeft:'auto'}}>
+          {publishedSnap&&(()=>{
+            const isPublished=publishedSnap.text===prompt;
+            const pubDate=new Date(publishedSnap.publishedAt).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+            return isPublished
+              ?<span className="lps-pub-badge lps-pub-badge--ok">✓ Published · {publishedSnap.accuracy}% · {pubDate}</span>
+              :<span className="lps-pub-badge lps-pub-badge--draft">⚠ Unpublished changes</span>;
+          })()}
           <span className={`workspace__status ${(meta||{status:'Draft'}).status.toLowerCase()}`} style={{fontSize:'11px'}}>{(meta||{status:'Draft'}).status}</span>
           <button className="workspace__manage-btn" onClick={e=>{e.stopPropagation();onVersion();}} style={{fontSize:'11px'}}>Version</button>
         </div>
@@ -3035,7 +3054,7 @@ function Workspace({activeL1Tab,setActiveL1Tab,activeTab,setActiveTab,l1Items,pr
 
 /* ── Test View — dedicated test mode (replaces workspace content) ── */
 const MOCK_LABELS=['Schadenmeldung','Schadenprüfung','Schadenabschluss','Sachgutachten','Kündigung','Vertrag','Rechnung'];
-function TestView({promptText,promptLabel,docs,dataSets,toggleSel,onMarkTested,onUpdateExpected,labelSuggestions=[],onBack}){
+function TestView({promptText,promptLabel,docs,dataSets,toggleSel,onMarkTested,onUpdateExpected,labelSuggestions=[],promptKey,publishedSnap,onPublish,onBack}){
   const [runningIds,setRunningIds]=useState(new Set());
   const [promptOpen,setPromptOpen]=useState(false);
   const [editingId,setEditingId]=useState(null);
@@ -3268,14 +3287,30 @@ function TestView({promptText,promptLabel,docs,dataSets,toggleSel,onMarkTested,o
       </div>
 
       {/* Summary bar — always visible */}
-      <div className="test-view__summary">
-        <span><strong>{testedDocs.length}</strong> / {docs.length} tested</span>
-        {matchCount>0&&<span style={{color:'#006b00',fontWeight:600}}>✓ {matchCount} matched</span>}
-        {validatedDocs.length-matchCount>0&&<span style={{color:'#b91c1c',fontWeight:600}}>✗ {validatedDocs.length-matchCount} missed</span>}
-        {accuracy!==null&&<span>accuracy <strong>{accuracy}%</strong></span>}
-        {avgConf!==null&&<span>avg conf <strong>{avgConf}%</strong></span>}
-        {runningIds.size>0&&<span style={{color:'var(--a)',fontWeight:600}}>⟳ {runningIds.size} running</span>}
-      </div>
+      {(()=>{
+        const isPublished=publishedSnap&&publishedSnap.text===promptText;
+        const hasChanges=publishedSnap&&publishedSnap.text!==promptText;
+        const pubDate=publishedSnap?new Date(publishedSnap.publishedAt).toLocaleDateString('en-GB',{day:'numeric',month:'short'}):null;
+        return(
+          <div className="test-view__summary">
+            <span><strong>{testedDocs.length}</strong> / {docs.length} tested</span>
+            {matchCount>0&&<span style={{color:'#006b00',fontWeight:600}}>✓ {matchCount} matched</span>}
+            {validatedDocs.length-matchCount>0&&<span style={{color:'#b91c1c',fontWeight:600}}>✗ {validatedDocs.length-matchCount} missed</span>}
+            {accuracy!==null&&<span>accuracy <strong>{accuracy}%</strong></span>}
+            {avgConf!==null&&<span>avg conf <strong>{avgConf}%</strong></span>}
+            {runningIds.size>0&&<span style={{color:'var(--a)',fontWeight:600}}>⟳ {runningIds.size} running</span>}
+            {/* Publish status / action */}
+            {isPublished
+              ?<span className="tp-pub-badge tp-pub-badge--ok">✓ Published · {publishedSnap.accuracy}% · {pubDate}</span>
+              :accuracy!==null&&<button
+                  className={`tp-approve-btn${hasChanges?' tp-approve-btn--republish':''}`}
+                  onClick={()=>onPublish(promptKey,{text:promptText,accuracy,avgConf,testedCount:testedDocs.length,validatedCount:validatedDocs.length,publishedAt:new Date().toISOString()})}>
+                  {hasChanges?'↑ Republish':'✓ Approve & Publish'}
+                </button>
+            }
+          </div>
+        );
+      })()}
     </div>
   );
 }
@@ -3911,6 +3946,7 @@ function App({devOverrides={}}){
   const [prompts,setPrompts]=useState(devOverrides.prompts||{});
   const [defaultPrompts,setDefaultPrompts]=useState(devOverrides.defaultPrompts||{});
   const [saveStates,setSaveStates]=useState(devOverrides.saveStates||{});
+  const [publishedPrompts,setPublishedPrompts]=useState({});
   const saveTimers=useRef({});
   const [showMenu,setShowMenu]=useState(null);
   const [modal,setModal]=useState(null);
@@ -4013,6 +4049,10 @@ function App({devOverrides={}}){
   const toggleSel=(id,forceTo)=>setDocs(ds=>ds.map(d=>d.id===id?{...d,selected:forceTo!==undefined?forceTo:!d.selected}:d));
   const delDoc=id=>{setDocs(ds=>ds.filter(d=>d.id!==id));addToast('Document removed','warning');};
   const markTested=(id,testMeta)=>setDocs(ds=>ds.map(d=>d.id===id?{...d,status:'Tested',selected:false,lastTest:testMeta||d.lastTest}:d));
+  const publishPrompt=(promptKey,snapshot)=>{
+    setPublishedPrompts(prev=>({...prev,[promptKey]:snapshot}));
+    addToast('Prompt approved & published ✓','success');
+  };
   const updateDocExpected=(id,label)=>setDocs(ds=>ds.map(d=>{
     if(d.id!==id)return d;
     const newLabels=label?[label]:[];
@@ -4096,18 +4136,21 @@ function App({devOverrides={}}){
                 const cat=l1Items.find(i=>i.id===activeTab);return cat?`${cat.name} · L2 Class`:`${l0Name} · L2 Class`;
               })();
               const currentPromptText=promptLevel==='l2'?(prompts[activeTab]||''):(prompts['l1']||'');
+              const promptKey=promptLevel==='l2'?activeTab:'l1';
+              const publishedSnap=publishedPrompts[promptKey]||null;
               if(testMode)return(
                 <TestView promptText={currentPromptText} promptLabel={activePromptLabel}
                   docs={docs} dataSets={dataSets} toggleSel={toggleSel} onMarkTested={markTested}
                   onUpdateExpected={updateDocExpected}
                   labelSuggestions={[...l1Items.map(i=>i.name),...l1Items.flatMap(i=>i.l2.map(l=>l.name))]}
+                  promptKey={promptKey} publishedSnap={publishedSnap} onPublish={publishPrompt}
                   onBack={()=>setTestMode(false)}/>
               );
               return promptLevel==='l2'
                 ?<Workspace activeL1Tab={activeL1Tab} setActiveL1Tab={setActiveL1Tab} activeTab={activeTab} setActiveTab={setActiveTab} l1Items={l1Items}
                     prompts={prompts} defaultPrompts={defaultPrompts} tabMeta={tabMeta} saveStates={saveStates}
                     onEdit={handleEdit} onSave={handleSave} onVersion={()=>setModal('version')}
-                    docs={docs}/>
+                    docs={docs} publishedPrompts={publishedPrompts}/>
                 :<div className="detail-scroll__main">
                     <div className="detail-scroll__toolbar">
                       <span className="detail-scroll__count">{promptLevel==='global'?'Global prompt':'Per-category prompts — '+l1Items.length+' categor'+(l1Items.length!==1?'ies':'y')}</span>
@@ -4118,7 +4161,7 @@ function App({devOverrides={}}){
                       onEdit={val=>handleEdit('l1',val)} onSave={()=>handleSave('l1')}
                       onVersion={()=>setModal('version')}
                       hierarchyContext={buildHierarchy(promptLevel==='global'?'global':'l1',l1Items)}
-                      promptMode={promptLevel}/>
+                      promptMode={promptLevel} publishedSnap={publishedSnap}/>
                   </div>;
             })()}
           </div>
