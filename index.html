@@ -510,6 +510,10 @@ input,textarea,select{font-family:inherit}
 .dlib__doc:last-child{border-bottom:none}
 .dlib__doc-name{flex:1;font-size:11px;color:var(--tx1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 .dlib__doc-sub{font-size:10px;color:var(--tx3)}
+.dlib__doc-status{font-size:10px;font-weight:600;padding:1px 6px;border-radius:10px;white-space:nowrap;flex-shrink:0}
+.dlib__doc-status--tested{background:#dcfce7;color:#15803d}
+.dlib__doc-status--failed{background:#fee2e2;color:#b91c1c}
+.dlib__doc-status--pending{background:var(--srf2);color:var(--tx3);border:1px solid var(--bdr)}
 /* ── Test View (dedicated test mode) ── */
 .test-view{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--bg)}
 .test-view__hdr{display:flex;align-items:center;gap:10px;padding:10px 20px;background:var(--srf);border-bottom:1px solid var(--bdr);flex-shrink:0}
@@ -2740,9 +2744,17 @@ function TestView({promptText,promptLabel,docs,dataSets,toggleSel,onMarkTested,o
 
       {/* Controls */}
       <div className="test-view__controls">
-        <button className="ws-test__sel-btn" onClick={selectAll}>Select all</button>
-        {totalSelected>0&&<button className="ws-test__sel-btn ws-test__sel-btn--clear" onClick={clearSel}>Clear ({totalSelected})</button>}
-        <span className="test-view__ctrl-info">{docs.length} doc{docs.length!==1?'s':''} in library</span>
+        {totalSelected===docs.length&&docs.length>0
+          ?<button className="ws-test__sel-btn ws-test__sel-btn--clear" onClick={clearSel}>Deselect all</button>
+          :<button className="ws-test__sel-btn" onClick={selectAll}>Select all</button>
+        }
+        {totalSelected>0&&totalSelected<docs.length&&<button className="ws-test__sel-btn ws-test__sel-btn--clear" onClick={clearSel}>Clear ({totalSelected})</button>}
+        <span className="test-view__ctrl-info">
+          {totalSelected===0
+            ?<span style={{color:'var(--a)',fontWeight:500}}>← Tick checkboxes to select documents for testing</span>
+            :`${totalSelected} of ${docs.length} selected`
+          }
+        </span>
         <button className="tp-run-btn" disabled={totalSelected===0} onClick={runTest}>
           ▶ Run Test{totalSelected>0?` (${totalSelected})`:''}
         </button>
@@ -2989,13 +3001,17 @@ function DocumentPanel({docs,dataSets,onAddDocs,delDoc,addDataSet,style}){
               {isOpen&&<div className="dlib__group-body">
                 {setDocs.length===0
                   ?<div className="ds-empty">No documents yet</div>
-                  :setDocs.map(doc=>(
-                    <div key={doc.id} className="dlib__doc">
-                      <span className="dlib__doc-name" title={doc.name}>{doc.name}</span>
-                      {doc.size&&<span className="dlib__doc-sub">{doc.size}</span>}
-                      <button className="ds-doc-del" onClick={()=>delDoc(doc.id)} title="Remove"><IC.Trash/></button>
-                    </div>
-                  ))
+                  :setDocs.map(doc=>{
+                    const st=doc.lastTest?(doc.lastTest.match?'tested':'failed'):'pending';
+                    const stLabel=st==='tested'?'✓ Tested':st==='failed'?'✗ Failed':'Pending';
+                    return(
+                      <div key={doc.id} className="dlib__doc">
+                        <span className="dlib__doc-name" title={doc.name}>{doc.name}</span>
+                        <span className={`dlib__doc-status dlib__doc-status--${st}`}>{stLabel}</span>
+                        <button className="ds-doc-del" onClick={()=>delDoc(doc.id)} title="Remove"><IC.Trash/></button>
+                      </div>
+                    );
+                  })
                 }
               </div>}
             </div>
@@ -3497,10 +3513,7 @@ function App(){
                     </label>
                   ))}
                 </div>
-                {testMode
-                  ?<button className="cl-setup__test-btn" style={{background:'none',color:'var(--a)',border:'1px solid var(--a)',boxShadow:'none'}} onClick={()=>setTestMode(false)}><IC.Back/> Edit prompt</button>
-                  :<button className="cl-setup__test-btn" onClick={()=>setTestMode(true)}>▶ Test Prompt</button>
-                }
+                {!testMode&&<button className="cl-setup__test-btn" onClick={()=>{setDocs(ds=>ds.map(d=>({...d,selected:true})));setTestMode(true);}}>▶ Test Prompt</button>}
               </div>
             </div>
             {/* Center content — swaps based on promptLevel / testMode */}
