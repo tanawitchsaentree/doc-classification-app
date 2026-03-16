@@ -1115,6 +1115,31 @@ body{font-family:'Allianz Neo','Helvetica Neue',Helvetica,Arial,sans-serif;backg
 .cl-setup__radio-label{font-size:12px;font-weight:600;color:var(--tx1)}
 .cl-setup__radio--active .cl-setup__radio-label{color:var(--a)}
 
+/* ── Dev Panel ── */
+.dev-panel{position:fixed;top:0;left:0;right:0;z-index:9999;background:#09090b;border-bottom:2px solid #f59e0b;font-family:ui-monospace,'SF Mono','Fira Code',monospace;font-size:11px;color:#71717a}
+.dev-panel__bar{height:32px;display:flex;align-items:center;gap:8px;padding:0 10px}
+.dev-panel__badge{background:#f59e0b;color:#000;font-weight:800;font-size:9px;padding:2px 6px;border-radius:3px;letter-spacing:.08em;text-transform:uppercase;flex-shrink:0}
+.dev-panel__sep{width:1px;height:14px;background:#27272a;flex-shrink:0;margin:0 2px}
+.dev-panel__scenario-label{color:#52525b;font-size:10px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dev-panel__scenario-label b{color:#e4e4e7;font-weight:600}
+.dev-panel__toggle{background:none;border:1px solid #3f3f46;color:#a1a1aa;padding:2px 8px;border-radius:3px;font-size:10px;cursor:pointer;font-family:inherit;transition:all .1s;white-space:nowrap;flex-shrink:0}
+.dev-panel__toggle:hover{border-color:#71717a;color:#e4e4e7}
+.dev-panel__reset{background:none;border:1px solid #7f1d1d;color:#f87171;padding:2px 7px;border-radius:3px;font-size:10px;cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0}
+.dev-panel__reset:hover{background:#450a0a}
+.dev-panel__body{padding:10px 12px;display:flex;flex-direction:column;gap:10px;border-top:1px solid #18181b;max-height:240px;overflow-y:auto}
+.dev-panel__body::-webkit-scrollbar{width:3px}.dev-panel__body::-webkit-scrollbar-thumb{background:#3f3f46}
+.dev-panel__group{display:flex;flex-direction:column;gap:5px}
+.dev-panel__group-label{font-size:9px;font-weight:700;color:#3f3f46;text-transform:uppercase;letter-spacing:.12em}
+.dev-panel__chips{display:flex;flex-wrap:wrap;gap:4px}
+.dev-chip{background:none;border:1px solid #27272a;color:#71717a;padding:3px 9px;border-radius:3px;font-size:10px;cursor:pointer;font-family:inherit;transition:all .1s;white-space:nowrap;line-height:1.4}
+.dev-chip:hover{border-color:#52525b;color:#d4d4d8;background:#18181b}
+.dev-chip--active{border-color:#f59e0b !important;color:#f59e0b !important;background:#1c1400 !important}
+/* shift app down when dev panel is visible */
+body.dev-on .navbar{top:32px !important}
+body.dev-on .app__sub-bar{margin-top:84px !important}
+body.dev-on .page-scroll{margin-top:84px !important}
+body.dev-on .ov-page{padding-top:84px}
+
 </style>
 </head>
 <body>
@@ -3316,13 +3341,117 @@ function ResizeHandle({onResize}){
   return <div className={`resize-handle${active?' resize-handle--active':''}`} onMouseDown={onMouseDown}/>;
 }
 
-function App(){
+/* ═══════════════════════════════════════════════════════════════════
+   DEV PANEL — scenario controller (outside main app, JSON-driven)
+   Defines UI state scenarios for testing empty/error/success states.
+   Does NOT modify main app logic — passes overrides via props only.
+═══════════════════════════════════════════════════════════════════ */
+
+/* Build detail-page state from a LOB object */
+const _devBuildDetail=(lob,opts={})=>{
+  if(!lob)return{page:'lob-overview'};
+  const l1Items=lob.categories.map(c=>({id:c.id,name:c.name,expanded:false,l2:c.types.map(t=>({id:t.id,name:t.name}))}));
+  const prompts={global:GLOBAL_PROMPT,l1:opts.l1Prompt!==undefined?opts.l1Prompt:(lob.lobPrompt||''),
+    ...lob.categories.reduce((acc,c)=>{acc[c.id]=opts.catPrompt!==undefined?opts.catPrompt:(c.prompt||'');c.types.forEach(t=>{acc[t.id]=t.prompt||'';});return acc;},{})};
+  const tabMeta={global:{version:'1.0',score:'N/A',status:'Active'},l1:{version:lob.classL1Version||'V.1',score:`${lob.confidence}%`,status:lob.status}};
+  lob.categories.forEach(c=>{tabMeta[c.id]={version:c.activeVersion||'V.1',score:`${c.confidence}%`,status:c.status};c.types.forEach(t=>{tabMeta[t.id]={version:c.activeVersion||'V.1',score:`${c.confidence}%`,status:c.status};});});
+  const firstCatId=l1Items[0]?.id||'l1';
+  return{page:'detail',selectedLobId:lob.id,l0Name:lob.name,l1Items,prompts,defaultPrompts:prompts,
+    tabMeta,activeTab:firstCatId,activeL1Tab:firstCatId,
+    promptLevel:opts.promptLevel||'l1',testMode:opts.testMode||false,
+    ...(opts.docs!==undefined?{docs:opts.docs}:{}),
+    ...(opts.lobs!==undefined?{lobs:opts.lobs}:{}),
+    ...(opts.saveStates!==undefined?{saveStates:opts.saveStates}:{})};
+};
+
+/* Preset doc collections — functions so each call returns fresh array */
+const _devDocs={
+  allPending:()=>makeDocs().map(d=>({...d,status:'Pending',selected:false,lastTest:null})),
+  allMatch:()=>makeDocs().map(d=>({...d,status:'Tested',selected:false,lastTest:{ctx:'L1 Class',pred:d.expectedLabels?.[0]||'Schadenmeldung',conf:91,match:true,testedAt:'2025-03-01'}})),
+  allMismatch:()=>makeDocs().map(d=>({...d,status:'Tested',selected:false,lastTest:{ctx:'L1 Class',pred:'Wrong Category',conf:44,match:false,testedAt:'2025-03-01'}})),
+  mixed:()=>makeDocs().map((d,i)=>i%3===2?{...d,status:'Tested',selected:false,lastTest:{ctx:'L1 Class',pred:'Other Class',conf:51,match:false,testedAt:'2025-03-01'}}:{...d,status:'Tested',selected:false,lastTest:{ctx:'L1 Class',pred:d.expectedLabels?.[0]||'Schadenmeldung',conf:84,match:true,testedAt:'2025-03-01'}}),
+  allSelected:()=>makeDocs().map(d=>({...d,selected:true,status:'Pending',lastTest:null})),
+  lowConf:()=>makeDocs().map(d=>({...d,status:'Tested',selected:false,lastTest:{ctx:'L1 Class',pred:d.expectedLabels?.[0]||'Unknown',conf:Math.floor(45+Math.random()*20),match:false,testedAt:'2025-03-01'}})),
+};
+
+/* ── Scenarios JSON ── */
+const DEV_SCENARIOS=[
+  /* Overview */
+  {id:'ov-default',  group:'Overview', label:'Default',        state:{page:'lob-overview'}},
+  {id:'ov-empty',    group:'Overview', label:'Empty — no LOBs',state:{page:'lob-overview',lobs:[]}},
+  {id:'ov-failed',   group:'Overview', label:'All Failed',     state:{page:'lob-overview',lobs:INIT_LOBS.map(l=>({...l,status:'Failed',confidence:0}))}},
+  {id:'ov-draft',    group:'Overview', label:'All Draft',      state:{page:'lob-overview',lobs:INIT_LOBS.map(l=>({...l,status:'Draft',confidence:0,trainedBy:''}))}},
+  {id:'ov-single',   group:'Overview', label:'Single LOB',     state:{page:'lob-overview',lobs:[INIT_LOBS[0]]}},
+  /* Prompt Detail */
+  {id:'det-l1',      group:'Prompt Detail', label:'L1 Mode',              state:_devBuildDetail(INIT_LOBS[0],{promptLevel:'l1'})},
+  {id:'det-l2',      group:'Prompt Detail', label:'L2 Mode',              state:_devBuildDetail(INIT_LOBS[0],{promptLevel:'l2'})},
+  {id:'det-global',  group:'Prompt Detail', label:'Global Mode',          state:_devBuildDetail(INIT_LOBS[0],{promptLevel:'global'})},
+  {id:'det-nocat',   group:'Prompt Detail', label:'No Categories',        state:_devBuildDetail({...INIT_LOBS[0],categories:[]},{})},
+  {id:'det-noph',    group:'Prompt Detail', label:'Missing Placeholder',  state:_devBuildDetail(INIT_LOBS[0],{l1Prompt:'Classify this document into the correct category.',promptLevel:'l1'})},
+  {id:'det-unsaved', group:'Prompt Detail', label:'Unsaved Changes',      state:_devBuildDetail(INIT_LOBS[0],{promptLevel:'l1',saveStates:{'l1':'unsaved'}})},
+  /* Test View */
+  {id:'tv-prerun',   group:'Test View', label:'Pre-run (all selected)',   state:_devBuildDetail(INIT_LOBS[0],{promptLevel:'l1',testMode:true,docs:_devDocs.allSelected()})},
+  {id:'tv-match',    group:'Test View', label:'All Matched',              state:_devBuildDetail(INIT_LOBS[0],{promptLevel:'l1',testMode:true,docs:_devDocs.allMatch()})},
+  {id:'tv-mismatch', group:'Test View', label:'All Mismatched (error)',   state:_devBuildDetail(INIT_LOBS[0],{promptLevel:'l1',testMode:true,docs:_devDocs.allMismatch()})},
+  {id:'tv-mixed',    group:'Test View', label:'Mixed Results',            state:_devBuildDetail(INIT_LOBS[0],{promptLevel:'l1',testMode:true,docs:_devDocs.mixed()})},
+  {id:'tv-lowconf',  group:'Test View', label:'Low Confidence',           state:_devBuildDetail(INIT_LOBS[0],{promptLevel:'l1',testMode:true,docs:_devDocs.lowConf()})},
+  {id:'tv-empty',    group:'Test View', label:'No Documents',             state:_devBuildDetail(INIT_LOBS[0],{promptLevel:'l1',testMode:true,docs:[]})},
+  /* Document Library */
+  {id:'doc-empty',   group:'Documents', label:'Empty Library',   state:_devBuildDetail(INIT_LOBS[0],{promptLevel:'l1',docs:[]})},
+  {id:'doc-pending', group:'Documents', label:'All Pending',     state:_devBuildDetail(INIT_LOBS[0],{promptLevel:'l1',docs:_devDocs.allPending()})},
+  {id:'doc-tested',  group:'Documents', label:'All Tested',      state:_devBuildDetail(INIT_LOBS[0],{promptLevel:'l1',docs:_devDocs.allMatch()})},
+];
+
+/* ── DevPanel Component ── */
+function DevPanel({onApply,onReset,activeId}){
+  const [open,setOpen]=useState(false);
+  const active=DEV_SCENARIOS.find(s=>s.id===activeId);
+  const groups=[...new Set(DEV_SCENARIOS.map(s=>s.group))];
+  useEffect(()=>{
+    document.body.classList.add('dev-on');
+    return()=>document.body.classList.remove('dev-on');
+  },[]);
+  return(
+    <div className="dev-panel">
+      <div className="dev-panel__bar">
+        <span className="dev-panel__badge">DEV</span>
+        <span className="dev-panel__sep"/>
+        <span className="dev-panel__scenario-label">
+          {active?<><b>{active.group}</b> · {active.label}</>:'Default state — no override'}
+        </span>
+        <button className="dev-panel__toggle" onClick={()=>setOpen(o=>!o)}>
+          {open?'▴ close':'▾ scenarios'}
+        </button>
+        {activeId&&<button className="dev-panel__reset" onClick={()=>{onReset();setOpen(false);}}>✕ reset</button>}
+      </div>
+      {open&&(
+        <div className="dev-panel__body">
+          {groups.map(g=>(
+            <div key={g} className="dev-panel__group">
+              <div className="dev-panel__group-label">{g}</div>
+              <div className="dev-panel__chips">
+                {DEV_SCENARIOS.filter(s=>s.group===g).map(s=>(
+                  <button key={s.id} className={`dev-chip${activeId===s.id?' dev-chip--active':''}`}
+                    onClick={()=>{onApply(s);setOpen(false);}}>
+                    {s.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function App({devOverrides={}}){
   const {toasts,addToast,removeToast}=useToast();
-  const [page,setPage]=useState('lob-overview');
+  const [page,setPage]=useState(devOverrides.page||'lob-overview');
   const [activeNav,setActiveNav]=useState('classification');
   const [showOutputFormat,setShowOutputFormat]=useState(false);
-  const [tabMeta,setTabMeta]=useState({});       // persists across modal open/close
-  const [ofActiveLobId,setOfActiveLobId]=useState(null); // pre-selects LOB in tree
+  const [tabMeta,setTabMeta]=useState(devOverrides.tabMeta||{});
+  const [ofActiveLobId,setOfActiveLobId]=useState(null);
   const [menus,setMenusState]=useState({user:false,tenant:false,lang:false});
   const setMenu=key=>setMenusState(m=>Object.fromEntries(Object.keys(m).map(k=>[k,k===key?!m[k]:false])));
   const handleNav=nav=>{
@@ -3331,23 +3460,22 @@ function App(){
     addToast(`${nav.charAt(0).toUpperCase()+nav.slice(1)} section coming soon`,'info');
   };
 
-  const [lobs,setLobs]=useState(INIT_LOBS);
+  const [lobs,setLobs]=useState(devOverrides.lobs!==undefined?devOverrides.lobs:INIT_LOBS);
   const updateLobData=updated=>setLobs(ls=>ls.map(l=>l.id===updated.id?updated:l));
-  
 
   /* Detail page state — initialized from selected LOB */
-  const [selectedLobId,setSelectedLobId]=useState(null);
-  const [promptLevel,setPromptLevel]=useState('l1');
-  const [testMode,setTestMode]=useState(false);
+  const [selectedLobId,setSelectedLobId]=useState(devOverrides.selectedLobId||null);
+  const [promptLevel,setPromptLevel]=useState(devOverrides.promptLevel||'l1');
+  const [testMode,setTestMode]=useState(devOverrides.testMode||false);
   const [sidebarW,setSidebarW]=useState(220);
   const [docPanelW,setDocPanelW]=useState(260);
-  const [l1Items,setL1Items]=useState([]);
-  const [l0Name,setL0Name]=useState('');
-  const [activeL1Tab,setActiveL1Tab]=useState('l1');
-  const [activeTab,setActiveTab]=useState('l1');
-  const [prompts,setPrompts]=useState({});
-  const [defaultPrompts,setDefaultPrompts]=useState({});
-  const [saveStates,setSaveStates]=useState({});
+  const [l1Items,setL1Items]=useState(devOverrides.l1Items||[]);
+  const [l0Name,setL0Name]=useState(devOverrides.l0Name||'');
+  const [activeL1Tab,setActiveL1Tab]=useState(devOverrides.activeL1Tab||'l1');
+  const [activeTab,setActiveTab]=useState(devOverrides.activeTab||'l1');
+  const [prompts,setPrompts]=useState(devOverrides.prompts||{});
+  const [defaultPrompts,setDefaultPrompts]=useState(devOverrides.defaultPrompts||{});
+  const [saveStates,setSaveStates]=useState(devOverrides.saveStates||{});
   const saveTimers=useRef({});
   const [showMenu,setShowMenu]=useState(null);
   const [modal,setModal]=useState(null);
@@ -3357,7 +3485,7 @@ function App(){
   const addDataSet=name=>{const id=`ds-${Date.now()}`;setDataSets(prev=>[...prev,{id,name,color:'#6b7280'}]);return id;};
 
   // Global docs pool
-  const [docs,setDocs]=useState(makeDocs());
+  const [docs,setDocs]=useState(devOverrides.docs!==undefined?devOverrides.docs:makeDocs());
   const [filter,setFilter]=useState('pending');
   // Sidebar active scroll target (L1-only mode)
   const [activeCatId,setActiveCatId]=useState(null);
@@ -3576,7 +3704,16 @@ function App(){
   );
 }
 
-ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+function Root(){
+  const [activeScenario,setActiveScenario]=useState(null);
+  return(
+    <>
+      <DevPanel onApply={setActiveScenario} onReset={()=>setActiveScenario(null)} activeId={activeScenario?.id}/>
+      <App key={activeScenario?.id||'default'} devOverrides={activeScenario?.state||{}}/>
+    </>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<Root/>);
 
 </script>
 </body>
