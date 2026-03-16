@@ -569,12 +569,26 @@ input,textarea,select{font-family:inherit}
 .test-view__accuracy--good{background:#e6f4e6;color:#006b00}
 .test-view__accuracy--ok{background:#fff3e0;color:#6b3000}
 .test-view__accuracy--bad{background:#fce8e8;color:#aa0000}
-.test-view__prompt{padding:8px 20px;border-bottom:1px solid var(--bdr);flex-shrink:0;cursor:pointer;user-select:none}
-.test-view__prompt-hdr{display:flex;align-items:center;gap:6px}
+.test-view__prompt{padding:8px 20px;border-bottom:1px solid var(--bdr);flex-shrink:0;background:var(--bg)}
+.test-view__prompt--editing{background:var(--srf);border-bottom:2px solid var(--a)}
+.test-view__prompt-hdr{display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none}
+.test-view__prompt-hdr--editing{cursor:default}
 .test-view__prompt-label{font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.05em}
+.test-view__prompt-label--editing{color:var(--a)}
 .test-view__prompt-toggle{font-size:10px;color:var(--tx3);margin-left:auto}
 .test-view__prompt-preview{font-size:11px;color:var(--tx2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;margin-top:3px;font-family:monospace}
 .test-view__prompt-full{font-size:11px;color:var(--tx2);white-space:pre-wrap;margin-top:6px;max-height:120px;overflow-y:auto;font-family:monospace;background:var(--srf2);border-radius:var(--r);padding:8px 10px;border:1px solid var(--bdr)}
+/* Inline prompt editor in TestView */
+.tv-prompt-edit-btn{font-size:11px;font-weight:600;color:var(--a);background:none;border:1px solid var(--a);border-radius:var(--r);padding:2px 8px;cursor:pointer;font-family:inherit;margin-left:auto;transition:all .15s;flex-shrink:0}
+.tv-prompt-edit-btn:hover{background:var(--a-lt)}
+.tv-prompt-textarea{width:100%;min-height:120px;max-height:260px;font-size:12px;font-family:monospace;color:var(--tx1);background:var(--bg);border:1px solid var(--bdr);border-radius:var(--r);padding:10px 12px;resize:vertical;outline:none;margin-top:8px;line-height:1.6}
+.tv-prompt-textarea:focus{border-color:var(--a);box-shadow:0 0 0 2px var(--a-glow)}
+.tv-prompt-edit-footer{display:flex;align-items:center;justify-content:space-between;margin-top:6px}
+.tv-prompt-char{font-size:11px;color:var(--tx3)}
+.tv-prompt-save-btn{display:flex;align-items:center;gap:5px;padding:6px 14px;border-radius:var(--r);font-size:12px;font-weight:700;border:none;cursor:pointer;font-family:inherit;background:var(--a);color:#fff;transition:background .15s}
+.tv-prompt-save-btn:hover{background:var(--a-h)}
+.tv-prompt-cancel-btn{font-size:11px;color:var(--tx3);background:none;border:none;cursor:pointer;font-family:inherit;padding:0 6px}
+.tv-prompt-cancel-btn:hover{color:var(--tx1)}
 .test-view__controls{display:flex;align-items:center;gap:8px;padding:8px 20px;border-bottom:1px solid var(--bdr);flex-shrink:0;background:var(--srf)}
 .test-view__ctrl-info{flex:1;font-size:11px;color:var(--tx3)}
 .test-view__body{flex:1;overflow-y:auto;padding:0 20px 16px}
@@ -3117,9 +3131,11 @@ function Workspace({activeL1Tab,setActiveL1Tab,activeTab,setActiveTab,l1Items,pr
 
 /* ── Test View — dedicated test mode (replaces workspace content) ── */
 const MOCK_LABELS=['Schadenmeldung','Schadenprüfung','Schadenabschluss','Sachgutachten','Kündigung','Vertrag','Rechnung'];
-function TestView({promptText,promptLabel,docs,dataSets,toggleSel,onMarkTested,onUpdateExpected,labelSuggestions=[],promptKey,publishedSnap,onPublish,onBack}){
+function TestView({promptText,promptLabel,docs,dataSets,toggleSel,onMarkTested,onUpdateExpected,labelSuggestions=[],promptKey,publishedSnap,onPublish,onEditPrompt,onBack}){
   const [runningIds,setRunningIds]=useState(new Set());
   const [promptOpen,setPromptOpen]=useState(false);
+  const [editingPrompt,setEditingPrompt]=useState(false);
+  const [draftPrompt,setDraftPrompt]=useState('');
   const [editingId,setEditingId]=useState(null);
   const [editingVal,setEditingVal]=useState('');
   const [filter,setFilter]=useState('all');       // all|untested|matched|failed
@@ -3177,6 +3193,18 @@ function TestView({promptText,promptLabel,docs,dataSets,toggleSel,onMarkTested,o
     .filter(d=>filterDs==='all'||d.dataSetId===filterDs)
     .filter(d=>filter==='all'||(filter==='untested'&&!d.lastTest)||(filter==='matched'&&d.lastTest?.match===true)||(filter==='failed'&&d.lastTest?.match===false));
 
+  /* inline prompt editing */
+  const startEditPrompt=()=>{setDraftPrompt(promptText);setEditingPrompt(true);setPromptOpen(true);};
+  const cancelEditPrompt=()=>{setEditingPrompt(false);setDraftPrompt('');};
+  const saveAndRerun=()=>{
+    if(draftPrompt.trim()===promptText){setEditingPrompt(false);setDraftPrompt('');return;}
+    onEditPrompt(draftPrompt.trim());
+    setEditingPrompt(false);setDraftPrompt('');
+    /* auto-select all + run */
+    docs.forEach(d=>toggleSel(d.id,true));
+    setTimeout(()=>_runDocs(docs),50);
+  };
+
   /* label suggestions for autocomplete */
   const allSuggestions=[...new Set([...labelSuggestions,...MOCK_LABELS])];
   const getSuggestions=(val)=>val.trim()?allSuggestions.filter(s=>s.toLowerCase().includes(val.toLowerCase())&&s!==val):allSuggestions.slice(0,6);
@@ -3190,15 +3218,35 @@ function TestView({promptText,promptLabel,docs,dataSets,toggleSel,onMarkTested,o
         {accuracy!==null&&<span className={`test-view__accuracy test-view__accuracy--${accuracy>=80?'good':accuracy>=60?'ok':'bad'}`}>{accuracy}% accuracy</span>}
       </div>
 
-      {/* Prompt snapshot (collapsible) */}
-      <div className="test-view__prompt" onClick={()=>setPromptOpen(o=>!o)}>
-        <div className="test-view__prompt-hdr">
-          <span className="test-view__prompt-label">Prompt being tested</span>
-          <span className="test-view__prompt-toggle">{promptOpen?'▴ hide':'▾ show'}</span>
+      {/* Prompt snapshot — collapsible + inline editable */}
+      <div className={`test-view__prompt${editingPrompt?' test-view__prompt--editing':''}`}>
+        <div className={`test-view__prompt-hdr${editingPrompt?' test-view__prompt-hdr--editing':''}`}
+          onClick={()=>!editingPrompt&&setPromptOpen(o=>!o)}>
+          <span className={`test-view__prompt-label${editingPrompt?' test-view__prompt-label--editing':''}`}>
+            {editingPrompt?'Editing prompt':'Prompt being tested'}
+          </span>
+          {!editingPrompt&&<span className="test-view__prompt-toggle">{promptOpen?'▴ hide':'▾ show'}</span>}
+          {!editingPrompt
+            ?<button className="tv-prompt-edit-btn" onClick={e=>{e.stopPropagation();startEditPrompt();}}>✎ Edit</button>
+            :<button className="tv-prompt-cancel-btn" onClick={e=>{e.stopPropagation();cancelEditPrompt();}}>✕ Cancel</button>
+          }
         </div>
-        {promptOpen
-          ?<pre className="test-view__prompt-full">{promptText}</pre>
-          :<span className="test-view__prompt-preview">{(promptText||'').replace(/\s+/g,' ').slice(0,140)}…</span>
+        {editingPrompt
+          ?<>
+              <textarea className="tv-prompt-textarea" value={draftPrompt}
+                onChange={e=>setDraftPrompt(e.target.value)}
+                onClick={e=>e.stopPropagation()}
+                onKeyDown={e=>{if(e.key==='Enter'&&(e.metaKey||e.ctrlKey))saveAndRerun();}}/>
+              <div className="tv-prompt-edit-footer">
+                <span className="tv-prompt-char">{draftPrompt.length} chars · ⌘Enter to save & run</span>
+                <button className="tv-prompt-save-btn" onClick={saveAndRerun}>
+                  Save &amp; Re-run ▶
+                </button>
+              </div>
+            </>
+          :promptOpen
+            ?<pre className="test-view__prompt-full">{promptText}</pre>
+            :<span className="test-view__prompt-preview">{(promptText||'').replace(/\s+/g,' ').slice(0,140)}…</span>
         }
       </div>
 
@@ -4231,6 +4279,7 @@ function App({devOverrides={}}){
                   onUpdateExpected={updateDocExpected}
                   labelSuggestions={[...l1Items.map(i=>i.name),...l1Items.flatMap(i=>i.l2.map(l=>l.name))]}
                   promptKey={promptKey} publishedSnap={publishedSnap} onPublish={publishPrompt}
+                  onEditPrompt={newText=>{handleEdit(promptKey,newText);setSaveStates(s=>({...s,[promptKey]:'unsaved'}));}}
                   onBack={exitTestMode}/>
               );
               return promptLevel==='l2'
