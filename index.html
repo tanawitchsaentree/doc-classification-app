@@ -510,6 +510,44 @@ input,textarea,select{font-family:inherit}
 .dlib__doc:last-child{border-bottom:none}
 .dlib__doc-name{flex:1;font-size:11px;color:var(--tx1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 .dlib__doc-sub{font-size:10px;color:var(--tx3)}
+/* ── Test View (dedicated test mode) ── */
+.test-view{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--bg)}
+.test-view__hdr{display:flex;align-items:center;gap:10px;padding:10px 20px;background:var(--srf);border-bottom:1px solid var(--bdr);flex-shrink:0}
+.test-view__back{background:none;border:none;font-size:12px;color:var(--a);font-weight:500;cursor:pointer;font-family:inherit;padding:0;white-space:nowrap;display:flex;align-items:center;gap:4px}
+.test-view__back:hover{text-decoration:underline}
+.test-view__title{flex:1;font-size:13px;font-weight:600;color:var(--tx1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.test-view__accuracy{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;white-space:nowrap;flex-shrink:0}
+.test-view__accuracy--good{background:#dcfce7;color:#15803d}
+.test-view__accuracy--ok{background:#fef3c7;color:#92400e}
+.test-view__accuracy--bad{background:#fee2e2;color:#b91c1c}
+.test-view__prompt{padding:8px 20px;border-bottom:1px solid var(--bdr);flex-shrink:0;cursor:pointer;user-select:none}
+.test-view__prompt-hdr{display:flex;align-items:center;gap:6px}
+.test-view__prompt-label{font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.05em}
+.test-view__prompt-toggle{font-size:10px;color:var(--tx3);margin-left:auto}
+.test-view__prompt-preview{font-size:11px;color:var(--tx2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;margin-top:3px;font-family:monospace}
+.test-view__prompt-full{font-size:11px;color:var(--tx2);white-space:pre-wrap;margin-top:6px;max-height:120px;overflow-y:auto;font-family:monospace;background:var(--srf2);border-radius:var(--r);padding:8px 10px;border:1px solid var(--bdr)}
+.test-view__controls{display:flex;align-items:center;gap:8px;padding:8px 20px;border-bottom:1px solid var(--bdr);flex-shrink:0;background:var(--srf)}
+.test-view__ctrl-info{flex:1;font-size:11px;color:var(--tx3)}
+.test-view__body{flex:1;overflow-y:auto;padding:0 20px 16px}
+.test-view__body::-webkit-scrollbar{width:4px}.test-view__body::-webkit-scrollbar-thumb{background:var(--bdr);border-radius:2px}
+.test-matrix{width:100%;border-collapse:collapse;font-size:12px;margin-top:4px}
+.test-matrix th{font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.04em;padding:8px 10px 6px;border-bottom:2px solid var(--bdr);text-align:left;white-space:nowrap}
+.test-matrix td{padding:7px 10px;border-bottom:1px solid var(--bdr);vertical-align:middle}
+.test-matrix tr:last-child td{border-bottom:none}
+.test-matrix tr.match>td{background:rgba(220,252,231,.2)}
+.test-matrix tr.mismatch>td{background:rgba(254,226,226,.2)}
+.test-matrix tbody tr:hover>td{background:var(--srf)}
+.test-matrix__doc-name{font-weight:500;color:var(--tx1);display:block;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.test-matrix__batch{display:block;font-size:10px;color:var(--tx3);padding-left:5px;border-left-style:solid;border-left-width:2px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px}
+.result-badge{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;font-size:11px;font-weight:700;flex-shrink:0}
+.result-badge--match{background:#dcfce7;color:#15803d}
+.result-badge--mismatch{background:#fee2e2;color:#b91c1c}
+.result-badge--pending{background:var(--srf2);color:var(--tx3);font-size:16px;line-height:1}
+.test-view__summary{display:flex;align-items:center;gap:14px;padding:8px 20px;background:var(--srf);border-top:1px solid var(--bdr);font-size:12px;color:var(--tx2);flex-shrink:0;flex-wrap:wrap}
+.test-view__empty{text-align:center;padding:56px 20px;font-size:13px;color:var(--tx3);line-height:1.8}
+/* Test Prompt button in toolbar */
+.cl-setup__test-btn{display:flex;align-items:center;gap:5px;padding:5px 14px;border-radius:var(--r);font-size:11px;font-weight:700;border:none;cursor:pointer;font-family:inherit;background:var(--a);color:#fff;transition:all var(--tf) var(--smooth);box-shadow:0 1px 3px var(--a-glow);white-space:nowrap}
+.cl-setup__test-btn:hover{background:var(--a-h);transform:translateY(-1px);box-shadow:0 3px 8px var(--a-glow)}
 
 /* ── Keyframes ── */
 @keyframes slideDown{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
@@ -2579,7 +2617,7 @@ function WorkspaceTabs({l1Items,activeL1Tab,setActiveL1Tab,activeTab,setActiveTa
   );
 }
 
-function Workspace({activeL1Tab,setActiveL1Tab,activeTab,setActiveTab,l1Items,prompts,defaultPrompts,tabMeta,saveStates,onEdit,onSave,onVersion,docs,dataSets,toggleSel,onMarkTested,activePromptLabel}){
+function Workspace({activeL1Tab,setActiveL1Tab,activeTab,setActiveTab,l1Items,prompts,defaultPrompts,tabMeta,saveStates,onEdit,onSave,onVersion,docs}){
   const getMeta=tabId=>{
     const base=tabMeta?.[tabId]||DEFAULT_TAB_META;
     const item=l1Items.find(i=>i.id===tabId);
@@ -2650,8 +2688,124 @@ function Workspace({activeL1Tab,setActiveL1Tab,activeTab,setActiveTab,l1Items,pr
           </div>
         </div>
       </div>
-      <TestSection docs={docs} dataSets={dataSets} toggleSel={toggleSel} onMarkTested={onMarkTested} activePromptLabel={activePromptLabel}/>
     </main>
+  );
+}
+
+/* ── Test View — dedicated test mode (replaces workspace content) ── */
+function TestView({promptText,promptLabel,docs,dataSets,toggleSel,onMarkTested,onBack}){
+  const [runningIds,setRunningIds]=useState(new Set());
+  const [promptOpen,setPromptOpen]=useState(false);
+  const totalSelected=docs.filter(d=>d.selected).length;
+  const testedDocs=docs.filter(d=>d.lastTest);
+  const matchCount=testedDocs.filter(d=>d.lastTest.match).length;
+  const accuracy=testedDocs.length>0?Math.round(matchCount/testedDocs.length*100):null;
+  const avgConf=testedDocs.length>0?Math.round(testedDocs.reduce((s,d)=>s+d.lastTest.conf,0)/testedDocs.length):null;
+  const selectAll=()=>docs.forEach(d=>toggleSel(d.id,true));
+  const clearSel=()=>docs.forEach(d=>toggleSel(d.id,false));
+  const runTest=()=>{
+    const sel=docs.filter(d=>d.selected);
+    if(!sel.length)return;
+    setRunningIds(new Set(sel.map(d=>d.id)));
+    sel.forEach((doc,i)=>{
+      setTimeout(()=>{
+        const conf=Math.floor(62+Math.random()*33);
+        const match=conf>=78;
+        const pred=doc.expectedLabels?.[0]||'Unknown';
+        onMarkTested(doc.id,{ctx:promptLabel,pred,conf,match,testedAt:new Date().toISOString()});
+        setRunningIds(prev=>{const n=new Set(prev);n.delete(doc.id);return n;});
+      },900+i*500+Math.random()*300);
+    });
+  };
+  return(
+    <div className="test-view">
+      {/* Header */}
+      <div className="test-view__hdr">
+        <button className="test-view__back" onClick={onBack}><IC.Back/> Edit prompt</button>
+        <span className="test-view__title">{promptLabel}</span>
+        {accuracy!==null&&<span className={`test-view__accuracy test-view__accuracy--${accuracy>=80?'good':accuracy>=60?'ok':'bad'}`}>{accuracy}% accuracy</span>}
+      </div>
+
+      {/* Prompt snapshot (collapsible) */}
+      <div className="test-view__prompt" onClick={()=>setPromptOpen(o=>!o)}>
+        <div className="test-view__prompt-hdr">
+          <span className="test-view__prompt-label">Prompt being tested</span>
+          <span className="test-view__prompt-toggle">{promptOpen?'▴ hide':'▾ show'}</span>
+        </div>
+        {promptOpen
+          ?<pre className="test-view__prompt-full">{promptText}</pre>
+          :<span className="test-view__prompt-preview">{(promptText||'').replace(/\s+/g,' ').slice(0,140)}…</span>
+        }
+      </div>
+
+      {/* Controls */}
+      <div className="test-view__controls">
+        <button className="ws-test__sel-btn" onClick={selectAll}>Select all</button>
+        {totalSelected>0&&<button className="ws-test__sel-btn ws-test__sel-btn--clear" onClick={clearSel}>Clear ({totalSelected})</button>}
+        <span className="test-view__ctrl-info">{docs.length} doc{docs.length!==1?'s':''} in library</span>
+        <button className="tp-run-btn" disabled={totalSelected===0} onClick={runTest}>
+          ▶ Run Test{totalSelected>0?` (${totalSelected})`:''}
+        </button>
+      </div>
+
+      {/* Test matrix */}
+      <div className="test-view__body">
+        {docs.length===0
+          ?<div className="test-view__empty">No documents in library.<br/>Upload documents using the right panel, then come back to test.</div>
+          :<table className="test-matrix">
+            <thead>
+              <tr>
+                <th style={{width:'28px'}}></th>
+                <th>Document</th>
+                <th>Expected</th>
+                <th>Predicted</th>
+                <th>Confidence</th>
+                <th style={{width:'40px'}}></th>
+              </tr>
+            </thead>
+            <tbody>
+              {docs.map(doc=>{
+                const ds=dataSets.find(s=>s.id===doc.dataSetId);
+                const running=runningIds.has(doc.id);
+                const rowCls=running?'':doc.lastTest?(doc.lastTest.match?' match':' mismatch'):'';
+                return(
+                  <tr key={doc.id} className={rowCls}>
+                    <td><input type="checkbox" checked={doc.selected} onChange={()=>toggleSel(doc.id)} style={{accentColor:'var(--a)',cursor:'pointer',width:'13px',height:'13px'}}/></td>
+                    <td>
+                      <span className="test-matrix__doc-name" title={doc.name}>{doc.name}</span>
+                      {ds&&<span className="test-matrix__batch" style={{borderLeftColor:ds.color}}>{ds.name}</span>}
+                    </td>
+                    <td style={{color:'var(--tx2)'}}>{doc.expectedLabels?.[0]||<span style={{color:'var(--tx3)'}}>—</span>}</td>
+                    <td style={{fontWeight:500,color:'var(--tx1)'}}>
+                      {running?<span className="tp-doc__running"><span className="tr-row__spinner"/>classifying…</span>
+                        :doc.lastTest?.pred||<span style={{color:'var(--tx3)'}}>—</span>}
+                    </td>
+                    <td style={{fontWeight:700,color:!doc.lastTest||running?'var(--tx3)':doc.lastTest.conf>=80?'#15803d':doc.lastTest.conf>=60?'#92400e':'#b91c1c'}}>
+                      {running?'…':doc.lastTest?`${doc.lastTest.conf}%`:'—'}
+                    </td>
+                    <td>
+                      {!running&&(doc.lastTest
+                        ?<span className={`result-badge result-badge--${doc.lastTest.match?'match':'mismatch'}`}>{doc.lastTest.match?'✓':'✗'}</span>
+                        :<span className="result-badge result-badge--pending">·</span>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        }
+      </div>
+
+      {/* Summary bar */}
+      {(testedDocs.length>0||runningIds.size>0)&&<div className="test-view__summary">
+        <span><strong>{testedDocs.length}</strong> tested</span>
+        {matchCount>0&&<span style={{color:'#15803d',fontWeight:600}}>✓ {matchCount} matched</span>}
+        {testedDocs.length-matchCount>0&&<span style={{color:'#b91c1c',fontWeight:600}}>✗ {testedDocs.length-matchCount} missed</span>}
+        {avgConf!==null&&<span>avg conf <strong>{avgConf}%</strong></span>}
+        {runningIds.size>0&&<span style={{color:'var(--a)',fontWeight:600}}>⟳ {runningIds.size} running</span>}
+      </div>}
+    </div>
   );
 }
 
@@ -3169,6 +3323,7 @@ function App(){
   /* Detail page state — initialized from selected LOB */
   const [selectedLobId,setSelectedLobId]=useState(null);
   const [promptLevel,setPromptLevel]=useState('l1');
+  const [testMode,setTestMode]=useState(false);
   const [sidebarW,setSidebarW]=useState(220);
   const [docPanelW,setDocPanelW]=useState(260);
   const [l1Items,setL1Items]=useState([]);
@@ -3337,25 +3492,35 @@ function App(){
                 <div className="cl-setup__row">
                   {[{id:'global',label:'Global'},{id:'l1',label:'L1'},{id:'l2',label:'L2'}].map(opt=>(
                     <label key={opt.id} className={`cl-setup__radio${promptLevel===opt.id?' cl-setup__radio--active':''}`} onClick={e=>e.stopPropagation()}>
-                      <input type="radio" name="promptLevel" value={opt.id} checked={promptLevel===opt.id} onChange={()=>setPromptLevel(opt.id)}/>
+                      <input type="radio" name="promptLevel" value={opt.id} checked={promptLevel===opt.id} onChange={()=>{setPromptLevel(opt.id);setTestMode(false);}}/>
                       <span className="cl-setup__radio-label">{opt.label}</span>
                     </label>
                   ))}
                 </div>
+                {testMode
+                  ?<button className="cl-setup__test-btn" style={{background:'none',color:'var(--a)',border:'1px solid var(--a)',boxShadow:'none'}} onClick={()=>setTestMode(false)}><IC.Back/> Edit prompt</button>
+                  :<button className="cl-setup__test-btn" onClick={()=>setTestMode(true)}>▶ Test Prompt</button>
+                }
               </div>
             </div>
-            {/* Center content — swaps based on promptLevel */}
+            {/* Center content — swaps based on promptLevel / testMode */}
             {(()=>{
               const activePromptLabel=(()=>{
                 if(promptLevel==='global')return`${l0Name} · Global Class`;
                 if(promptLevel==='l1'){const cat=l1Items.find(i=>i.id===activeCatId);return cat?`${cat.name} · L1 Class`:`${l0Name} · L1 Class`;}
                 const cat=l1Items.find(i=>i.id===activeTab);return cat?`${cat.name} · L2 Class`:`${l0Name} · L2 Class`;
               })();
+              const currentPromptText=promptLevel==='l2'?(prompts[activeTab]||''):(prompts['l1']||'');
+              if(testMode)return(
+                <TestView promptText={currentPromptText} promptLabel={activePromptLabel}
+                  docs={docs} dataSets={dataSets} toggleSel={toggleSel} onMarkTested={markTested}
+                  onBack={()=>setTestMode(false)}/>
+              );
               return promptLevel==='l2'
                 ?<Workspace activeL1Tab={activeL1Tab} setActiveL1Tab={setActiveL1Tab} activeTab={activeTab} setActiveTab={setActiveTab} l1Items={l1Items}
                     prompts={prompts} defaultPrompts={defaultPrompts} tabMeta={tabMeta} saveStates={saveStates}
                     onEdit={handleEdit} onSave={handleSave} onVersion={()=>setModal('version')}
-                    docs={docs} dataSets={dataSets} toggleSel={toggleSel} onMarkTested={markTested} activePromptLabel={activePromptLabel}/>
+                    docs={docs}/>
                 :<div className="detail-scroll__main">
                     <div className="detail-scroll__toolbar">
                       <span className="detail-scroll__count">{promptLevel==='global'?'Global prompt':'Per-category prompts — '+l1Items.length+' categor'+(l1Items.length!==1?'ies':'y')}</span>
@@ -3367,7 +3532,6 @@ function App(){
                       onVersion={()=>setModal('version')}
                       hierarchyContext={buildHierarchy(promptLevel==='global'?'global':'l1',l1Items)}
                       promptMode={promptLevel}/>
-                    <TestSection docs={docs} dataSets={dataSets} toggleSel={toggleSel} onMarkTested={markTested} activePromptLabel={activePromptLabel}/>
                   </div>;
             })()}
           </div>
