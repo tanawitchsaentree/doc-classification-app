@@ -1395,7 +1395,7 @@ body.dev-on .ov-page{padding-top:84px}
 <div id="root"></div>
 <script type="text/babel">
 
-const { useState, useRef, useEffect, useLayoutEffect, useCallback } = React;
+const { useState, useRef, useEffect, useLayoutEffect, useCallback, useContext } = React;
 
 /* ── Data ── */
 
@@ -1449,611 +1449,55 @@ const LABELS = {
   l2: { short:'L2', label:'L2 Class', full:'L2 Class', plural:'L2 Classes' },
 };
 
-const INIT_LOBS = [
-  {
-    id:'schaden', name:'Schaden',
-    classL1Version:'V.2', classL2Version:'V.1',
-    status:'Deployed', confidence:92, trainedBy:'Arlene Wilson',
-    lobPrompt:
-`You are classifying Schaden (Claims) documents.
-
-This L0 covers all claim-related documents: first notifications, assessments, expert reports, and settlement letters.
-
-{{CLASSIFICATION_HIERARCHY}}
-
-Key identifiers:
-- Claim reference numbers (SCH-, CLM-, FNOL-)
-- "Schadenmeldung", "Schadenanzeige", "Schadennummer"
-- Loss date, incident description, policyholder details
-- Third-party information and witness statements`,
-    versions:[
-      {v:'V.2',date:'2025-02-10',status:'Active',  score:'92%',note:'Improved FNOL and assessment accuracy.',createdBy:'Arlene Wilson'},
-      {v:'V.1',date:'2024-12-01',status:'Archived',score:'88%',note:'Initial Schaden L0 release.',createdBy:'Jennie Cooper'},
-    ],
-    categories:[
-      {id:'sch-meldung',name:'Schadenmeldung',activeVersion:'V.2',status:'Deployed',confidence:93,trainedBy:'Arlene Wilson',
-        prompt:
-`Classify first notification of loss (FNOL) documents.
-
-Look for:
-- "Schadenmeldung", "Schadenanzeige", "Erstmeldung"
-- Incident date, time, and location
-- Policyholder signature and date of submission
-- Claim reference number (SCH-, FNOL-)`,
-        types:[
-          {id:'sch-fnol',name:'FNOL Formular',tags:[],prompt:'Structured first notification of loss form. Contains policyholder details, incident date/time/location, description of loss, and claim number.'},
-          {id:'sch-zeugen',name:'Zeugenaussage',tags:[],prompt:'Witness statement accompanying a claim. Contains witness name, contact details, and account of the incident.'},
-        ]},
-      {id:'sch-pruefung',name:'Schadenprüfung',activeVersion:'V.1',status:'Deployed',confidence:89,trainedBy:'Evan Flores',
-        prompt:
-`Classify claim assessment and investigation documents.
-
-Look for:
-- Adjuster or expert report letterhead
-- Assessment date and reference to claim number
-- Coverage decision language ("gedeckt", "abgelehnt")
-- Itemised damage list with cost estimates`,
-        types:[
-          {id:'sch-gutachten',name:'Schadengutachten',tags:[],prompt:'Expert damage assessment report. Contains adjuster name, inspection date, itemised damage, and repair cost estimate.'},
-          {id:'sch-foto',name:'Fotodokumentation',tags:[],prompt:'Photo documentation of damage. Usually a PDF with images, captions, and claim reference.'},
-        ]},
-      {id:'sch-abschluss',name:'Schadenabschluss',activeVersion:'V.1',status:'Draft',confidence:0,trainedBy:'',
-        prompt:
-`Classify claim settlement and closure documents.
-
-Look for:
-- "Abfindungserklärung", "Schadenabschluss", "Entschädigungszahlung"
-- Payment amount and bank details
-- Claimant signature confirming settlement
-- Closure date and claim reference`,
-        types:[]},
-    ]
+/* ── DataService ──────────────────────────────────────────────────────────────
+   Single source of truth for LOB taxonomy, datasets, and mock documents.
+   Loads from /data/*.json — validates expected labels against LOB taxonomy.
+   Provides derived helpers used by App and components.
+────────────────────────────────────────────────────────────────────────────── */
+const DataService={
+  lobs:null,datasets:null,_rawDocs:null,
+  async load(){
+    const [lobs,datasets,docs]=await Promise.all([
+      fetch('./data/lobs.json').then(r=>{if(!r.ok)throw new Error('lobs.json — HTTP '+r.status);return r.json();}),
+      fetch('./data/datasets.json').then(r=>{if(!r.ok)throw new Error('datasets.json — HTTP '+r.status);return r.json();}),
+      fetch('./data/documents.json').then(r=>{if(!r.ok)throw new Error('documents.json — HTTP '+r.status);return r.json();}),
+    ]);
+    this.lobs=lobs;this.datasets=datasets;this._rawDocs=docs;
+    this._validate();
+    return this;
   },
-  {
-    id:'sach', name:'Sach',
-    classL1Version:'V.2', classL2Version:'V.1',
-    status:'Deployed', confidence:90, trainedBy:'Philip Steward',
-    lobPrompt:
-`You are classifying Sach (Property) documents.
-
-This L0 covers property insurance documents: claims, policies, surveys, and repair invoices.
-
-{{CLASSIFICATION_HIERARCHY}}
-
-Key identifiers:
-- Property address (street, city, postcode)
-- Policy numbers starting with "SAC-" or "PHH-"
-- "Gebäudeversicherung", "Hausratversicherung", "Sachversicherung"
-- Building survey or valuation reference numbers`,
-    versions:[
-      {v:'V.2',date:'2025-01-20',status:'Active',  score:'90%',note:'Improved property survey and claim accuracy.',createdBy:'Philip Steward'},
-      {v:'V.1',date:'2024-09-15',status:'Archived',score:'74%',note:'Initial Sach L0 release.',createdBy:'Philip Steward'},
-    ],
-    categories:[
-      {id:'sach-schaden',name:'Sachschaden',activeVersion:'V.2',status:'Failed',confidence:78,trainedBy:'Evan Flores',
-        prompt:
-`Classify property damage claim documents.
-
-Look for:
-- "Sachschaden", "Gebäudeschaden", "Wasserschaden", "Feuerschaden"
-- Property address and description of damage
-- Photos or survey report reference
-- Repair cost estimate or contractor quote`,
-        types:[
-          {id:'sach-wasser',name:'Wasserschaden',tags:[],prompt:'Water damage claim document. Contains source of water ingress, affected rooms, drying/repair estimate, and claim reference.'},
-          {id:'sach-feuer',name:'Feuerschaden',tags:[],prompt:'Fire damage claim. Contains fire brigade report reference, extent of damage, and salvage details.'},
-          {id:'sach-einbruch',name:'Einbruchschaden',tags:[],prompt:'Burglary/break-in damage claim. Contains police report number, list of stolen/damaged items, and entry point description.'},
-        ]},
-      {id:'sach-gutachten',name:'Sachgutachten',activeVersion:'V.1',status:'Deployed',confidence:85,trainedBy:'Philip Steward',
-        prompt:
-`Classify property survey and valuation reports.
-
-Look for:
-- Surveyor credentials and accreditation
-- Property address and full description
-- Rebuild cost or market value figure
-- Survey date and reference number`,
-        types:[
-          {id:'sach-bewertung',name:'Bewertungsbericht',tags:[],prompt:'Property valuation report for underwriting. Contains rebuild cost, market value, construction type, and risk assessment.'},
-          {id:'sach-landlord',name:'Vermieterobjekt',tags:[],prompt:'Landlord/rented property policy or survey. Contains "Vermieter" or "vermietetes Objekt" language, rental income references.'},
-        ]},
-      {id:'sach-police',name:'Sachpolice',activeVersion:'V.1',status:'Deployed',confidence:90,trainedBy:'Jane Doe',
-        prompt:
-`Classify property insurance policy documents.
-
-Look for:
-- "Versicherungsschein", "Police", policy number (SAC-, PHH-)
-- Insured property address
-- Sum insured and premium details
-- Policy period start and end dates`,
-        types:[
-          {id:'sach-wohngebaeude',name:'Wohngebäude',tags:[],prompt:'Residential building (Wohngebäude) policy. Contains building sum insured, postcode, construction year, and cover type.'},
-          {id:'sach-hausrat',name:'Hausrat',tags:[],prompt:'Household contents (Hausrat) policy. Contains contents sum insured, insured address, and listed valuables.'},
-        ]},
-    ]
+  /* All L1 + L2 label names for a LOB — used for autocomplete and mock targets */
+  getAllLabels(lobId){
+    const lob=this.lobs.find(l=>l.id===lobId);
+    if(!lob)return[];
+    return lob.categories.flatMap(c=>[c.name,...c.types.map(t=>t.name)]);
   },
-  {
-    id:'kraft', name:'Kraft',
-    classL1Version:'V.3', classL2Version:'V.2',
-    status:'Deployed', confidence:95, trainedBy:'Arlene Wilson',
-    lobPrompt:
-`You are classifying Kraft (Motor) documents.
-
-This L0 covers motor insurance: claims, policies, quotations, and legal documentation.
-
-{{CLASSIFICATION_HIERARCHY}}
-
-Key identifiers:
-- Vehicle registration numbers, chassis/VIN numbers
-- Policy numbers starting with "KFZ-" or "KRA-"
-- "Kraftfahrzeugversicherung", "Kfz-Haftpflicht", "Vollkasko"
-- Garage/repairer letterheads and approval numbers
-- FNOL reference numbers (SCH-, FNOL-)`,
-    versions:[
-      {v:'V.3',date:'2025-02-18',status:'Active',  score:'95%',note:'Improved FNOL and repair invoice accuracy.',createdBy:'Arlene Wilson'},
-      {v:'V.2',date:'2025-01-05',status:'Archived',score:'91%',note:'Added inspection classifier, expanded complaint sub-types.',createdBy:'Jennie Cooper'},
-      {v:'V.1',date:'2024-11-20',status:'Archived',score:'87%',note:'Initial Kraft L0 release.',createdBy:'Arlene Wilson'},
-    ],
-    categories:[
-      {id:'kraft-schaden',name:'Kraft Schaden',activeVersion:'V.3',status:'Deployed',confidence:94,trainedBy:'Arlene Wilson',
-        prompt:
-`Classify Kraft (Motor) claim documents.
-
-Look for:
-- Vehicle registration number and make/model
-- Incident date and location
-- Third-party details and police report reference
-- FNOL or claim reference (SCH-, KFZ-)`,
-        types:[
-          {id:'kraft-fnol',name:'FNOL Formular',tags:[],prompt:'Motor first notification of loss. Contains vehicle details, incident description, third-party information, and claim reference.'},
-          {id:'kraft-reparatur',name:'Reparaturrechnung',tags:[],prompt:'Garage repair invoice for motor claim. Contains garage name, vehicle registration, itemised repair costs, and parts list.'},
-          {id:'kraft-polizei',name:'Polizeibericht',tags:[],prompt:'Police report for motor incident. Contains crime/accident reference number, officer details, and incident summary.'},
-        ]},
-      {id:'kraft-beschwerde',name:'Einfach Beschwerde',activeVersion:'V.2',status:'Failed',confidence:81,trainedBy:'Evan Flores',
-        prompt:
-`Classify standard complaint documents for Kraft (Motor).
-
-Look for:
-- Customer dissatisfaction language
-- Reference to policy or claim number
-- Escalation language (ombudsman, regulator)`,
-        types:[
-          {id:'kraft-std-beschwerde',name:'Standard Beschwerde',tags:[],prompt:'Standard customer complaint letter. Contains complaint description, policy reference, and desired resolution.'},
-          {id:'kraft-vorstand-beschwerde',name:'Vorstand Beschwerde',tags:[],prompt:'Board-level escalated complaint. Addressed to Vorstand/management, high urgency language, regulatory references.'},
-        ]},
-      {id:'kraft-police',name:'Kraft Versicherungsschein',activeVersion:'V.2',status:'Deployed',confidence:93,trainedBy:'Jennie Cooper',
-        prompt:
-`Classify Kraft (Motor) policy documents.
-
-Look for:
-- "Versicherungsschein", "Kraftfahrzeugschein"
-- Vehicle registration, make, model, and year
-- Policy number (KFZ-, KRA-)
-- Cover type: Haftpflicht, Teilkasko, Vollkasko`,
-        types:[
-          {id:'kraft-haftpflicht',name:'Kfz-Haftpflicht',tags:[],prompt:'Motor third-party liability policy. Contains vehicle details, coverage limits, and "Haftpflicht" designation.'},
-          {id:'kraft-vollkasko',name:'Vollkasko',tags:[],prompt:'Comprehensive motor policy. Contains "Vollkasko" coverage, vehicle value, and excess/deductible details.'},
-        ]},
-      {id:'kraft-rechnung',name:'Rechnung',activeVersion:'V.1',status:'Deployed',confidence:88,trainedBy:'Philip Steward',
-        prompt:
-`Classify invoices related to Kraft (Motor) insurance.
-
-Look for:
-- Garage or supplier letterhead
-- VAT number and invoice number
-- Itemised parts and labour costs
-- Vehicle registration number`,
-        types:[
-          {id:'kraft-garagerechnung',name:'Werkstattrechnung',tags:[],prompt:'Workshop/garage invoice. Contains labour hours, parts list, VAT breakdown, and vehicle registration.'},
-        ]},
-    ]
+  /* Docs scoped to a single LOB, shaped for App state */
+  getDocsForLob(lobId){
+    return(this._rawDocs||[])
+      .filter(d=>d.lobId===lobId)
+      .map(d=>({
+        id:d.id,name:d.name,size:d.size,dataSetId:d.dataSetId,
+        expectedLabels:d.expectedLabel?[d.expectedLabel]:[],
+        status:d.lastTest?'Tested':'Pending',selected:false,
+        lastTest:d.lastTest?{...d.lastTest,testedAt:d.lastTest.testedAt||'2025-03-01'}:null,
+      }));
   },
-  {
-    id:'rechnung', name:'Rechnung',
-    classL1Version:'V.1', classL2Version:'V.1',
-    status:'Deployed', confidence:88, trainedBy:'Philip Steward',
-    lobPrompt:
-`You are classifying Rechnung (Invoice) documents.
-
-This L0 covers all invoice and billing documents submitted across insurance lines.
-
-{{CLASSIFICATION_HIERARCHY}}
-
-Key identifiers:
-- "Rechnung", "Faktura", "Invoice"
-- Invoice number and date
-- VAT number (Steuernummer / USt-IdNr.)
-- Supplier/vendor name and address
-- Itemised services or goods with amounts`,
-    versions:[
-      {v:'V.1',date:'2025-01-15',status:'Active',score:'88%',note:'Initial Rechnung L0 release.',createdBy:'Philip Steward'},
-    ],
-    categories:[
-      {id:'rech-reparatur',name:'Reparaturrechnung',activeVersion:'V.1',status:'Deployed',confidence:90,trainedBy:'Philip Steward',
-        prompt:
-`Classify repair invoices.
-
-Look for:
-- Workshop or contractor letterhead
-- Itemised labour and parts
-- Vehicle registration or property address reference
-- Claim or job reference number`,
-        types:[
-          {id:'rech-kfz',name:'Kfz-Reparatur',tags:[],prompt:'Motor vehicle repair invoice. Contains vehicle registration, garage details, parts list, and labour charges.'},
-          {id:'rech-gebaeude',name:'Gebäudereparatur',tags:[],prompt:'Building repair invoice. Contains property address, contractor details, scope of works, and total cost.'},
-        ]},
-      {id:'rech-gutachter',name:'Gutachterrechnung',activeVersion:'V.1',status:'Deployed',confidence:86,trainedBy:'Evan Flores',
-        prompt:
-`Classify expert/assessor invoices.
-
-Look for:
-- Expert or assessor firm letterhead
-- Reference to inspection or report number
-- Assessment fee and travel expenses
-- Claim reference number`,
-        types:[
-          {id:'rech-sachverstaendiger',name:'Sachverständigenrechnung',tags:[],prompt:'Independent expert invoice. Contains assessor accreditation, inspection date, fee schedule, and report reference.'},
-        ]},
-      {id:'rech-anwalt',name:'Anwaltsrechnung',activeVersion:'V.1',status:'Draft',confidence:0,trainedBy:'',
-        prompt:
-`Classify legal/solicitor invoices.
-
-Look for:
-- Law firm letterhead with "Rechtsanwalt" or "Kanzlei"
-- Hourly rate and billable hours
-- Case or file reference number
-- RVG (Rechtsanwaltsvergütungsgesetz) fee references`,
-        types:[]},
-    ]
+  /* Warn on load if any doc's expected label is not in its LOB's taxonomy */
+  _validate(){
+    const byLob={};
+    this.lobs.forEach(l=>{
+      byLob[l.id]=new Set(l.categories.flatMap(c=>[c.name,...c.types.map(t=>t.name)]));
+    });
+    this._rawDocs.forEach(d=>{
+      if(!d.expectedLabel)return;
+      const valid=byLob[d.lobId];
+      if(valid&&!valid.has(d.expectedLabel))
+        console.warn(`[DataService] "${d.name}": expected "${d.expectedLabel}" not found in LOB "${d.lobId}"`);
+    });
   },
-  {
-    id:'einfach', name:'Einfach',
-    classL1Version:'V.1', classL2Version:null,
-    status:'Deployed', confidence:85, trainedBy:'Jennie Cooper',
-    lobPrompt:
-`You are classifying Einfach (Simple/Standard) documents.
-
-This L0 covers routine, low-complexity documents: standard letters, acknowledgements, and simple requests.
-
-{{CLASSIFICATION_HIERARCHY}}
-
-Key identifiers:
-- Simple one-page correspondence
-- Standard acknowledgement language ("Bestätigung", "Eingangsbestätigung")
-- No complex claim or legal content
-- Routine policyholder enquiries`,
-    versions:[
-      {v:'V.1',date:'2025-01-10',status:'Active',score:'85%',note:'Initial Einfach L0 release.',createdBy:'Jennie Cooper'},
-    ],
-    categories:[
-      {id:'ein-beschwerde',name:'Einfach Beschwerde',activeVersion:'V.1',status:'Deployed',confidence:87,trainedBy:'Jennie Cooper',
-        prompt:
-`Classify standard (simple) complaint letters.
-
-Look for:
-- Routine dissatisfaction language
-- Single issue complaint (delay, communication)
-- No regulatory escalation language
-- Policy or claim number reference`,
-        types:[
-          {id:'ein-std',name:'Standardbeschwerde',tags:[],prompt:'Standard complaint with single issue. Contains policyholder name, policy number, complaint description, and desired outcome.'},
-        ]},
-      {id:'ein-anfrage',name:'Standardanfrage',activeVersion:'V.1',status:'Deployed',confidence:83,trainedBy:'Jennie Cooper',
-        prompt:
-`Classify standard policyholder enquiry letters.
-
-Look for:
-- Question or information request tone
-- Policy or claim number reference
-- No urgency or legal language
-- Routine topics: address change, coverage query, payment query`,
-        types:[
-          {id:'ein-adresse',name:'Adressänderung',tags:[],prompt:'Address change request. Contains current and new address, policy number, and policyholder signature.'},
-          {id:'ein-auskunft',name:'Auskunftsanfrage',tags:[],prompt:'Information request about policy or claim status. Contains policy/claim reference and specific question.'},
-        ]},
-    ]
-  },
-  {
-    id:'vorstand', name:'Vorstand',
-    classL1Version:'V.1', classL2Version:null,
-    status:'Deployed', confidence:91, trainedBy:'Evan Flores',
-    lobPrompt:
-`You are classifying Vorstand (Board-level) documents.
-
-This L0 covers escalated, board-level correspondence: senior complaints, regulatory escalations, and management decisions.
-
-{{CLASSIFICATION_HIERARCHY}}
-
-Key identifiers:
-- Addressed to "Vorstand", "Geschäftsführung", "Management"
-- Regulatory body references (BaFin, Ombudsmann)
-- High-urgency or legal threat language
-- Senior signatory on both sender and recipient side`,
-    versions:[
-      {v:'V.1',date:'2025-01-20',status:'Active',score:'91%',note:'Initial Vorstand L0 release.',createdBy:'Evan Flores'},
-    ],
-    categories:[
-      {id:'vor-beschwerde',name:'Vorstand Beschwerde',activeVersion:'V.1',status:'Deployed',confidence:92,trainedBy:'Evan Flores',
-        prompt:
-`Classify board-level escalated complaint documents.
-
-Look for:
-- Addressed to Vorstand or Geschäftsführung
-- Prior complaint reference (already escalated once)
-- Ombudsmann or BaFin reference
-- Legal threat or litigation language`,
-        types:[
-          {id:'vor-bafin',name:'BaFin-Beschwerde',tags:[],prompt:'Complaint referencing or copied to BaFin (German financial regulator). Contains BaFin reference, escalation history, and regulatory language.'},
-          {id:'vor-ombuds',name:'Ombudsmann-Beschwerde',tags:[],prompt:'Complaint submitted to or via the insurance ombudsman (Ombudsmann). Contains case number and ombudsman letterhead.'},
-        ]},
-      {id:'vor-entscheid',name:'Vorstandsentscheidung',activeVersion:'V.1',status:'Draft',confidence:0,trainedBy:'',
-        prompt:
-`Classify board-level decision and approval documents.
-
-Look for:
-- Internal memo or board minute format
-- Decision language ("beschlossen", "genehmigt")
-- Board member signatures
-- Reference to policy or claim case`,
-        types:[]},
-    ]
-  },
-  {
-    id:'vertragsaenderung', name:'Vertragsänderung',
-    classL1Version:'V.1', classL2Version:null,
-    status:'Deployed', confidence:87, trainedBy:'Jane Doe',
-    lobPrompt:
-`You are classifying Vertragsänderung (Policy Change) documents.
-
-This L0 covers all mid-term policy amendments: coverage changes, vehicle/property updates, and endorsements.
-
-{{CLASSIFICATION_HIERARCHY}}
-
-Key identifiers:
-- "Vertragsänderung", "Nachtrag", "Endorsement", "Änderungsantrag"
-- Policy number and effective date of change
-- Description of what is being changed (old vs new value)
-- Policyholder signature and date`,
-    versions:[
-      {v:'V.1',date:'2025-02-01',status:'Active',score:'87%',note:'Initial Vertragsänderung L0 release.',createdBy:'Jane Doe'},
-    ],
-    categories:[
-      {id:'vta-antrag',name:'Änderungsantrag',activeVersion:'V.1',status:'Deployed',confidence:88,trainedBy:'Jane Doe',
-        prompt:
-`Classify policy change request documents.
-
-Look for:
-- "Änderungsantrag", "Antrag auf Vertragsänderung"
-- Current policy details and requested change
-- Effective date of requested change
-- Policyholder signature`,
-        types:[
-          {id:'vta-fahrzeug',name:'Fahrzeugwechsel',tags:[],prompt:'Vehicle substitution request. Contains old and new vehicle registration, make/model, and requested effective date.'},
-          {id:'vta-deckung',name:'Deckungsänderung',tags:[],prompt:'Coverage change request. Contains current cover level, requested new level (e.g. Haftpflicht → Vollkasko), and reason.'},
-          {id:'vta-adresse',name:'Adress-/Risikoänderung',tags:[],prompt:'Change of insured address or risk location. Contains old and new address, postcode, and effective date.'},
-        ]},
-      {id:'vta-bestaetigung',name:'Änderungsbestätigung',activeVersion:'V.1',status:'Deployed',confidence:86,trainedBy:'Jane Doe',
-        prompt:
-`Classify policy change confirmation documents (endorsements).
-
-Look for:
-- "Nachtrag", "Änderungsbestätigung", endorsement number
-- Updated policy schedule reflecting the change
-- Insurer stamp or digital signature
-- Revised premium (if applicable)`,
-        types:[
-          {id:'vta-nachtrag',name:'Nachtrag',tags:[],prompt:'Policy endorsement / mid-term adjustment confirmation. Contains endorsement number, changed fields, and updated premium.'},
-        ]},
-    ]
-  },
-  {
-    id:'privatschutz', name:'Privatschutz',
-    classL1Version:'V.1', classL2Version:null,
-    status:'Deployed', confidence:89, trainedBy:'Jennie Cooper',
-    lobPrompt:
-`You are classifying Privatschutz (Private Coverage) documents.
-
-This L0 covers personal lines private insurance: household, personal liability, legal protection, and life cover.
-
-{{CLASSIFICATION_HIERARCHY}}
-
-Key identifiers:
-- "Privathaftpflicht", "Hausrat", "Rechtsschutz", "Lebensversicherung"
-- Individual policyholder name and home address
-- Policy numbers starting with "PRI-" or "PRV-"
-- Personal risk details (family size, property type)`,
-    versions:[
-      {v:'V.1',date:'2025-01-25',status:'Active',score:'89%',note:'Initial Privatschutz L0 release.',createdBy:'Jennie Cooper'},
-    ],
-    categories:[
-      {id:'pri-haftpflicht',name:'Privathaftpflicht',activeVersion:'V.1',status:'Deployed',confidence:91,trainedBy:'Jennie Cooper',
-        prompt:
-`Classify private liability insurance documents.
-
-Look for:
-- "Privathaftpflicht", "PHV"
-- Individual or family policyholder details
-- Liability limit and deductible
-- Covered persons (family members, pets)`,
-        types:[
-          {id:'pri-single',name:'Einzelperson',tags:[],prompt:'Private liability policy for a single person. Contains individual name, address, and single-person premium.'},
-          {id:'pri-familie',name:'Familientarif',tags:[],prompt:'Family private liability policy. Contains policyholder and listed family members, family premium rate.'},
-        ]},
-      {id:'pri-rechtsschutz',name:'Rechtsschutz',activeVersion:'V.1',status:'Deployed',confidence:88,trainedBy:'Philip Steward',
-        prompt:
-`Classify legal protection insurance documents.
-
-Look for:
-- "Rechtsschutzversicherung", "RSV"
-- Legal area covered (Arbeitsrecht, Mietrecht, Verkehrsrecht)
-- Waiting period clause references
-- Law firm panel or free choice of lawyer clause`,
-        types:[
-          {id:'pri-arbeitsrecht',name:'Arbeitsrechtsschutz',tags:[],prompt:'Employment law protection policy. Contains "Arbeitsrecht" cover, employment status of insured, and waiting period.'},
-          {id:'pri-mietrecht',name:'Mietrechtsschutz',tags:[],prompt:'Tenancy law protection policy. Contains "Mietrecht" cover, rental address, and tenant/landlord role.'},
-        ]},
-      {id:'pri-hausrat',name:'Hausrat',activeVersion:'V.1',status:'Draft',confidence:0,trainedBy:'',
-        prompt:
-`Classify household contents insurance documents.
-
-Look for:
-- "Hausratversicherung", "Hausrat"
-- Insured address and sum insured for contents
-- Listed high-value items (Wertsachen)
-- Burglary, fire, and water damage cover sections`,
-        types:[]},
-    ]
-  },
-  {
-    id:'kuendigung', name:'Kündigung',
-    classL1Version:'V.1', classL2Version:null,
-    status:'Deployed', confidence:90, trainedBy:'Arlene Wilson',
-    lobPrompt:
-`You are classifying Kündigung (Cancellation) documents.
-
-This L0 covers all policy cancellation and termination documents from both policyholder and insurer side.
-
-{{CLASSIFICATION_HIERARCHY}}
-
-Key identifiers:
-- "Kündigung", "Vertragsauflösung", "Kündigung zum nächstmöglichen Termin"
-- Policy number and cancellation effective date
-- Reason for cancellation (optional)
-- Registered letter (Einschreiben) references`,
-    versions:[
-      {v:'V.1',date:'2025-02-05',status:'Active',score:'90%',note:'Initial Kündigung L0 release.',createdBy:'Arlene Wilson'},
-    ],
-    categories:[
-      {id:'kuend-vh',name:'Versicherungsnehmer-Kündigung',activeVersion:'V.1',status:'Deployed',confidence:91,trainedBy:'Arlene Wilson',
-        prompt:
-`Classify cancellation letters sent BY the policyholder.
-
-Look for:
-- Policyholder as sender
-- "Ich kündige", "hiermit kündige ich"
-- Policy number and requested cancellation date
-- Reason: premium increase, found better cover, no longer needed`,
-        types:[
-          {id:'kuend-ordentlich',name:'Ordentliche Kündigung',tags:[],prompt:'Standard annual cancellation at policy renewal date. Contains policy number, renewal date, and policyholder signature.'},
-          {id:'kuend-sonder',name:'Sonderkündigung',tags:[],prompt:'Special cancellation right triggered by premium increase or claim. Contains trigger event reference and cancellation date.'},
-        ]},
-      {id:'kuend-vers',name:'Versicherer-Kündigung',activeVersion:'V.1',status:'Deployed',confidence:89,trainedBy:'Evan Flores',
-        prompt:
-`Classify cancellation notices sent BY the insurer.
-
-Look for:
-- Insurer letterhead as sender
-- "Wir kündigen", "Kündigung des Versicherungsvertrages"
-- Reason: non-payment, fraud, risk change
-- Notice period stated`,
-        types:[
-          {id:'kuend-nichtzahlung',name:'Kündigung wegen Nichtzahlung',tags:[],prompt:'Insurer cancellation due to non-payment of premium. Contains outstanding amount, reminder references, and final cancellation date.'},
-          {id:'kuend-betrug',name:'Kündigung wegen Obliegenheitsverletzung',tags:[],prompt:'Insurer cancellation due to breach of duty or misrepresentation. Contains reason statement and legal basis.'},
-        ]},
-      {id:'kuend-bestaetigung',name:'Kündigungsbestätigung',activeVersion:'V.1',status:'Draft',confidence:0,trainedBy:'',
-        prompt:
-`Classify cancellation confirmation documents.
-
-Look for:
-- "Kündigungsbestätigung", "Wir bestätigen die Kündigung"
-- Policy number and confirmed cancellation date
-- Pro-rata refund amount (if applicable)
-- Insurer stamp or digital signature`,
-        types:[]},
-    ]
-  },
-];
-
-const DOC_NAMES = [
-  /* Schaden */
-  'Schadenmeldung_FNOL_SCH-00392.pdf','Zeugenaussage_Unfall_RTC-4421.pdf','Schadengutachten_Kfz_Sachverstaendiger.pdf',
-  'Fotodokumentation_Wasserschaden_2025.jpg','Abfindungserklaerung_SCH-00392.pdf','Schadenmeldung_Einbruch_SCH-00501.pdf',
-  /* Sach */
-  'Sachgutachten_Wohngebaeude_RICS.pdf','Sachschaden_Wasserschaden_SAC-0391.pdf','Reparaturrechnung_Dachdecker_Sturmschaden.pdf',
-  'Wohngebaeude_Police_SAC-8812.pdf','Bewertungsbericht_Neuwert_2025.pdf','Hausrat_Police_PHH-4421.pdf',
-  'Einbruchschaden_Fotos_Fenster.jpg','Feuerschaden_Bericht_FW-Ref.pdf',
-  /* Kraft */
-  'FNOL_Formular_SCH-00921_KFZ.pdf','Reparaturrechnung_Werkstatt_B-MN3421.pdf','Polizeibericht_Unfall_CAD-4421.pdf',
-  'Kfz_Versicherungsschein_KFZ-8821.pdf','Einfach_Beschwerde_Regulierungsverzoegerung.pdf','Vorstand_Beschwerde_BaFin-Ref.pdf',
-  'Vollkasko_Police_KFZ-3310.pdf','Zeugenaussage_Unfall_RTC-0021.pdf','Werkstattrechnung_OEM-Teile.pdf',
-  /* Rechnung */
-  'Reparaturrechnung_Kfz_Garage_AutoFix.pdf','Gebäudereparatur_Rechnung_Dachdecker.pdf','Sachverstaendigenrechnung_Gutachter.pdf',
-  'Anwaltsrechnung_Kanzlei_RVG.pdf',
-  /* Einfach */
-  'Standardbeschwerde_Bearbeitungszeit.pdf','Adressaenderung_Antrag_PRV-4431.pdf','Auskunftsanfrage_Deckungsumfang.pdf',
-  /* Vorstand */
-  'Vorstand_Beschwerde_Ombudsmann.pdf','BaFin_Beschwerde_Eskalation.pdf',
-  /* Vertragsänderung */
-  'Aenderungsantrag_Fahrzeugwechsel_KFZ-8821.pdf','Deckungsaenderung_Haftpflicht_Vollkasko.pdf',
-  'Nachtrag_Adressaenderung_SAC-4421.pdf','Aenderungsbestaetigung_Nachtrag-0012.pdf',
-  /* Privatschutz */
-  'Privathaftpflicht_Police_PRI-2291.pdf','Familientarif_PHV_Familie_Müller.pdf',
-  'Rechtsschutz_Arbeitsrecht_RSV-0391.pdf','Mietrechtsschutz_Police_RSV-1102.pdf',
-  /* Kündigung */
-  'Kuendigung_Ordentlich_KFZ-7712.pdf','Sonderkuendigung_Praemienerhoehung.pdf',
-  'Versicherer_Kuendigung_Nichtzahlung.pdf','Kuendigungsbestaetigung_SAC-8812.pdf',
-];
-/* ── Data Sets ── */
-const INIT_DATASETS=[
-  {id:'ds-schaden',  name:'Schaden Batch',         color:'#ef4444'},
-  {id:'ds-sach',     name:'Sach & Kraft',           color:'#3b82f6'},
-  {id:'ds-rechnung', name:'Rechnung & Einfach',     color:'#10b981'},
-  {id:'ds-vertraege',name:'Verträge & Kündigung',   color:'#8b5cf6'},
-];
-/* [dataSetId, expectedLabel, lastTest|null] — one entry per DOC_NAMES index */
-const INIT_DOC_META=[
-  ['ds-schaden',  'Schadenmeldung',    {ctx:'Schaden',pred:'Schadenmeldung',conf:94,match:true}],
-  ['ds-schaden',  'Schadenmeldung',    null],
-  ['ds-schaden',  'Schadenprüfung',    {ctx:'Schaden',pred:'Schadenprüfung',conf:89,match:true}],
-  ['ds-schaden',  'Schadenprüfung',    null],
-  ['ds-schaden',  'Schadenabschluss',  null],
-  ['ds-schaden',  'Schadenmeldung',    {ctx:'Schaden',pred:'Schadenabschluss',conf:61,match:false}],
-  ['ds-sach',     'Sachgutachten',     {ctx:'Sach',pred:'Sachgutachten',conf:92,match:true}],
-  ['ds-sach',     'Sachschaden',       null],
-  ['ds-sach',     'Sachschaden',       null],
-  ['ds-sach',     'Sachpolice',        {ctx:'Sach',pred:'Sachpolice',conf:91,match:true}],
-  ['ds-sach',     'Sachgutachten',     null],
-  ['ds-sach',     'Sachpolice',        null],
-  ['ds-sach',     'Sachschaden',       null],
-  ['ds-sach',     'Sachschaden',       null],
-  ['ds-sach',     'Kraft Schaden',     {ctx:'Kraft',pred:'Kraft Schaden',conf:93,match:true}],
-  ['ds-sach',     'Kraft Schaden',     null],
-  ['ds-sach',     'Kraft Schaden',     null],
-  ['ds-sach',     'Kraft Versicherungsschein', null],
-  ['ds-sach',     'Einfach Beschwerde',{ctx:'Kraft',pred:'Einfach Beschwerde',conf:82,match:true}],
-  ['ds-sach',     'Vorstand Beschwerde',{ctx:'Kraft',pred:'Einfach Beschwerde',conf:68,match:false}],
-  ['ds-sach',     'Kraft Versicherungsschein', null],
-  ['ds-sach',     'Kraft Schaden',     null],
-  ['ds-sach',     'Rechnung',          null],
-  ['ds-rechnung', 'Reparaturrechnung', {ctx:'Rechnung',pred:'Reparaturrechnung',conf:91,match:true}],
-  ['ds-rechnung', 'Reparaturrechnung', null],
-  ['ds-rechnung', 'Gutachterrechnung', null],
-  ['ds-rechnung', 'Anwaltsrechnung',   null],
-  ['ds-rechnung', 'Einfach Beschwerde',{ctx:'Einfach',pred:'Einfach Beschwerde',conf:86,match:true}],
-  ['ds-rechnung', 'Standardanfrage',   null],
-  ['ds-rechnung', 'Standardanfrage',   null],
-  ['ds-vertraege','Vorstand Beschwerde',{ctx:'Vorstand',pred:'Vorstand Beschwerde',conf:90,match:true}],
-  ['ds-vertraege','Vorstand Beschwerde',null],
-  ['ds-vertraege','Änderungsantrag',   {ctx:'Vertragsänderung',pred:'Änderungsantrag',conf:88,match:true}],
-  ['ds-vertraege','Änderungsantrag',   null],
-  ['ds-vertraege','Änderungsbestätigung',null],
-  ['ds-vertraege','Änderungsbestätigung',{ctx:'Vertragsänderung',pred:'Änderungsantrag',conf:72,match:false}],
-  ['ds-vertraege','Privathaftpflicht', {ctx:'Privatschutz',pred:'Privathaftpflicht',conf:89,match:true}],
-  ['ds-vertraege','Privathaftpflicht', null],
-  ['ds-vertraege','Rechtsschutz',      null],
-  ['ds-vertraege','Rechtsschutz',      null],
-  ['ds-vertraege','Ordentliche Kündigung',{ctx:'Kündigung',pred:'Ordentliche Kündigung',conf:93,match:true}],
-  ['ds-vertraege','Sonderkündigung',   null],
-  ['ds-vertraege','Versicherer-Kündigung',null],
-  ['ds-vertraege','Kündigungsbestätigung',null],
-];
-const MOCK_SIZES=['48 KB','112 KB','239 KB','185 KB','76 KB','320 KB','95 KB','54 KB','143 KB','88 KB','201 KB','67 KB','156 KB','93 KB','274 KB','41 KB','118 KB','209 KB','73 KB','162 KB','88 KB','311 KB','55 KB','129 KB','197 KB','84 KB','243 KB','61 KB','174 KB','92 KB','288 KB','47 KB','136 KB','215 KB','79 KB'];
-const makeDocs=()=>DOC_NAMES.map((name,i)=>{
-  const [dsId,expLabel,lastTest]=INIT_DOC_META[i]||['ds-schaden','',null];
-  return{id:i+1,name,size:MOCK_SIZES[i]||'100 KB',dataSetId:dsId,expectedLabels:expLabel?[expLabel]:[],
-    status:lastTest?'Tested':'Pending',selected:false,
-    lastTest:lastTest?{...lastTest,testedAt:'2025-03-01'}:null};
-});
+};
+const DataCtx=React.createContext(null);
 
 /* ──────────────────────────────────────────────────────────────────────────
    Mock Classification Engine
@@ -3130,7 +2574,6 @@ function Workspace({activeL1Tab,setActiveL1Tab,activeTab,setActiveTab,l1Items,pr
 }
 
 /* ── Test View — dedicated test mode (replaces workspace content) ── */
-const MOCK_LABELS=['Schadenmeldung','Schadenprüfung','Schadenabschluss','Sachgutachten','Kündigung','Vertrag','Rechnung'];
 function TestView({promptText,promptLabel,docs,dataSets,toggleSel,onMarkTested,onUpdateExpected,labelSuggestions=[],promptKey,publishedSnap,onPublish,onEditPrompt,onBack}){
   const [runningIds,setRunningIds]=useState(new Set());
   const [promptOpen,setPromptOpen]=useState(false);
@@ -3158,13 +2601,14 @@ function TestView({promptText,promptLabel,docs,dataSets,toggleSel,onMarkTested,o
   const _runDocs=(sel)=>{
     if(!sel.length)return;
     setRunningIds(prev=>{const n=new Set(prev);sel.forEach(d=>n.add(d.id));return n;});
+    const targets=labelSuggestions.map(name=>({id:name,name}));
+    const effectiveTargets=targets.length>0?targets:[{id:'unknown',name:'Unknown'}];
     sel.forEach((doc,i)=>{
       setTimeout(()=>{
-        const conf=Math.floor(50+Math.random()*46);
+        const r=mockClassify(doc.name,effectiveTargets);
+        const pred=r?.classification||'Unknown';
+        const conf=r?parseInt(r.confidence)||50:50;
         const expected=doc.expectedLabels?.[0];
-        const isCorrect=Math.random()>0.3;
-        const others=MOCK_LABELS.filter(l=>l!==expected);
-        const pred=expected?(isCorrect?expected:others[Math.floor(Math.random()*others.length)]):MOCK_LABELS[Math.floor(Math.random()*MOCK_LABELS.length)];
         const match=expected?(pred===expected):null;
         onMarkTested(doc.id,{ctx:promptLabel,pred,conf,match,testedAt:new Date().toISOString()});
         setRunningIds(prev=>{const n=new Set(prev);n.delete(doc.id);return n;});
@@ -3206,7 +2650,7 @@ function TestView({promptText,promptLabel,docs,dataSets,toggleSel,onMarkTested,o
   };
 
   /* label suggestions for autocomplete */
-  const allSuggestions=[...new Set([...labelSuggestions,...MOCK_LABELS])];
+  const allSuggestions=[...new Set(labelSuggestions)];
   const getSuggestions=(val)=>val.trim()?allSuggestions.filter(s=>s.toLowerCase().includes(val.toLowerCase())&&s!==val):allSuggestions.slice(0,6);
 
   return(
@@ -3924,70 +3368,15 @@ function ResizeHandle({onResize}){
 
 /* ═══════════════════════════════════════════════════════════════════
    DEV PANEL — scenario controller (outside main app, JSON-driven)
-   Defines UI state scenarios for testing empty/error/success states.
-   Does NOT modify main app logic — passes overrides via props only.
+   Scenarios are built inside Root using DataService context so they
+   always reference live LOB/doc data from the JSON files.
 ═══════════════════════════════════════════════════════════════════ */
 
-/* Build detail-page state from a LOB object */
-const _devBuildDetail=(lob,opts={})=>{
-  if(!lob)return{page:'lob-overview'};
-  const l1Items=lob.categories.map(c=>({id:c.id,name:c.name,expanded:false,l2:c.types.map(t=>({id:t.id,name:t.name}))}));
-  const prompts={global:GLOBAL_PROMPT,l1:opts.l1Prompt!==undefined?opts.l1Prompt:(lob.lobPrompt||''),
-    ...lob.categories.reduce((acc,c)=>{acc[c.id]=opts.catPrompt!==undefined?opts.catPrompt:(c.prompt||'');c.types.forEach(t=>{acc[t.id]=t.prompt||'';});return acc;},{})};
-  const tabMeta={global:{version:'1.0',score:'N/A',status:'Active'},l1:{version:lob.classL1Version||'V.1',score:`${lob.confidence}%`,status:lob.status}};
-  lob.categories.forEach(c=>{tabMeta[c.id]={version:c.activeVersion||'V.1',score:`${c.confidence}%`,status:c.status};c.types.forEach(t=>{tabMeta[t.id]={version:c.activeVersion||'V.1',score:`${c.confidence}%`,status:c.status};});});
-  const firstCatId=l1Items[0]?.id||'l1';
-  return{page:'detail',selectedLobId:lob.id,l0Name:lob.name,l1Items,prompts,defaultPrompts:prompts,
-    tabMeta,activeTab:firstCatId,activeL1Tab:firstCatId,
-    promptLevel:opts.promptLevel||'l1',testMode:opts.testMode||false,
-    ...(opts.docs!==undefined?{docs:opts.docs}:{}),
-    ...(opts.lobs!==undefined?{lobs:opts.lobs}:{}),
-    ...(opts.saveStates!==undefined?{saveStates:opts.saveStates}:{})};
-};
-
-/* Preset doc collections — functions so each call returns fresh array */
-const _devDocs={
-  allPending:()=>makeDocs().map(d=>({...d,status:'Pending',selected:false,lastTest:null})),
-  allMatch:()=>makeDocs().map(d=>({...d,status:'Tested',selected:false,lastTest:{ctx:'L1 Class',pred:d.expectedLabels?.[0]||'Schadenmeldung',conf:91,match:true,testedAt:'2025-03-01'}})),
-  allMismatch:()=>makeDocs().map(d=>({...d,status:'Tested',selected:false,lastTest:{ctx:'L1 Class',pred:'Wrong Category',conf:44,match:false,testedAt:'2025-03-01'}})),
-  mixed:()=>makeDocs().map((d,i)=>i%3===2?{...d,status:'Tested',selected:false,lastTest:{ctx:'L1 Class',pred:'Other Class',conf:51,match:false,testedAt:'2025-03-01'}}:{...d,status:'Tested',selected:false,lastTest:{ctx:'L1 Class',pred:d.expectedLabels?.[0]||'Schadenmeldung',conf:84,match:true,testedAt:'2025-03-01'}}),
-  allSelected:()=>makeDocs().map(d=>({...d,selected:true,status:'Pending',lastTest:null})),
-  lowConf:()=>makeDocs().map(d=>({...d,status:'Tested',selected:false,lastTest:{ctx:'L1 Class',pred:d.expectedLabels?.[0]||'Unknown',conf:Math.floor(45+Math.random()*20),match:false,testedAt:'2025-03-01'}})),
-};
-
-/* ── Scenarios JSON ── */
-const DEV_SCENARIOS=[
-  /* Overview */
-  {id:'ov-default',  group:'Overview', label:'Default',        state:{page:'lob-overview'}},
-  {id:'ov-empty',    group:'Overview', label:'Empty — no LOBs',state:{page:'lob-overview',lobs:[]}},
-  {id:'ov-failed',   group:'Overview', label:'All Failed',     state:{page:'lob-overview',lobs:INIT_LOBS.map(l=>({...l,status:'Failed',confidence:0}))}},
-  {id:'ov-draft',    group:'Overview', label:'All Draft',      state:{page:'lob-overview',lobs:INIT_LOBS.map(l=>({...l,status:'Draft',confidence:0,trainedBy:''}))}},
-  {id:'ov-single',   group:'Overview', label:'Single LOB',     state:{page:'lob-overview',lobs:[INIT_LOBS[0]]}},
-  /* Prompt Detail */
-  {id:'det-l1',      group:'Prompt Detail', label:'L1 Mode',              state:_devBuildDetail(INIT_LOBS[0],{promptLevel:'l1'})},
-  {id:'det-l2',      group:'Prompt Detail', label:'L2 Mode',              state:_devBuildDetail(INIT_LOBS[0],{promptLevel:'l2'})},
-  {id:'det-global',  group:'Prompt Detail', label:'Global Mode',          state:_devBuildDetail(INIT_LOBS[0],{promptLevel:'global'})},
-  {id:'det-nocat',   group:'Prompt Detail', label:'No Categories',        state:_devBuildDetail({...INIT_LOBS[0],categories:[]},{})},
-  {id:'det-noph',    group:'Prompt Detail', label:'Missing Placeholder',  state:_devBuildDetail(INIT_LOBS[0],{l1Prompt:'Classify this document into the correct category.',promptLevel:'l1'})},
-  {id:'det-unsaved', group:'Prompt Detail', label:'Unsaved Changes',      state:_devBuildDetail(INIT_LOBS[0],{promptLevel:'l1',saveStates:{'l1':'unsaved'}})},
-  /* Test View */
-  {id:'tv-prerun',   group:'Test View', label:'Pre-run (all selected)',   state:_devBuildDetail(INIT_LOBS[0],{promptLevel:'l1',testMode:true,docs:_devDocs.allSelected()})},
-  {id:'tv-match',    group:'Test View', label:'All Matched',              state:_devBuildDetail(INIT_LOBS[0],{promptLevel:'l1',testMode:true,docs:_devDocs.allMatch()})},
-  {id:'tv-mismatch', group:'Test View', label:'All Mismatched (error)',   state:_devBuildDetail(INIT_LOBS[0],{promptLevel:'l1',testMode:true,docs:_devDocs.allMismatch()})},
-  {id:'tv-mixed',    group:'Test View', label:'Mixed Results',            state:_devBuildDetail(INIT_LOBS[0],{promptLevel:'l1',testMode:true,docs:_devDocs.mixed()})},
-  {id:'tv-lowconf',  group:'Test View', label:'Low Confidence',           state:_devBuildDetail(INIT_LOBS[0],{promptLevel:'l1',testMode:true,docs:_devDocs.lowConf()})},
-  {id:'tv-empty',    group:'Test View', label:'No Documents',             state:_devBuildDetail(INIT_LOBS[0],{promptLevel:'l1',testMode:true,docs:[]})},
-  /* Document Library */
-  {id:'doc-empty',   group:'Documents', label:'Empty Library',   state:_devBuildDetail(INIT_LOBS[0],{promptLevel:'l1',docs:[]})},
-  {id:'doc-pending', group:'Documents', label:'All Pending',     state:_devBuildDetail(INIT_LOBS[0],{promptLevel:'l1',docs:_devDocs.allPending()})},
-  {id:'doc-tested',  group:'Documents', label:'All Tested',      state:_devBuildDetail(INIT_LOBS[0],{promptLevel:'l1',docs:_devDocs.allMatch()})},
-];
-
 /* ── DevPanel Component ── */
-function DevPanel({onApply,onReset,activeId}){
+function DevPanel({scenarios,onApply,onReset,activeId}){
   const [open,setOpen]=useState(false);
-  const active=DEV_SCENARIOS.find(s=>s.id===activeId);
-  const groups=[...new Set(DEV_SCENARIOS.map(s=>s.group))];
+  const active=scenarios.find(s=>s.id===activeId);
+  const groups=[...new Set(scenarios.map(s=>s.group))];
   useEffect(()=>{
     document.body.classList.add('dev-on');
     return()=>document.body.classList.remove('dev-on');
@@ -4011,7 +3400,7 @@ function DevPanel({onApply,onReset,activeId}){
             <div key={g} className="dev-panel__group">
               <div className="dev-panel__group-label">{g}</div>
               <div className="dev-panel__chips">
-                {DEV_SCENARIOS.filter(s=>s.group===g).map(s=>(
+                {scenarios.filter(s=>s.group===g).map(s=>(
                   <button key={s.id} className={`dev-chip${activeId===s.id?' dev-chip--active':''}`}
                     onClick={()=>{onApply(s);setOpen(false);}}>
                     {s.label}
@@ -4027,6 +3416,7 @@ function DevPanel({onApply,onReset,activeId}){
 }
 
 function App({devOverrides={}}){
+  const ds=useContext(DataCtx);
   const {toasts,addToast,removeToast}=useToast();
   const [page,setPage]=useState(devOverrides.page||'lob-overview');
   const [activeNav,setActiveNav]=useState('classification');
@@ -4041,7 +3431,7 @@ function App({devOverrides={}}){
     addToast(`${nav.charAt(0).toUpperCase()+nav.slice(1)} section coming soon`,'info');
   };
 
-  const [lobs,setLobs]=useState(devOverrides.lobs!==undefined?devOverrides.lobs:INIT_LOBS);
+  const [lobs,setLobs]=useState(devOverrides.lobs!==undefined?devOverrides.lobs:ds.lobs);
   const updateLobData=updated=>setLobs(ls=>ls.map(l=>l.id===updated.id?updated:l));
 
   /* Detail page state — initialized from selected LOB */
@@ -4064,11 +3454,11 @@ function App({devOverrides={}}){
   const [modal,setModal]=useState(null);
   const [confirmState,setConfirmState]=useState(null);
   // Data Sets
-  const [dataSets,setDataSets]=useState(INIT_DATASETS);
+  const [dataSets,setDataSets]=useState(ds.datasets);
   const addDataSet=name=>{const id=`ds-${Date.now()}`;setDataSets(prev=>[...prev,{id,name,color:'#6b7280'}]);return id;};
 
   // Global docs pool
-  const [docs,setDocs]=useState(devOverrides.docs!==undefined?devOverrides.docs:makeDocs());
+  const [docs,setDocs]=useState(devOverrides.docs!==undefined?devOverrides.docs:[]);
   const [filter,setFilter]=useState('pending');
   // Sidebar active scroll target (L1-only mode)
   const [activeCatId,setActiveCatId]=useState(null);
@@ -4144,6 +3534,7 @@ function App({devOverrides={}}){
     setSaveStates({});
     setActiveTab(startTab);
     setActiveL1Tab(startL1Tab);
+    setDocs(ds.getDocsForLob(lob.id));
     setPage('detail');
     setActiveNav('classification');
   };
@@ -4158,9 +3549,9 @@ function App({devOverrides={}}){
   },[]);
   const handleSave=useCallback(tabId=>{clearTimeout(saveTimers.current[tabId]);setSaveStates(s=>({...s,[tabId]:'saved'}));addToast('Prompt saved');},[addToast]);
 
-  const toggleSel=(id,forceTo)=>setDocs(ds=>ds.map(d=>d.id===id?{...d,selected:forceTo!==undefined?forceTo:!d.selected}:d));
-  const delDoc=id=>{setDocs(ds=>ds.filter(d=>d.id!==id));addToast('Document removed','warning');};
-  const markTested=(id,testMeta)=>setDocs(ds=>ds.map(d=>d.id===id?{...d,status:'Tested',selected:false,lastTest:testMeta||d.lastTest}:d));
+  const toggleSel=(id,forceTo)=>setDocs(prev=>prev.map(d=>d.id===id?{...d,selected:forceTo!==undefined?forceTo:!d.selected}:d));
+  const delDoc=id=>{setDocs(prev=>prev.filter(d=>d.id!==id));addToast('Document removed','warning');};
+  const markTested=(id,testMeta)=>setDocs(prev=>prev.map(d=>d.id===id?{...d,status:'Tested',selected:false,lastTest:testMeta||d.lastTest}:d));
   const publishPrompt=(promptKey,snapshot)=>{
     setPublishedPrompts(prev=>({...prev,[promptKey]:snapshot}));
     addToast('Prompt approved & published ✓','success');
@@ -4188,7 +3579,7 @@ function App({devOverrides={}}){
     }
     setTestMode(false);
   },[docs]);
-  const updateDocExpected=(id,label)=>setDocs(ds=>ds.map(d=>{
+  const updateDocExpected=(id,label)=>setDocs(prev=>prev.map(d=>{
     if(d.id!==id)return d;
     const newLabels=label?[label]:[];
     /* live-recalculate match if doc already has test result */
@@ -4332,15 +3723,81 @@ function App({devOverrides={}}){
 }
 
 function Root(){
+  const ds=useContext(DataCtx);
+  const L0=ds.lobs[0];
+
+  /* ── Dev scenario builder (uses live DataService data) ── */
+  const _devBuildDetail=(lob,opts={})=>{
+    if(!lob)return{page:'lob-overview'};
+    const l1Items=lob.categories.map(c=>({id:c.id,name:c.name,expanded:false,l2:c.types.map(t=>({id:t.id,name:t.name}))}));
+    const prompts={global:GLOBAL_PROMPT,l1:opts.l1Prompt!==undefined?opts.l1Prompt:(lob.lobPrompt||''),
+      ...lob.categories.reduce((acc,c)=>{acc[c.id]=opts.catPrompt!==undefined?opts.catPrompt:(c.prompt||'');c.types.forEach(t=>{acc[t.id]=t.prompt||'';});return acc;},{})};
+    const tabMeta={global:{version:'1.0',score:'N/A',status:'Active'},l1:{version:lob.classL1Version||'V.1',score:`${lob.confidence}%`,status:lob.status}};
+    lob.categories.forEach(c=>{tabMeta[c.id]={version:c.activeVersion||'V.1',score:`${c.confidence}%`,status:c.status};c.types.forEach(t=>{tabMeta[t.id]={version:c.activeVersion||'V.1',score:`${c.confidence}%`,status:c.status};});});
+    const firstCatId=l1Items[0]?.id||'l1';
+    return{page:'detail',selectedLobId:lob.id,l0Name:lob.name,l1Items,prompts,defaultPrompts:prompts,
+      tabMeta,activeTab:firstCatId,activeL1Tab:firstCatId,
+      promptLevel:opts.promptLevel||'l1',testMode:opts.testMode||false,
+      ...(opts.docs!==undefined?{docs:opts.docs}:{}),
+      ...(opts.lobs!==undefined?{lobs:opts.lobs}:{}),
+      ...(opts.saveStates!==undefined?{saveStates:opts.saveStates}:{})};
+  };
+  const _lobDocs=ds.getDocsForLob(L0.id);
+  const _devDocs={
+    allPending:()=>_lobDocs.map(d=>({...d,status:'Pending',selected:false,lastTest:null})),
+    allMatch:()=>_lobDocs.map(d=>({...d,status:'Tested',selected:false,lastTest:{ctx:'L1 Class',pred:d.expectedLabels?.[0]||'Schadenmeldung',conf:91,match:true,testedAt:'2025-03-01'}})),
+    allMismatch:()=>_lobDocs.map(d=>({...d,status:'Tested',selected:false,lastTest:{ctx:'L1 Class',pred:'Wrong Category',conf:44,match:false,testedAt:'2025-03-01'}})),
+    mixed:()=>_lobDocs.map((d,i)=>i%3===2?{...d,status:'Tested',selected:false,lastTest:{ctx:'L1 Class',pred:'Other Class',conf:51,match:false,testedAt:'2025-03-01'}}:{...d,status:'Tested',selected:false,lastTest:{ctx:'L1 Class',pred:d.expectedLabels?.[0]||'Schadenmeldung',conf:84,match:true,testedAt:'2025-03-01'}}),
+    allSelected:()=>_lobDocs.map(d=>({...d,selected:true,status:'Pending',lastTest:null})),
+    lowConf:()=>_lobDocs.map(d=>({...d,status:'Tested',selected:false,lastTest:{ctx:'L1 Class',pred:d.expectedLabels?.[0]||'Unknown',conf:Math.floor(45+Math.random()*20),match:false,testedAt:'2025-03-01'}})),
+  };
+  const DEV_SCENARIOS=[
+    {id:'ov-default',  group:'Overview', label:'Default',        state:{page:'lob-overview'}},
+    {id:'ov-empty',    group:'Overview', label:'Empty — no LOBs',state:{page:'lob-overview',lobs:[]}},
+    {id:'ov-failed',   group:'Overview', label:'All Failed',     state:{page:'lob-overview',lobs:ds.lobs.map(l=>({...l,status:'Failed',confidence:0}))}},
+    {id:'ov-draft',    group:'Overview', label:'All Draft',      state:{page:'lob-overview',lobs:ds.lobs.map(l=>({...l,status:'Draft',confidence:0,trainedBy:''}))}},
+    {id:'ov-single',   group:'Overview', label:'Single LOB',     state:{page:'lob-overview',lobs:[L0]}},
+    {id:'det-l1',      group:'Prompt Detail', label:'L1 Mode',             state:_devBuildDetail(L0,{promptLevel:'l1'})},
+    {id:'det-l2',      group:'Prompt Detail', label:'L2 Mode',             state:_devBuildDetail(L0,{promptLevel:'l2'})},
+    {id:'det-global',  group:'Prompt Detail', label:'Global Mode',         state:_devBuildDetail(L0,{promptLevel:'global'})},
+    {id:'det-nocat',   group:'Prompt Detail', label:'No Categories',       state:_devBuildDetail({...L0,categories:[]},{})},
+    {id:'det-noph',    group:'Prompt Detail', label:'Missing Placeholder', state:_devBuildDetail(L0,{l1Prompt:'Classify this document into the correct category.',promptLevel:'l1'})},
+    {id:'det-unsaved', group:'Prompt Detail', label:'Unsaved Changes',     state:_devBuildDetail(L0,{promptLevel:'l1',saveStates:{'l1':'unsaved'}})},
+    {id:'tv-prerun',   group:'Test View', label:'Pre-run (all selected)',  state:_devBuildDetail(L0,{promptLevel:'l1',testMode:true,docs:_devDocs.allSelected()})},
+    {id:'tv-match',    group:'Test View', label:'All Matched',             state:_devBuildDetail(L0,{promptLevel:'l1',testMode:true,docs:_devDocs.allMatch()})},
+    {id:'tv-mismatch', group:'Test View', label:'All Mismatched (error)',  state:_devBuildDetail(L0,{promptLevel:'l1',testMode:true,docs:_devDocs.allMismatch()})},
+    {id:'tv-mixed',    group:'Test View', label:'Mixed Results',           state:_devBuildDetail(L0,{promptLevel:'l1',testMode:true,docs:_devDocs.mixed()})},
+    {id:'tv-lowconf',  group:'Test View', label:'Low Confidence',          state:_devBuildDetail(L0,{promptLevel:'l1',testMode:true,docs:_devDocs.lowConf()})},
+    {id:'tv-empty',    group:'Test View', label:'No Documents',            state:_devBuildDetail(L0,{promptLevel:'l1',testMode:true,docs:[]})},
+    {id:'doc-empty',   group:'Documents', label:'Empty Library',  state:_devBuildDetail(L0,{promptLevel:'l1',docs:[]})},
+    {id:'doc-pending', group:'Documents', label:'All Pending',    state:_devBuildDetail(L0,{promptLevel:'l1',docs:_devDocs.allPending()})},
+    {id:'doc-tested',  group:'Documents', label:'All Tested',     state:_devBuildDetail(L0,{promptLevel:'l1',docs:_devDocs.allMatch()})},
+  ];
+
   const [activeScenario,setActiveScenario]=useState(null);
   return(
     <>
-      <DevPanel onApply={setActiveScenario} onReset={()=>setActiveScenario(null)} activeId={activeScenario?.id}/>
+      <DevPanel scenarios={DEV_SCENARIOS} onApply={setActiveScenario} onReset={()=>setActiveScenario(null)} activeId={activeScenario?.id}/>
       <App key={activeScenario?.id||'default'} devOverrides={activeScenario?.state||{}}/>
     </>
   );
 }
-ReactDOM.createRoot(document.getElementById('root')).render(<Root/>);
+
+function AppLoader(){
+  const [ds,setDs]=useState(null);
+  const [err,setErr]=useState(null);
+  useEffect(()=>{DataService.load().then(setDs).catch(e=>setErr(e.message));},[]);
+  if(err)return(
+    <div style={{padding:40,fontFamily:'monospace',fontSize:13,color:'#cc0000'}}>
+      <b>Data load failed:</b> {err}<br/>
+      <span style={{color:'#767676'}}>Local dev: run <b>npx serve .</b> in the project directory, then reload.</span>
+    </div>
+  );
+  if(!ds)return<div style={{padding:40,color:'#767676',fontSize:13}}>Loading…</div>;
+  return<DataCtx.Provider value={ds}><Root/></DataCtx.Provider>;
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<AppLoader/>);
 
 </script>
 </body>

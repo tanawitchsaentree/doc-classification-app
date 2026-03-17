@@ -1,0 +1,450 @@
+[
+  {
+    "id": "schaden",
+    "name": "Schaden",
+    "classL1Version": "V.2",
+    "classL2Version": "V.1",
+    "status": "Deployed",
+    "confidence": 92,
+    "trainedBy": "Arlene Wilson",
+    "lobPrompt": "You are classifying Schaden (Claims) documents.\n\nThis L0 covers all claim-related documents: first notifications, assessments, expert reports, and settlement letters.\n\n{{CLASSIFICATION_HIERARCHY}}\n\nKey identifiers:\n- Claim reference numbers (SCH-, CLM-, FNOL-)\n- \"Schadenmeldung\", \"Schadenanzeige\", \"Schadennummer\"\n- Loss date, incident description, policyholder details\n- Third-party information and witness statements",
+    "versions": [
+      {"v":"V.2","date":"2025-02-10","status":"Active",  "score":"92%","note":"Improved FNOL and assessment accuracy.","createdBy":"Arlene Wilson"},
+      {"v":"V.1","date":"2024-12-01","status":"Archived","score":"88%","note":"Initial Schaden L0 release.",           "createdBy":"Jennie Cooper"}
+    ],
+    "categories": [
+      {
+        "id": "sch-meldung",
+        "name": "Schadenmeldung",
+        "activeVersion": "V.2",
+        "status": "Deployed",
+        "confidence": 93,
+        "trainedBy": "Arlene Wilson",
+        "prompt": "Classify first notification of loss (FNOL) documents.\n\nLook for:\n- \"Schadenmeldung\", \"Schadenanzeige\", \"Erstmeldung\"\n- Incident date, time, and location\n- Policyholder signature and date of submission\n- Claim reference number (SCH-, FNOL-)",
+        "types": [
+          {"id":"sch-fnol",  "name":"FNOL Formular",  "tags":[],"prompt":"Structured first notification of loss form. Contains policyholder details, incident date/time/location, description of loss, and claim number."},
+          {"id":"sch-zeugen","name":"Zeugenaussage",   "tags":[],"prompt":"Witness statement accompanying a claim. Contains witness name, contact details, and account of the incident."}
+        ]
+      },
+      {
+        "id": "sch-pruefung",
+        "name": "Schadenprüfung",
+        "activeVersion": "V.1",
+        "status": "Deployed",
+        "confidence": 89,
+        "trainedBy": "Evan Flores",
+        "prompt": "Classify claim assessment and investigation documents.\n\nLook for:\n- Adjuster or expert report letterhead\n- Assessment date and reference to claim number\n- Coverage decision language (\"gedeckt\", \"abgelehnt\")\n- Itemised damage list with cost estimates",
+        "types": [
+          {"id":"sch-gutachten","name":"Schadengutachten",  "tags":[],"prompt":"Expert damage assessment report. Contains adjuster name, inspection date, itemised damage, and repair cost estimate."},
+          {"id":"sch-foto",    "name":"Fotodokumentation","tags":[],"prompt":"Photo documentation of damage. Usually a PDF with images, captions, and claim reference."}
+        ]
+      },
+      {
+        "id": "sch-abschluss",
+        "name": "Schadenabschluss",
+        "activeVersion": "V.1",
+        "status": "Draft",
+        "confidence": 0,
+        "trainedBy": "",
+        "prompt": "Classify claim settlement and closure documents.\n\nLook for:\n- \"Abfindungserklärung\", \"Schadenabschluss\", \"Entschädigungszahlung\"\n- Payment amount and bank details\n- Claimant signature confirming settlement\n- Closure date and claim reference",
+        "types": []
+      }
+    ]
+  },
+  {
+    "id": "sach",
+    "name": "Sach",
+    "classL1Version": "V.2",
+    "classL2Version": "V.1",
+    "status": "Deployed",
+    "confidence": 90,
+    "trainedBy": "Philip Steward",
+    "lobPrompt": "You are classifying Sach (Property) documents.\n\nThis L0 covers property insurance documents: claims, policies, surveys, and repair invoices.\n\n{{CLASSIFICATION_HIERARCHY}}\n\nKey identifiers:\n- Property address (street, city, postcode)\n- Policy numbers starting with \"SAC-\" or \"PHH-\"\n- \"Gebäudeversicherung\", \"Hausratversicherung\", \"Sachversicherung\"\n- Building survey or valuation reference numbers",
+    "versions": [
+      {"v":"V.2","date":"2025-01-20","status":"Active",  "score":"90%","note":"Improved property survey and claim accuracy.","createdBy":"Philip Steward"},
+      {"v":"V.1","date":"2024-09-15","status":"Archived","score":"74%","note":"Initial Sach L0 release.",               "createdBy":"Philip Steward"}
+    ],
+    "categories": [
+      {
+        "id": "sach-schaden",
+        "name": "Sachschaden",
+        "activeVersion": "V.2",
+        "status": "Failed",
+        "confidence": 78,
+        "trainedBy": "Evan Flores",
+        "prompt": "Classify property damage claim documents.\n\nLook for:\n- \"Sachschaden\", \"Gebäudeschaden\", \"Wasserschaden\", \"Feuerschaden\"\n- Property address and description of damage\n- Photos or survey report reference\n- Repair cost estimate or contractor quote",
+        "types": [
+          {"id":"sach-wasser",  "name":"Wasserschaden",  "tags":[],"prompt":"Water damage claim document. Contains source of water ingress, affected rooms, drying/repair estimate, and claim reference."},
+          {"id":"sach-feuer",   "name":"Feuerschaden",   "tags":[],"prompt":"Fire damage claim. Contains fire brigade report reference, extent of damage, and salvage details."},
+          {"id":"sach-einbruch","name":"Einbruchschaden","tags":[],"prompt":"Burglary/break-in damage claim. Contains police report number, list of stolen/damaged items, and entry point description."}
+        ]
+      },
+      {
+        "id": "sach-gutachten",
+        "name": "Sachgutachten",
+        "activeVersion": "V.1",
+        "status": "Deployed",
+        "confidence": 85,
+        "trainedBy": "Philip Steward",
+        "prompt": "Classify property survey and valuation reports.\n\nLook for:\n- Surveyor credentials and accreditation\n- Property address and full description\n- Rebuild cost or market value figure\n- Survey date and reference number",
+        "types": [
+          {"id":"sach-bewertung","name":"Bewertungsbericht","tags":[],"prompt":"Property valuation report for underwriting. Contains rebuild cost, market value, construction type, and risk assessment."},
+          {"id":"sach-landlord","name":"Vermieterobjekt",  "tags":[],"prompt":"Landlord/rented property policy or survey. Contains \"Vermieter\" or \"vermietetes Objekt\" language, rental income references."}
+        ]
+      },
+      {
+        "id": "sach-police",
+        "name": "Sachpolice",
+        "activeVersion": "V.1",
+        "status": "Deployed",
+        "confidence": 90,
+        "trainedBy": "Jane Doe",
+        "prompt": "Classify property insurance policy documents.\n\nLook for:\n- \"Versicherungsschein\", \"Police\", policy number (SAC-, PHH-)\n- Insured property address\n- Sum insured and premium details\n- Policy period start and end dates",
+        "types": [
+          {"id":"sach-wohngebaeude","name":"Wohngebäude","tags":[],"prompt":"Residential building (Wohngebäude) policy. Contains building sum insured, postcode, construction year, and cover type."},
+          {"id":"sach-hausrat",    "name":"Hausrat",     "tags":[],"prompt":"Household contents (Hausrat) policy. Contains contents sum insured, insured address, and listed valuables."}
+        ]
+      }
+    ]
+  },
+  {
+    "id": "kraft",
+    "name": "Kraft",
+    "classL1Version": "V.3",
+    "classL2Version": "V.2",
+    "status": "Deployed",
+    "confidence": 95,
+    "trainedBy": "Arlene Wilson",
+    "lobPrompt": "You are classifying Kraft (Motor) documents.\n\nThis L0 covers motor insurance: claims, policies, quotations, and legal documentation.\n\n{{CLASSIFICATION_HIERARCHY}}\n\nKey identifiers:\n- Vehicle registration numbers, chassis/VIN numbers\n- Policy numbers starting with \"KFZ-\" or \"KRA-\"\n- \"Kraftfahrzeugversicherung\", \"Kfz-Haftpflicht\", \"Vollkasko\"\n- Garage/repairer letterheads and approval numbers\n- FNOL reference numbers (SCH-, FNOL-)",
+    "versions": [
+      {"v":"V.3","date":"2025-02-18","status":"Active",  "score":"95%","note":"Improved FNOL and repair invoice accuracy.",                  "createdBy":"Arlene Wilson"},
+      {"v":"V.2","date":"2025-01-05","status":"Archived","score":"91%","note":"Added inspection classifier, expanded complaint sub-types.", "createdBy":"Jennie Cooper"},
+      {"v":"V.1","date":"2024-11-20","status":"Archived","score":"87%","note":"Initial Kraft L0 release.",                                   "createdBy":"Arlene Wilson"}
+    ],
+    "categories": [
+      {
+        "id": "kraft-schaden",
+        "name": "Kraft Schaden",
+        "activeVersion": "V.3",
+        "status": "Deployed",
+        "confidence": 94,
+        "trainedBy": "Arlene Wilson",
+        "prompt": "Classify Kraft (Motor) claim documents.\n\nLook for:\n- Vehicle registration number and make/model\n- Incident date and location\n- Third-party details and police report reference\n- FNOL or claim reference (SCH-, KFZ-)",
+        "types": [
+          {"id":"kraft-fnol",    "name":"FNOL Formular",     "tags":[],"prompt":"Motor first notification of loss. Contains vehicle details, incident description, third-party information, and claim reference."},
+          {"id":"kraft-reparatur","name":"Reparaturrechnung","tags":[],"prompt":"Garage repair invoice for motor claim. Contains garage name, vehicle registration, itemised repair costs, and parts list."},
+          {"id":"kraft-polizei", "name":"Polizeibericht",    "tags":[],"prompt":"Police report for motor incident. Contains crime/accident reference number, officer details, and incident summary."}
+        ]
+      },
+      {
+        "id": "kraft-beschwerde",
+        "name": "Einfach Beschwerde",
+        "activeVersion": "V.2",
+        "status": "Failed",
+        "confidence": 81,
+        "trainedBy": "Evan Flores",
+        "prompt": "Classify standard complaint documents for Kraft (Motor).\n\nLook for:\n- Customer dissatisfaction language\n- Reference to policy or claim number\n- Escalation language (ombudsman, regulator)",
+        "types": [
+          {"id":"kraft-std-beschwerde",     "name":"Standard Beschwerde","tags":[],"prompt":"Standard customer complaint letter. Contains complaint description, policy reference, and desired resolution."},
+          {"id":"kraft-vorstand-beschwerde","name":"Vorstand Beschwerde","tags":[],"prompt":"Board-level escalated complaint. Addressed to Vorstand/management, high urgency language, regulatory references."}
+        ]
+      },
+      {
+        "id": "kraft-police",
+        "name": "Kraft Versicherungsschein",
+        "activeVersion": "V.2",
+        "status": "Deployed",
+        "confidence": 93,
+        "trainedBy": "Jennie Cooper",
+        "prompt": "Classify Kraft (Motor) policy documents.\n\nLook for:\n- \"Versicherungsschein\", \"Kraftfahrzeugschein\"\n- Vehicle registration, make, model, and year\n- Policy number (KFZ-, KRA-)\n- Cover type: Haftpflicht, Teilkasko, Vollkasko",
+        "types": [
+          {"id":"kraft-haftpflicht","name":"Kfz-Haftpflicht","tags":[],"prompt":"Motor third-party liability policy. Contains vehicle details, coverage limits, and \"Haftpflicht\" designation."},
+          {"id":"kraft-vollkasko", "name":"Vollkasko",        "tags":[],"prompt":"Comprehensive motor policy. Contains \"Vollkasko\" coverage, vehicle value, and excess/deductible details."}
+        ]
+      },
+      {
+        "id": "kraft-rechnung",
+        "name": "Rechnung",
+        "activeVersion": "V.1",
+        "status": "Deployed",
+        "confidence": 88,
+        "trainedBy": "Philip Steward",
+        "prompt": "Classify invoices related to Kraft (Motor) insurance.\n\nLook for:\n- Garage or supplier letterhead\n- VAT number and invoice number\n- Itemised parts and labour costs\n- Vehicle registration number",
+        "types": [
+          {"id":"kraft-garagerechnung","name":"Werkstattrechnung","tags":[],"prompt":"Workshop/garage invoice. Contains labour hours, parts list, VAT breakdown, and vehicle registration."}
+        ]
+      }
+    ]
+  },
+  {
+    "id": "rechnung",
+    "name": "Rechnung",
+    "classL1Version": "V.1",
+    "classL2Version": "V.1",
+    "status": "Deployed",
+    "confidence": 88,
+    "trainedBy": "Philip Steward",
+    "lobPrompt": "You are classifying Rechnung (Invoice) documents.\n\nThis L0 covers all invoice and billing documents submitted across insurance lines.\n\n{{CLASSIFICATION_HIERARCHY}}\n\nKey identifiers:\n- \"Rechnung\", \"Faktura\", \"Invoice\"\n- Invoice number and date\n- VAT number (Steuernummer / USt-IdNr.)\n- Supplier/vendor name and address\n- Itemised services or goods with amounts",
+    "versions": [
+      {"v":"V.1","date":"2025-01-15","status":"Active","score":"88%","note":"Initial Rechnung L0 release.","createdBy":"Philip Steward"}
+    ],
+    "categories": [
+      {
+        "id": "rech-reparatur",
+        "name": "Reparaturrechnung",
+        "activeVersion": "V.1",
+        "status": "Deployed",
+        "confidence": 90,
+        "trainedBy": "Philip Steward",
+        "prompt": "Classify repair invoices.\n\nLook for:\n- Workshop or contractor letterhead\n- Itemised labour and parts\n- Vehicle registration or property address reference\n- Claim or job reference number",
+        "types": [
+          {"id":"rech-kfz",     "name":"Kfz-Reparatur",    "tags":[],"prompt":"Motor vehicle repair invoice. Contains vehicle registration, garage details, parts list, and labour charges."},
+          {"id":"rech-gebaeude","name":"Gebäudereparatur",  "tags":[],"prompt":"Building repair invoice. Contains property address, contractor details, scope of works, and total cost."}
+        ]
+      },
+      {
+        "id": "rech-gutachter",
+        "name": "Gutachterrechnung",
+        "activeVersion": "V.1",
+        "status": "Deployed",
+        "confidence": 86,
+        "trainedBy": "Evan Flores",
+        "prompt": "Classify expert/assessor invoices.\n\nLook for:\n- Expert or assessor firm letterhead\n- Reference to inspection or report number\n- Assessment fee and travel expenses\n- Claim reference number",
+        "types": [
+          {"id":"rech-sachverstaendiger","name":"Sachverständigenrechnung","tags":[],"prompt":"Independent expert invoice. Contains assessor accreditation, inspection date, fee schedule, and report reference."}
+        ]
+      },
+      {
+        "id": "rech-anwalt",
+        "name": "Anwaltsrechnung",
+        "activeVersion": "V.1",
+        "status": "Draft",
+        "confidence": 0,
+        "trainedBy": "",
+        "prompt": "Classify legal/solicitor invoices.\n\nLook for:\n- Law firm letterhead with \"Rechtsanwalt\" or \"Kanzlei\"\n- Hourly rate and billable hours\n- Case or file reference number\n- RVG (Rechtsanwaltsvergütungsgesetz) fee references",
+        "types": []
+      }
+    ]
+  },
+  {
+    "id": "einfach",
+    "name": "Einfach",
+    "classL1Version": "V.1",
+    "classL2Version": null,
+    "status": "Deployed",
+    "confidence": 85,
+    "trainedBy": "Jennie Cooper",
+    "lobPrompt": "You are classifying Einfach (Simple/Standard) documents.\n\nThis L0 covers routine, low-complexity documents: standard letters, acknowledgements, and simple requests.\n\n{{CLASSIFICATION_HIERARCHY}}\n\nKey identifiers:\n- Simple one-page correspondence\n- Standard acknowledgement language (\"Bestätigung\", \"Eingangsbestätigung\")\n- No complex claim or legal content\n- Routine policyholder enquiries",
+    "versions": [
+      {"v":"V.1","date":"2025-01-10","status":"Active","score":"85%","note":"Initial Einfach L0 release.","createdBy":"Jennie Cooper"}
+    ],
+    "categories": [
+      {
+        "id": "ein-beschwerde",
+        "name": "Einfach Beschwerde",
+        "activeVersion": "V.1",
+        "status": "Deployed",
+        "confidence": 87,
+        "trainedBy": "Jennie Cooper",
+        "prompt": "Classify standard (simple) complaint letters.\n\nLook for:\n- Routine dissatisfaction language\n- Single issue complaint (delay, communication)\n- No regulatory escalation language\n- Policy or claim number reference",
+        "types": [
+          {"id":"ein-std","name":"Standardbeschwerde","tags":[],"prompt":"Standard complaint with single issue. Contains policyholder name, policy number, complaint description, and desired outcome."}
+        ]
+      },
+      {
+        "id": "ein-anfrage",
+        "name": "Standardanfrage",
+        "activeVersion": "V.1",
+        "status": "Deployed",
+        "confidence": 83,
+        "trainedBy": "Jennie Cooper",
+        "prompt": "Classify standard policyholder enquiry letters.\n\nLook for:\n- Question or information request tone\n- Policy or claim number reference\n- No urgency or legal language\n- Routine topics: address change, coverage query, payment query",
+        "types": [
+          {"id":"ein-adresse","name":"Adressänderung",  "tags":[],"prompt":"Address change request. Contains current and new address, policy number, and policyholder signature."},
+          {"id":"ein-auskunft","name":"Auskunftsanfrage","tags":[],"prompt":"Information request about policy or claim status. Contains policy/claim reference and specific question."}
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vorstand",
+    "name": "Vorstand",
+    "classL1Version": "V.1",
+    "classL2Version": null,
+    "status": "Deployed",
+    "confidence": 91,
+    "trainedBy": "Evan Flores",
+    "lobPrompt": "You are classifying Vorstand (Board-level) documents.\n\nThis L0 covers escalated, board-level correspondence: senior complaints, regulatory escalations, and management decisions.\n\n{{CLASSIFICATION_HIERARCHY}}\n\nKey identifiers:\n- Addressed to \"Vorstand\", \"Geschäftsführung\", \"Management\"\n- Regulatory body references (BaFin, Ombudsmann)\n- High-urgency or legal threat language\n- Senior signatory on both sender and recipient side",
+    "versions": [
+      {"v":"V.1","date":"2025-01-20","status":"Active","score":"91%","note":"Initial Vorstand L0 release.","createdBy":"Evan Flores"}
+    ],
+    "categories": [
+      {
+        "id": "vor-beschwerde",
+        "name": "Vorstand Beschwerde",
+        "activeVersion": "V.1",
+        "status": "Deployed",
+        "confidence": 92,
+        "trainedBy": "Evan Flores",
+        "prompt": "Classify board-level escalated complaint documents.\n\nLook for:\n- Addressed to Vorstand or Geschäftsführung\n- Prior complaint reference (already escalated once)\n- Ombudsmann or BaFin reference\n- Legal threat or litigation language",
+        "types": [
+          {"id":"vor-bafin", "name":"BaFin-Beschwerde",     "tags":[],"prompt":"Complaint referencing or copied to BaFin (German financial regulator). Contains BaFin reference, escalation history, and regulatory language."},
+          {"id":"vor-ombuds","name":"Ombudsmann-Beschwerde","tags":[],"prompt":"Complaint submitted to or via the insurance ombudsman (Ombudsmann). Contains case number and ombudsman letterhead."}
+        ]
+      },
+      {
+        "id": "vor-entscheid",
+        "name": "Vorstandsentscheidung",
+        "activeVersion": "V.1",
+        "status": "Draft",
+        "confidence": 0,
+        "trainedBy": "",
+        "prompt": "Classify board-level decision and approval documents.\n\nLook for:\n- Internal memo or board minute format\n- Decision language (\"beschlossen\", \"genehmigt\")\n- Board member signatures\n- Reference to policy or claim case",
+        "types": []
+      }
+    ]
+  },
+  {
+    "id": "vertragsaenderung",
+    "name": "Vertragsänderung",
+    "classL1Version": "V.1",
+    "classL2Version": null,
+    "status": "Deployed",
+    "confidence": 87,
+    "trainedBy": "Jane Doe",
+    "lobPrompt": "You are classifying Vertragsänderung (Policy Change) documents.\n\nThis L0 covers all mid-term policy amendments: coverage changes, vehicle/property updates, and endorsements.\n\n{{CLASSIFICATION_HIERARCHY}}\n\nKey identifiers:\n- \"Vertragsänderung\", \"Nachtrag\", \"Endorsement\", \"Änderungsantrag\"\n- Policy number and effective date of change\n- Description of what is being changed (old vs new value)\n- Policyholder signature and date",
+    "versions": [
+      {"v":"V.1","date":"2025-02-01","status":"Active","score":"87%","note":"Initial Vertragsänderung L0 release.","createdBy":"Jane Doe"}
+    ],
+    "categories": [
+      {
+        "id": "vta-antrag",
+        "name": "Änderungsantrag",
+        "activeVersion": "V.1",
+        "status": "Deployed",
+        "confidence": 88,
+        "trainedBy": "Jane Doe",
+        "prompt": "Classify policy change request documents.\n\nLook for:\n- \"Änderungsantrag\", \"Antrag auf Vertragsänderung\"\n- Current policy details and requested change\n- Effective date of requested change\n- Policyholder signature",
+        "types": [
+          {"id":"vta-fahrzeug","name":"Fahrzeugwechsel",        "tags":[],"prompt":"Vehicle substitution request. Contains old and new vehicle registration, make/model, and requested effective date."},
+          {"id":"vta-deckung","name":"Deckungsänderung",        "tags":[],"prompt":"Coverage change request. Contains current cover level, requested new level (e.g. Haftpflicht → Vollkasko), and reason."},
+          {"id":"vta-adresse","name":"Adress-/Risikoänderung","tags":[],"prompt":"Change of insured address or risk location. Contains old and new address, postcode, and effective date."}
+        ]
+      },
+      {
+        "id": "vta-bestaetigung",
+        "name": "Änderungsbestätigung",
+        "activeVersion": "V.1",
+        "status": "Deployed",
+        "confidence": 86,
+        "trainedBy": "Jane Doe",
+        "prompt": "Classify policy change confirmation documents (endorsements).\n\nLook for:\n- \"Nachtrag\", \"Änderungsbestätigung\", endorsement number\n- Updated policy schedule reflecting the change\n- Insurer stamp or digital signature\n- Revised premium (if applicable)",
+        "types": [
+          {"id":"vta-nachtrag","name":"Nachtrag","tags":[],"prompt":"Policy endorsement / mid-term adjustment confirmation. Contains endorsement number, changed fields, and updated premium."}
+        ]
+      }
+    ]
+  },
+  {
+    "id": "privatschutz",
+    "name": "Privatschutz",
+    "classL1Version": "V.1",
+    "classL2Version": null,
+    "status": "Deployed",
+    "confidence": 89,
+    "trainedBy": "Jennie Cooper",
+    "lobPrompt": "You are classifying Privatschutz (Private Coverage) documents.\n\nThis L0 covers personal lines private insurance: household, personal liability, legal protection, and life cover.\n\n{{CLASSIFICATION_HIERARCHY}}\n\nKey identifiers:\n- \"Privathaftpflicht\", \"Hausrat\", \"Rechtsschutz\", \"Lebensversicherung\"\n- Individual policyholder name and home address\n- Policy numbers starting with \"PRI-\" or \"PRV-\"\n- Personal risk details (family size, property type)",
+    "versions": [
+      {"v":"V.1","date":"2025-01-25","status":"Active","score":"89%","note":"Initial Privatschutz L0 release.","createdBy":"Jennie Cooper"}
+    ],
+    "categories": [
+      {
+        "id": "pri-haftpflicht",
+        "name": "Privathaftpflicht",
+        "activeVersion": "V.1",
+        "status": "Deployed",
+        "confidence": 91,
+        "trainedBy": "Jennie Cooper",
+        "prompt": "Classify private liability insurance documents.\n\nLook for:\n- \"Privathaftpflicht\", \"PHV\"\n- Individual or family policyholder details\n- Liability limit and deductible\n- Covered persons (family members, pets)",
+        "types": [
+          {"id":"pri-single", "name":"Einzelperson", "tags":[],"prompt":"Private liability policy for a single person. Contains individual name, address, and single-person premium."},
+          {"id":"pri-familie","name":"Familientarif","tags":[],"prompt":"Family private liability policy. Contains policyholder and listed family members, family premium rate."}
+        ]
+      },
+      {
+        "id": "pri-rechtsschutz",
+        "name": "Rechtsschutz",
+        "activeVersion": "V.1",
+        "status": "Deployed",
+        "confidence": 88,
+        "trainedBy": "Philip Steward",
+        "prompt": "Classify legal protection insurance documents.\n\nLook for:\n- \"Rechtsschutzversicherung\", \"RSV\"\n- Legal area covered (Arbeitsrecht, Mietrecht, Verkehrsrecht)\n- Waiting period clause references\n- Law firm panel or free choice of lawyer clause",
+        "types": [
+          {"id":"pri-arbeitsrecht","name":"Arbeitsrechtsschutz","tags":[],"prompt":"Employment law protection policy. Contains \"Arbeitsrecht\" cover, employment status of insured, and waiting period."},
+          {"id":"pri-mietrecht",  "name":"Mietrechtsschutz",  "tags":[],"prompt":"Tenancy law protection policy. Contains \"Mietrecht\" cover, rental address, and tenant/landlord role."}
+        ]
+      },
+      {
+        "id": "pri-hausrat",
+        "name": "Hausrat",
+        "activeVersion": "V.1",
+        "status": "Draft",
+        "confidence": 0,
+        "trainedBy": "",
+        "prompt": "Classify household contents insurance documents.\n\nLook for:\n- \"Hausratversicherung\", \"Hausrat\"\n- Insured address and sum insured for contents\n- Listed high-value items (Wertsachen)\n- Burglary, fire, and water damage cover sections",
+        "types": []
+      }
+    ]
+  },
+  {
+    "id": "kuendigung",
+    "name": "Kündigung",
+    "classL1Version": "V.1",
+    "classL2Version": null,
+    "status": "Deployed",
+    "confidence": 90,
+    "trainedBy": "Arlene Wilson",
+    "lobPrompt": "You are classifying Kündigung (Cancellation) documents.\n\nThis L0 covers all policy cancellation and termination documents from both policyholder and insurer side.\n\n{{CLASSIFICATION_HIERARCHY}}\n\nKey identifiers:\n- \"Kündigung\", \"Vertragsauflösung\", \"Kündigung zum nächstmöglichen Termin\"\n- Policy number and cancellation effective date\n- Reason for cancellation (optional)\n- Registered letter (Einschreiben) references",
+    "versions": [
+      {"v":"V.1","date":"2025-02-05","status":"Active","score":"90%","note":"Initial Kündigung L0 release.","createdBy":"Arlene Wilson"}
+    ],
+    "categories": [
+      {
+        "id": "kuend-vh",
+        "name": "Versicherungsnehmer-Kündigung",
+        "activeVersion": "V.1",
+        "status": "Deployed",
+        "confidence": 91,
+        "trainedBy": "Arlene Wilson",
+        "prompt": "Classify cancellation letters sent BY the policyholder.\n\nLook for:\n- Policyholder as sender\n- \"Ich kündige\", \"hiermit kündige ich\"\n- Policy number and requested cancellation date\n- Reason: premium increase, found better cover, no longer needed",
+        "types": [
+          {"id":"kuend-ordentlich","name":"Ordentliche Kündigung","tags":[],"prompt":"Standard annual cancellation at policy renewal date. Contains policy number, renewal date, and policyholder signature."},
+          {"id":"kuend-sonder",   "name":"Sonderkündigung",      "tags":[],"prompt":"Special cancellation right triggered by premium increase or claim. Contains trigger event reference and cancellation date."}
+        ]
+      },
+      {
+        "id": "kuend-vers",
+        "name": "Versicherer-Kündigung",
+        "activeVersion": "V.1",
+        "status": "Deployed",
+        "confidence": 89,
+        "trainedBy": "Evan Flores",
+        "prompt": "Classify cancellation notices sent BY the insurer.\n\nLook for:\n- Insurer letterhead as sender\n- \"Wir kündigen\", \"Kündigung des Versicherungsvertrages\"\n- Reason: non-payment, fraud, risk change\n- Notice period stated",
+        "types": [
+          {"id":"kuend-nichtzahlung","name":"Kündigung wegen Nichtzahlung",          "tags":[],"prompt":"Insurer cancellation due to non-payment of premium. Contains outstanding amount, reminder references, and final cancellation date."},
+          {"id":"kuend-betrug",     "name":"Kündigung wegen Obliegenheitsverletzung","tags":[],"prompt":"Insurer cancellation due to breach of duty or misrepresentation. Contains reason statement and legal basis."}
+        ]
+      },
+      {
+        "id": "kuend-bestaetigung",
+        "name": "Kündigungsbestätigung",
+        "activeVersion": "V.1",
+        "status": "Draft",
+        "confidence": 0,
+        "trainedBy": "",
+        "prompt": "Classify cancellation confirmation documents.\n\nLook for:\n- \"Kündigungsbestätigung\", \"Wir bestätigen die Kündigung\"\n- Policy number and confirmed cancellation date\n- Pro-rata refund amount (if applicable)\n- Insurer stamp or digital signature",
+        "types": []
+      }
+    ]
+  }
+]

@@ -1,0 +1,6 @@
+[
+  {"id":"ds-schaden",  "name":"Schaden Batch",        "color":"#ef4444"},
+  {"id":"ds-sach",     "name":"Sach & Kraft",          "color":"#3b82f6"},
+  {"id":"ds-rechnung", "name":"Rechnung & Einfach",    "color":"#10b981"},
+  {"id":"ds-vertraege","name":"Verträge & Kündigung",  "color":"#8b5cf6"}
+]

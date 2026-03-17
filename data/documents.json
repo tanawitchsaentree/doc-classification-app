@@ -1,0 +1,54 @@
+[
+  {"id":1,  "name":"Schadenmeldung_FNOL_SCH-00392.pdf",        "size":"48 KB",  "lobId":"schaden",          "dataSetId":"ds-schaden",  "expectedLabel":"Schadenmeldung",              "lastTest":{"ctx":"Schaden",         "pred":"Schadenmeldung",              "conf":94,"match":true}},
+  {"id":2,  "name":"Zeugenaussage_Unfall_RTC-4421.pdf",         "size":"112 KB", "lobId":"schaden",          "dataSetId":"ds-schaden",  "expectedLabel":"Schadenmeldung",              "lastTest":null},
+  {"id":3,  "name":"Schadengutachten_Kfz_Sachverstaendiger.pdf","size":"239 KB", "lobId":"schaden",          "dataSetId":"ds-schaden",  "expectedLabel":"Schadenprüfung",              "lastTest":{"ctx":"Schaden",         "pred":"Schadenprüfung",              "conf":89,"match":true}},
+  {"id":4,  "name":"Fotodokumentation_Wasserschaden_2025.jpg",  "size":"185 KB", "lobId":"schaden",          "dataSetId":"ds-schaden",  "expectedLabel":"Schadenprüfung",              "lastTest":null},
+  {"id":5,  "name":"Abfindungserklaerung_SCH-00392.pdf",        "size":"76 KB",  "lobId":"schaden",          "dataSetId":"ds-schaden",  "expectedLabel":"Schadenabschluss",            "lastTest":null},
+  {"id":6,  "name":"Schadenmeldung_Einbruch_SCH-00501.pdf",     "size":"320 KB", "lobId":"schaden",          "dataSetId":"ds-schaden",  "expectedLabel":"Schadenmeldung",              "lastTest":{"ctx":"Schaden",         "pred":"Schadenabschluss",            "conf":61,"match":false}},
+
+  {"id":7,  "name":"Sachgutachten_Wohngebaeude_RICS.pdf",       "size":"95 KB",  "lobId":"sach",             "dataSetId":"ds-sach",     "expectedLabel":"Sachgutachten",               "lastTest":{"ctx":"Sach",            "pred":"Sachgutachten",               "conf":92,"match":true}},
+  {"id":8,  "name":"Sachschaden_Wasserschaden_SAC-0391.pdf",    "size":"54 KB",  "lobId":"sach",             "dataSetId":"ds-sach",     "expectedLabel":"Sachschaden",                 "lastTest":null},
+  {"id":9,  "name":"Reparaturrechnung_Dachdecker_Sturmschaden.pdf","size":"143 KB","lobId":"sach",           "dataSetId":"ds-sach",     "expectedLabel":"Sachschaden",                 "lastTest":null},
+  {"id":10, "name":"Wohngebaeude_Police_SAC-8812.pdf",          "size":"88 KB",  "lobId":"sach",             "dataSetId":"ds-sach",     "expectedLabel":"Sachpolice",                  "lastTest":{"ctx":"Sach",            "pred":"Sachpolice",                  "conf":91,"match":true}},
+  {"id":11, "name":"Bewertungsbericht_Neuwert_2025.pdf",        "size":"201 KB", "lobId":"sach",             "dataSetId":"ds-sach",     "expectedLabel":"Sachgutachten",               "lastTest":null},
+  {"id":12, "name":"Hausrat_Police_PHH-4421.pdf",               "size":"67 KB",  "lobId":"sach",             "dataSetId":"ds-sach",     "expectedLabel":"Sachpolice",                  "lastTest":null},
+  {"id":13, "name":"Einbruchschaden_Fotos_Fenster.jpg",         "size":"156 KB", "lobId":"sach",             "dataSetId":"ds-sach",     "expectedLabel":"Sachschaden",                 "lastTest":null},
+  {"id":14, "name":"Feuerschaden_Bericht_FW-Ref.pdf",           "size":"93 KB",  "lobId":"sach",             "dataSetId":"ds-sach",     "expectedLabel":"Sachschaden",                 "lastTest":null},
+
+  {"id":15, "name":"FNOL_Formular_SCH-00921_KFZ.pdf",           "size":"274 KB", "lobId":"kraft",            "dataSetId":"ds-sach",     "expectedLabel":"Kraft Schaden",               "lastTest":{"ctx":"Kraft",           "pred":"Kraft Schaden",               "conf":93,"match":true}},
+  {"id":16, "name":"Reparaturrechnung_Werkstatt_B-MN3421.pdf",  "size":"41 KB",  "lobId":"kraft",            "dataSetId":"ds-sach",     "expectedLabel":"Kraft Schaden",               "lastTest":null},
+  {"id":17, "name":"Polizeibericht_Unfall_CAD-4421.pdf",        "size":"118 KB", "lobId":"kraft",            "dataSetId":"ds-sach",     "expectedLabel":"Kraft Schaden",               "lastTest":null},
+  {"id":18, "name":"Kfz_Versicherungsschein_KFZ-8821.pdf",      "size":"209 KB", "lobId":"kraft",            "dataSetId":"ds-sach",     "expectedLabel":"Kraft Versicherungsschein",   "lastTest":null},
+  {"id":19, "name":"Einfach_Beschwerde_Regulierungsverzoegerung.pdf","size":"73 KB","lobId":"kraft",          "dataSetId":"ds-sach",     "expectedLabel":"Einfach Beschwerde",          "lastTest":{"ctx":"Kraft",           "pred":"Einfach Beschwerde",          "conf":82,"match":true}},
+  {"id":20, "name":"Vorstand_Beschwerde_BaFin-Ref.pdf",         "size":"162 KB", "lobId":"vorstand",         "dataSetId":"ds-vertraege","expectedLabel":"Vorstand Beschwerde",         "lastTest":{"ctx":"Vorstand",        "pred":"Einfach Beschwerde",          "conf":68,"match":false}},
+  {"id":21, "name":"Vollkasko_Police_KFZ-3310.pdf",             "size":"88 KB",  "lobId":"kraft",            "dataSetId":"ds-sach",     "expectedLabel":"Kraft Versicherungsschein",   "lastTest":null},
+  {"id":22, "name":"Zeugenaussage_Unfall_RTC-0021.pdf",         "size":"311 KB", "lobId":"kraft",            "dataSetId":"ds-sach",     "expectedLabel":"Kraft Schaden",               "lastTest":null},
+  {"id":23, "name":"Werkstattrechnung_OEM-Teile.pdf",           "size":"55 KB",  "lobId":"kraft",            "dataSetId":"ds-sach",     "expectedLabel":"Rechnung",                    "lastTest":null},
+
+  {"id":24, "name":"Reparaturrechnung_Kfz_Garage_AutoFix.pdf",  "size":"129 KB", "lobId":"rechnung",         "dataSetId":"ds-rechnung", "expectedLabel":"Reparaturrechnung",           "lastTest":{"ctx":"Rechnung",        "pred":"Reparaturrechnung",           "conf":91,"match":true}},
+  {"id":25, "name":"Gebäudereparatur_Rechnung_Dachdecker.pdf",  "size":"197 KB", "lobId":"rechnung",         "dataSetId":"ds-rechnung", "expectedLabel":"Reparaturrechnung",           "lastTest":null},
+  {"id":26, "name":"Sachverstaendigenrechnung_Gutachter.pdf",    "size":"84 KB",  "lobId":"rechnung",         "dataSetId":"ds-rechnung", "expectedLabel":"Gutachterrechnung",           "lastTest":null},
+  {"id":27, "name":"Anwaltsrechnung_Kanzlei_RVG.pdf",           "size":"243 KB", "lobId":"rechnung",         "dataSetId":"ds-rechnung", "expectedLabel":"Anwaltsrechnung",             "lastTest":null},
+
+  {"id":28, "name":"Standardbeschwerde_Bearbeitungszeit.pdf",   "size":"61 KB",  "lobId":"einfach",          "dataSetId":"ds-rechnung", "expectedLabel":"Einfach Beschwerde",          "lastTest":{"ctx":"Einfach",         "pred":"Einfach Beschwerde",          "conf":86,"match":true}},
+  {"id":29, "name":"Adressaenderung_Antrag_PRV-4431.pdf",       "size":"174 KB", "lobId":"einfach",          "dataSetId":"ds-rechnung", "expectedLabel":"Standardanfrage",             "lastTest":null},
+  {"id":30, "name":"Auskunftsanfrage_Deckungsumfang.pdf",       "size":"92 KB",  "lobId":"einfach",          "dataSetId":"ds-rechnung", "expectedLabel":"Standardanfrage",             "lastTest":null},
+
+  {"id":31, "name":"Vorstand_Beschwerde_Ombudsmann.pdf",        "size":"288 KB", "lobId":"vorstand",         "dataSetId":"ds-vertraege","expectedLabel":"Vorstand Beschwerde",         "lastTest":{"ctx":"Vorstand",        "pred":"Vorstand Beschwerde",         "conf":90,"match":true}},
+  {"id":32, "name":"BaFin_Beschwerde_Eskalation.pdf",           "size":"47 KB",  "lobId":"vorstand",         "dataSetId":"ds-vertraege","expectedLabel":"Vorstand Beschwerde",         "lastTest":null},
+
+  {"id":33, "name":"Aenderungsantrag_Fahrzeugwechsel_KFZ-8821.pdf","size":"136 KB","lobId":"vertragsaenderung","dataSetId":"ds-vertraege","expectedLabel":"Änderungsantrag",           "lastTest":{"ctx":"Vertragsänderung","pred":"Änderungsantrag",            "conf":88,"match":true}},
+  {"id":34, "name":"Deckungsaenderung_Haftpflicht_Vollkasko.pdf","size":"215 KB","lobId":"vertragsaenderung","dataSetId":"ds-vertraege","expectedLabel":"Änderungsantrag",            "lastTest":null},
+  {"id":35, "name":"Nachtrag_Adressaenderung_SAC-4421.pdf",     "size":"79 KB",  "lobId":"vertragsaenderung","dataSetId":"ds-vertraege","expectedLabel":"Änderungsbestätigung",       "lastTest":null},
+  {"id":36, "name":"Aenderungsbestaetigung_Nachtrag-0012.pdf",  "size":"100 KB", "lobId":"vertragsaenderung","dataSetId":"ds-vertraege","expectedLabel":"Änderungsbestätigung",       "lastTest":{"ctx":"Vertragsänderung","pred":"Änderungsantrag",            "conf":72,"match":false}},
+
+  {"id":37, "name":"Privathaftpflicht_Police_PRI-2291.pdf",     "size":"100 KB", "lobId":"privatschutz",     "dataSetId":"ds-vertraege","expectedLabel":"Privathaftpflicht",           "lastTest":{"ctx":"Privatschutz",    "pred":"Privathaftpflicht",           "conf":89,"match":true}},
+  {"id":38, "name":"Familientarif_PHV_Familie_Müller.pdf",      "size":"100 KB", "lobId":"privatschutz",     "dataSetId":"ds-vertraege","expectedLabel":"Privathaftpflicht",           "lastTest":null},
+  {"id":39, "name":"Rechtsschutz_Arbeitsrecht_RSV-0391.pdf",    "size":"100 KB", "lobId":"privatschutz",     "dataSetId":"ds-vertraege","expectedLabel":"Rechtsschutz",                "lastTest":null},
+  {"id":40, "name":"Mietrechtsschutz_Police_RSV-1102.pdf",      "size":"100 KB", "lobId":"privatschutz",     "dataSetId":"ds-vertraege","expectedLabel":"Rechtsschutz",                "lastTest":null},
+
+  {"id":41, "name":"Kuendigung_Ordentlich_KFZ-7712.pdf",        "size":"100 KB", "lobId":"kuendigung",       "dataSetId":"ds-vertraege","expectedLabel":"Versicherungsnehmer-Kündigung","lastTest":{"ctx":"Kündigung",      "pred":"Versicherungsnehmer-Kündigung","conf":93,"match":true}},
+  {"id":42, "name":"Sonderkuendigung_Praemienerhoehung.pdf",     "size":"100 KB", "lobId":"kuendigung",       "dataSetId":"ds-vertraege","expectedLabel":"Versicherungsnehmer-Kündigung","lastTest":null},
+  {"id":43, "name":"Versicherer_Kuendigung_Nichtzahlung.pdf",   "size":"100 KB", "lobId":"kuendigung",       "dataSetId":"ds-vertraege","expectedLabel":"Versicherer-Kündigung",        "lastTest":null},
+  {"id":44, "name":"Kuendigungsbestaetigung_SAC-8812.pdf",      "size":"100 KB", "lobId":"kuendigung",       "dataSetId":"ds-vertraege","expectedLabel":"Kündigungsbestätigung",        "lastTest":null}
+]
