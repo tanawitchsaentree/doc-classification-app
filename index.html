@@ -3724,56 +3724,59 @@ function App({devOverrides={}}){
 
 function Root(){
   const ds=useContext(DataCtx);
-  const L0=ds.lobs[0];
 
-  /* ── Dev scenario builder (uses live DataService data) ── */
-  const _devBuildDetail=(lob,opts={})=>{
-    if(!lob)return{page:'lob-overview'};
-    const l1Items=lob.categories.map(c=>({id:c.id,name:c.name,expanded:false,l2:c.types.map(t=>({id:t.id,name:t.name}))}));
-    const prompts={global:GLOBAL_PROMPT,l1:opts.l1Prompt!==undefined?opts.l1Prompt:(lob.lobPrompt||''),
-      ...lob.categories.reduce((acc,c)=>{acc[c.id]=opts.catPrompt!==undefined?opts.catPrompt:(c.prompt||'');c.types.forEach(t=>{acc[t.id]=t.prompt||'';});return acc;},{})};
-    const tabMeta={global:{version:'1.0',score:'N/A',status:'Active'},l1:{version:lob.classL1Version||'V.1',score:`${lob.confidence}%`,status:lob.status}};
-    lob.categories.forEach(c=>{tabMeta[c.id]={version:c.activeVersion||'V.1',score:`${c.confidence}%`,status:c.status};c.types.forEach(t=>{tabMeta[t.id]={version:c.activeVersion||'V.1',score:`${c.confidence}%`,status:c.status};});});
-    const firstCatId=l1Items[0]?.id||'l1';
-    return{page:'detail',selectedLobId:lob.id,l0Name:lob.name,l1Items,prompts,defaultPrompts:prompts,
-      tabMeta,activeTab:firstCatId,activeL1Tab:firstCatId,
-      promptLevel:opts.promptLevel||'l1',testMode:opts.testMode||false,
-      ...(opts.docs!==undefined?{docs:opts.docs}:{}),
-      ...(opts.lobs!==undefined?{lobs:opts.lobs}:{}),
-      ...(opts.saveStates!==undefined?{saveStates:opts.saveStates}:{})};
-  };
-  const _lobDocs=ds.getDocsForLob(L0.id);
-  const _devDocs={
-    allPending:()=>_lobDocs.map(d=>({...d,status:'Pending',selected:false,lastTest:null})),
-    allMatch:()=>_lobDocs.map(d=>({...d,status:'Tested',selected:false,lastTest:{ctx:'L1 Class',pred:d.expectedLabels?.[0]||'Schadenmeldung',conf:91,match:true,testedAt:'2025-03-01'}})),
-    allMismatch:()=>_lobDocs.map(d=>({...d,status:'Tested',selected:false,lastTest:{ctx:'L1 Class',pred:'Wrong Category',conf:44,match:false,testedAt:'2025-03-01'}})),
-    mixed:()=>_lobDocs.map((d,i)=>i%3===2?{...d,status:'Tested',selected:false,lastTest:{ctx:'L1 Class',pred:'Other Class',conf:51,match:false,testedAt:'2025-03-01'}}:{...d,status:'Tested',selected:false,lastTest:{ctx:'L1 Class',pred:d.expectedLabels?.[0]||'Schadenmeldung',conf:84,match:true,testedAt:'2025-03-01'}}),
-    allSelected:()=>_lobDocs.map(d=>({...d,selected:true,status:'Pending',lastTest:null})),
-    lowConf:()=>_lobDocs.map(d=>({...d,status:'Tested',selected:false,lastTest:{ctx:'L1 Class',pred:d.expectedLabels?.[0]||'Unknown',conf:Math.floor(45+Math.random()*20),match:false,testedAt:'2025-03-01'}})),
-  };
-  const DEV_SCENARIOS=[
-    {id:'ov-default',  group:'Overview', label:'Default',        state:{page:'lob-overview'}},
-    {id:'ov-empty',    group:'Overview', label:'Empty — no LOBs',state:{page:'lob-overview',lobs:[]}},
-    {id:'ov-failed',   group:'Overview', label:'All Failed',     state:{page:'lob-overview',lobs:ds.lobs.map(l=>({...l,status:'Failed',confidence:0}))}},
-    {id:'ov-draft',    group:'Overview', label:'All Draft',      state:{page:'lob-overview',lobs:ds.lobs.map(l=>({...l,status:'Draft',confidence:0,trainedBy:''}))}},
-    {id:'ov-single',   group:'Overview', label:'Single LOB',     state:{page:'lob-overview',lobs:[L0]}},
-    {id:'det-l1',      group:'Prompt Detail', label:'L1 Mode',             state:_devBuildDetail(L0,{promptLevel:'l1'})},
-    {id:'det-l2',      group:'Prompt Detail', label:'L2 Mode',             state:_devBuildDetail(L0,{promptLevel:'l2'})},
-    {id:'det-global',  group:'Prompt Detail', label:'Global Mode',         state:_devBuildDetail(L0,{promptLevel:'global'})},
-    {id:'det-nocat',   group:'Prompt Detail', label:'No Categories',       state:_devBuildDetail({...L0,categories:[]},{})},
-    {id:'det-noph',    group:'Prompt Detail', label:'Missing Placeholder', state:_devBuildDetail(L0,{l1Prompt:'Classify this document into the correct category.',promptLevel:'l1'})},
-    {id:'det-unsaved', group:'Prompt Detail', label:'Unsaved Changes',     state:_devBuildDetail(L0,{promptLevel:'l1',saveStates:{'l1':'unsaved'}})},
-    {id:'tv-prerun',   group:'Test View', label:'Pre-run (all selected)',  state:_devBuildDetail(L0,{promptLevel:'l1',testMode:true,docs:_devDocs.allSelected()})},
-    {id:'tv-match',    group:'Test View', label:'All Matched',             state:_devBuildDetail(L0,{promptLevel:'l1',testMode:true,docs:_devDocs.allMatch()})},
-    {id:'tv-mismatch', group:'Test View', label:'All Mismatched (error)',  state:_devBuildDetail(L0,{promptLevel:'l1',testMode:true,docs:_devDocs.allMismatch()})},
-    {id:'tv-mixed',    group:'Test View', label:'Mixed Results',           state:_devBuildDetail(L0,{promptLevel:'l1',testMode:true,docs:_devDocs.mixed()})},
-    {id:'tv-lowconf',  group:'Test View', label:'Low Confidence',          state:_devBuildDetail(L0,{promptLevel:'l1',testMode:true,docs:_devDocs.lowConf()})},
-    {id:'tv-empty',    group:'Test View', label:'No Documents',            state:_devBuildDetail(L0,{promptLevel:'l1',testMode:true,docs:[]})},
-    {id:'doc-empty',   group:'Documents', label:'Empty Library',  state:_devBuildDetail(L0,{promptLevel:'l1',docs:[]})},
-    {id:'doc-pending', group:'Documents', label:'All Pending',    state:_devBuildDetail(L0,{promptLevel:'l1',docs:_devDocs.allPending()})},
-    {id:'doc-tested',  group:'Documents', label:'All Tested',     state:_devBuildDetail(L0,{promptLevel:'l1',docs:_devDocs.allMatch()})},
-  ];
-
+  /* ── Dev scenarios — computed once when ds loads, stable after that ── */
+  const DEV_SCENARIOS=React.useMemo(()=>{
+    const build=(lob,opts={})=>{
+      if(!lob)return{page:'lob-overview'};
+      const l1Items=lob.categories.map(c=>({id:c.id,name:c.name,expanded:false,l2:c.types.map(t=>({id:t.id,name:t.name}))}));
+      const prompts={global:GLOBAL_PROMPT,l1:opts.l1Prompt!==undefined?opts.l1Prompt:(lob.lobPrompt||''),
+        ...lob.categories.reduce((acc,c)=>{acc[c.id]=opts.catPrompt!==undefined?opts.catPrompt:(c.prompt||'');c.types.forEach(t=>{acc[t.id]=t.prompt||'';});return acc;},{})};
+      const tabMeta={global:{version:'1.0',score:'N/A',status:'Active'},l1:{version:lob.classL1Version||'V.1',score:`${lob.confidence}%`,status:lob.status}};
+      lob.categories.forEach(c=>{tabMeta[c.id]={version:c.activeVersion||'V.1',score:`${c.confidence}%`,status:c.status};c.types.forEach(t=>{tabMeta[t.id]={version:c.activeVersion||'V.1',score:`${c.confidence}%`,status:c.status};});});
+      const firstCatId=l1Items[0]?.id||'l1';
+      return{page:'detail',selectedLobId:lob.id,l0Name:lob.name,l1Items,prompts,defaultPrompts:prompts,
+        tabMeta,activeTab:firstCatId,activeL1Tab:firstCatId,
+        promptLevel:opts.promptLevel||'l1',testMode:opts.testMode||false,
+        ...(opts.docs!==undefined?{docs:opts.docs}:{}),
+        ...(opts.lobs!==undefined?{lobs:opts.lobs}:{}),
+        ...(opts.saveStates!==undefined?{saveStates:opts.saveStates}:{})};
+    };
+    const lob=ds.lobs[0];
+    const lobDocs=ds.getDocsForLob(lob.id);
+    /* doc state presets — each called once here, result is frozen in the memo */
+    const pending =lobDocs.map(d=>({...d,status:'Pending', selected:false,lastTest:null}));
+    const selected=lobDocs.map(d=>({...d,status:'Pending', selected:true, lastTest:null}));
+    const matched =lobDocs.map(d=>({...d,status:'Tested',  selected:false,lastTest:{ctx:'L1 Class',pred:d.expectedLabels?.[0]||'Schadenmeldung',conf:91,match:true, testedAt:'2025-03-01'}}));
+    const mismatch=lobDocs.map(d=>({...d,status:'Tested',  selected:false,lastTest:{ctx:'L1 Class',pred:'Wrong Category',conf:44,match:false,testedAt:'2025-03-01'}}));
+    const mixed   =lobDocs.map((d,i)=>i%3===2
+      ?{...d,status:'Tested',selected:false,lastTest:{ctx:'L1 Class',pred:'Other Class',                   conf:51,match:false,testedAt:'2025-03-01'}}
+      :{...d,status:'Tested',selected:false,lastTest:{ctx:'L1 Class',pred:d.expectedLabels?.[0]||'Unknown',conf:84,match:true, testedAt:'2025-03-01'}});
+    /* lowConf — random values frozen at memo-compute time, not at render time */
+    const lowConf =lobDocs.map(d=>({...d,status:'Tested',  selected:false,lastTest:{ctx:'L1 Class',pred:d.expectedLabels?.[0]||'Unknown',conf:Math.floor(45+Math.random()*20),match:false,testedAt:'2025-03-01'}}));
+    return[
+      {id:'ov-default',  group:'Overview', label:'Default',        state:{page:'lob-overview'}},
+      {id:'ov-empty',    group:'Overview', label:'Empty — no LOBs',state:{page:'lob-overview',lobs:[]}},
+      {id:'ov-failed',   group:'Overview', label:'All Failed',     state:{page:'lob-overview',lobs:ds.lobs.map(l=>({...l,status:'Failed',confidence:0}))}},
+      {id:'ov-draft',    group:'Overview', label:'All Draft',      state:{page:'lob-overview',lobs:ds.lobs.map(l=>({...l,status:'Draft',confidence:0,trainedBy:''}))}},
+      {id:'ov-single',   group:'Overview', label:'Single LOB',     state:{page:'lob-overview',lobs:[lob]}},
+      {id:'det-l1',      group:'Prompt Detail', label:'L1 Mode',             state:build(lob,{promptLevel:'l1'})},
+      {id:'det-l2',      group:'Prompt Detail', label:'L2 Mode',             state:build(lob,{promptLevel:'l2'})},
+      {id:'det-global',  group:'Prompt Detail', label:'Global Mode',         state:build(lob,{promptLevel:'global'})},
+      {id:'det-nocat',   group:'Prompt Detail', label:'No Categories',       state:build({...lob,categories:[]},{})},
+      {id:'det-noph',    group:'Prompt Detail', label:'Missing Placeholder', state:build(lob,{l1Prompt:'Classify this document into the correct category.',promptLevel:'l1'})},
+      {id:'det-unsaved', group:'Prompt Detail', label:'Unsaved Changes',     state:build(lob,{promptLevel:'l1',saveStates:{'l1':'unsaved'}})},
+      {id:'tv-prerun',   group:'Test View', label:'Pre-run (all selected)',  state:build(lob,{promptLevel:'l1',testMode:true,docs:selected})},
+      {id:'tv-match',    group:'Test View', label:'All Matched',             state:build(lob,{promptLevel:'l1',testMode:true,docs:matched})},
+      {id:'tv-mismatch', group:'Test View', label:'All Mismatched (error)',  state:build(lob,{promptLevel:'l1',testMode:true,docs:mismatch})},
+      {id:'tv-mixed',    group:'Test View', label:'Mixed Results',           state:build(lob,{promptLevel:'l1',testMode:true,docs:mixed})},
+      {id:'tv-lowconf',  group:'Test View', label:'Low Confidence',          state:build(lob,{promptLevel:'l1',testMode:true,docs:lowConf})},
+      {id:'tv-empty',    group:'Test View', label:'No Documents',            state:build(lob,{promptLevel:'l1',testMode:true,docs:[]})},
+      {id:'doc-empty',   group:'Documents', label:'Empty Library',  state:build(lob,{promptLevel:'l1',docs:[]})},
+      {id:'doc-pending', group:'Documents', label:'All Pending',    state:build(lob,{promptLevel:'l1',docs:pending})},
+      {id:'doc-tested',  group:'Documents', label:'All Tested',     state:build(lob,{promptLevel:'l1',docs:matched})},
+    ];
+  },[ds]);
   const [activeScenario,setActiveScenario]=useState(null);
   return(
     <>
