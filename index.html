@@ -2294,17 +2294,10 @@ function ReadinessChecklist({l1Items,docs}){
 function Sidebar({promptLevel,l0Name,setL0Name,l1Items,setL1Items,showMenu,setShowMenu,addToast,onConfirm,onScrollTo,activeCatId,style}){
   const [editingL0,setEditingL0]=useState(false);
   const [l0Draft,setL0Draft]=useState(l0Name);
-  const [showAddL2,setShowAddL2]=useState(null);
-  const [addL2Name,setAddL2Name]=useState('');
-  const [showAddL1,setShowAddL1]=useState(false);
-  const [addL1Name,setAddL1Name]=useState('');
+  const [addModal,setAddModal]=useState(null);
   const [renamingId,setRenamingId]=useState(null);
   const [renameDraft,setRenameDraft]=useState('');
   const [sidebarSearch,setSidebarSearch]=useState('');
-  const addL2Ref=useRef(null);
-  const addL1Ref=useRef(null);
-  useEffect(()=>{if(showAddL2&&addL2Ref.current)addL2Ref.current.focus();},[showAddL2]);
-  useEffect(()=>{if(showAddL1&&addL1Ref.current)addL1Ref.current.focus();},[showAddL1]);
   const filteredL1=sidebarSearch.trim()
     ?l1Items.filter(i=>i.name.toLowerCase().includes(sidebarSearch.toLowerCase())||i.l2.some(l2=>l2.name.toLowerCase().includes(sidebarSearch.toLowerCase())))
     :l1Items;
@@ -2312,13 +2305,13 @@ function Sidebar({promptLevel,l0Name,setL0Name,l1Items,setL1Items,showMenu,setSh
   const toggleAllExpand=()=>setL1Items(items=>items.map(i=>({...i,expanded:!allExpanded})));
   const commitL0=()=>{const v=l0Draft.trim();if(v&&v!==l0Name){setL0Name(v);addToast(`Root renamed to "${v}"`);}setEditingL0(false);};
   const toggleL1=id=>setL1Items(items=>items.map(i=>i.id===id?{...i,expanded:!i.expanded}:i));
-  const addL2=id=>{if(!addL2Name.trim())return;setL1Items(items=>items.map(i=>i.id===id?{...i,l2:[...i.l2,{id:Date.now().toString(),name:addL2Name.trim()}]}:i));addToast(`"${addL2Name.trim()}" added`);setAddL2Name('');setShowAddL2(null);};
+  const addL2=(id,name)=>{setL1Items(items=>items.map(i=>i.id===id?{...i,l2:[...i.l2,{id:Date.now().toString(),name}]}:i));addToast(`"${name}" added`);setAddModal(null);};
   const delL2=(l1id,l2id,n)=>{setL1Items(items=>items.map(i=>i.id===l1id?{...i,l2:i.l2.filter(x=>x.id!==l2id)}:i));addToast(`"${n}" removed`,'warning');};
   const startRenameL1=id=>{const item=l1Items.find(i=>i.id===id);setRenameDraft(item?.name||'');setRenamingId(id);setShowMenu(null);};
   const commitRename=()=>{if(renameDraft.trim()&&renamingId){const item=l1Items.find(i=>i.id===renamingId);if(renameDraft.trim()!==item?.name){setL1Items(items=>items.map(i=>i.id===renamingId?{...i,name:renameDraft.trim()}:i));addToast(`Renamed to "${renameDraft.trim()}"`);}setRenamingId(null);setRenameDraft('');}else{setRenamingId(null);}};
   const cancelRename=()=>{setRenamingId(null);setRenameDraft('');};
   const requestDelL1=id=>{const item=l1Items.find(i=>i.id===id);setShowMenu(null);onConfirm({title:`Delete ${LABELS.l1.label}`,message:`Delete "${item?.name}"? This will remove its workspace tab.`,confirmLabel:'Delete',onConfirm:()=>{setL1Items(items=>items.filter(i=>i.id!==id));addToast(`"${item?.name}" deleted`,'warning');}});};
-  const addL1=()=>{if(!addL1Name.trim())return;const id=addL1Name.toLowerCase().replace(/\s+/g,'-')+'-'+Date.now();setL1Items(items=>[...items,{id,name:addL1Name.trim(),expanded:false,l2:[]}]);addToast(`"${addL1Name.trim()}" added`);setAddL1Name('');setShowAddL1(false);};
+  const addL1=name=>{const id=name.toLowerCase().replace(/\s+/g,'-')+'-'+Date.now();setL1Items(items=>[...items,{id,name,expanded:false,l2:[]}]);addToast(`"${name}" added`);setAddModal(null);};
   return(
     <aside className="sidebar" style={style}>
       <div className="sidebar__header"><h2 className="sidebar__title">Document Classification</h2></div>
@@ -2392,25 +2385,51 @@ function Sidebar({promptLevel,l0Name,setL0Name,l1Items,setL1Items,showMenu,setSh
                   <button className="sidebar__l2-del" onClick={()=>delL2(item.id,l2.id,l2.name)}>×</button>
                 </li>
               ))}</ul>}
-              {showAddL2===item.id?<div className="sidebar__add-input-wrap">
-                <input ref={addL2Ref} className="sidebar__add-input" value={addL2Name} onChange={e=>setAddL2Name(e.target.value)} onKeyDown={e=>{if(e.key==='Enter')addL2(item.id);if(e.key==='Escape'){setShowAddL2(null);setAddL2Name('');}}} placeholder="Type name…"/>
-                <div className="sidebar__add-actions">
-                  <button className="sidebar__add-confirm" onClick={()=>addL2(item.id)} disabled={!addL2Name.trim()}>Add</button>
-                  <button className="sidebar__add-cancel" onClick={()=>{setShowAddL2(null);setAddL2Name('');}}>Cancel</button>
-                </div>
-              </div>:<button className="sidebar__add-btn" onClick={()=>setShowAddL2(item.id)}><IC.Plus/> Add level 2</button>}
+              <button className="sidebar__add-btn" onClick={()=>setAddModal({type:'l2',parentId:item.id,parentName:item.name})}><IC.Plus/> Add level 2</button>
             </div>}
           </div>
         ))}
       </div>
       <div className="sidebar__add-l1-bar">
-        {showAddL1?<div className="sidebar__add-l1-input-wrap">
-          <input ref={addL1Ref} className="sidebar__add-l1-input" value={addL1Name} onChange={e=>setAddL1Name(e.target.value)} onKeyDown={e=>{if(e.key==='Enter')addL1();if(e.key==='Escape'){setShowAddL1(false);setAddL1Name('');}}} placeholder={`${LABELS.l1.label} name…`}/>
-          <button className="sidebar__add-confirm" onClick={addL1} disabled={!addL1Name.trim()}>Add</button>
-          <button className="sidebar__add-cancel" onClick={()=>{setShowAddL1(false);setAddL1Name('');}}>✕</button>
-        </div>:<button className="sidebar__add-l1-btn" onClick={()=>setShowAddL1(true)}><IC.Plus s={13}/> Add level 1</button>}
+        <button className="sidebar__add-l1-btn" onClick={()=>setAddModal({type:'l1'})}><IC.Plus s={13}/> Add {LABELS.l1.label}</button>
       </div>
+      {addModal&&(addModal.type==='l1'
+        ?<AddClassModal title={`Add ${LABELS.l1.label}`} placeholder={`${LABELS.l1.label} name…`} onConfirm={name=>addL1(name)} onClose={()=>setAddModal(null)}/>
+        :<AddClassModal title={`Add ${LABELS.l2.label}`} subtitle={addModal.parentName} placeholder={`${LABELS.l2.label} name…`} onConfirm={name=>addL2(addModal.parentId,name)} onClose={()=>setAddModal(null)}/>
+      )}
     </aside>
+  );
+}
+
+function AddClassModal({title,subtitle,placeholder,onConfirm,onClose}){
+  const [name,setName]=useState('');
+  const inputRef=useRef(null);
+  useEffect(()=>{inputRef.current?.focus();},[]);
+  const submit=()=>{if(!name.trim())return;onConfirm(name.trim());};
+  return(
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal" style={{maxWidth:'380px'}} onClick={e=>e.stopPropagation()}>
+        <div className="modal__header">
+          <div>
+            <h3>{title}</h3>
+            {subtitle&&<div style={{fontSize:'11px',color:'var(--tx3)',marginTop:'2px'}}>under {subtitle}</div>}
+          </div>
+          <button className="modal__close" onClick={onClose}>×</button>
+        </div>
+        <div className="modal__body">
+          <input ref={inputRef} style={{width:'100%',border:'1px solid var(--bdr)',borderRadius:'var(--r)',padding:'8px 10px',fontSize:'13px',outline:'none',fontFamily:'inherit',color:'var(--tx1)',background:'var(--bg)',transition:'border-color var(--tf)'}}
+            onFocus={e=>e.target.style.borderColor='var(--a)'}
+            onBlur={e=>e.target.style.borderColor='var(--bdr)'}
+            value={name} onChange={e=>setName(e.target.value)}
+            onKeyDown={e=>{if(e.key==='Enter')submit();if(e.key==='Escape')onClose();}}
+            placeholder={placeholder}/>
+        </div>
+        <div className="modal__footer">
+          <button className="btn btn-outline btn-sm" onClick={onClose}>Cancel</button>
+          <button className="btn btn-primary btn-sm" onClick={submit} disabled={!name.trim()}>Add</button>
+        </div>
+      </div>
+    </div>
   );
 }
 
