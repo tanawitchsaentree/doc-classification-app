@@ -213,24 +213,26 @@ input,textarea,select{font-family:inherit}
 .resize-handle:hover,.resize-handle--active{background:var(--a-mid)}
 .resize-handle::after{content:'';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:2px;height:32px;background:var(--bdr);border-radius:1px;transition:background 150ms}
 .resize-handle:hover::after,.resize-handle--active::after{background:var(--a)}
-.sidebar__header{padding:14px 16px 10px;border-bottom:1px solid #f5f5f5;flex-shrink:0}
-.sidebar__title{font-size:13px;font-weight:700;color:#333333}
+.sidebar__header{padding:20px 16px 14px;border-bottom:1px solid #ebebeb;flex-shrink:0}
+.sidebar__title{font-size:18px;font-weight:700;color:#003781}
 .sidebar__section{padding:12px 16px;flex-shrink:0}
 .sidebar__section-lbl{font-size:10px;font-weight:600;color:#a0a0a0;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;display:block}
 .sidebar__cb-label{display:flex;align-items:center;gap:7px;font-size:12px;color:#444444;cursor:pointer;padding:2px 0;user-select:none}
 .sidebar__cb-label input{accent-color:#003781;cursor:pointer}
 .sidebar__divider{height:1px;background:#f5f5f5;flex-shrink:0}
-.sidebar__level0{padding:10px 16px;flex-shrink:0}
-.sidebar__level-lbl{font-size:10px;font-weight:700;color:#a0a0a0;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px}
-.sidebar__level-lbl.sub{margin:8px 0 4px;padding:0 2px}
+.sidebar__level0{padding:12px 16px 8px;flex-shrink:0}
+.sidebar__level-lbl{font-size:12px;font-weight:600;color:#003781;text-transform:none;letter-spacing:0;display:block;margin-bottom:4px}
+.sidebar__level-lbl.sub{margin:8px 0 4px;padding:0 2px;font-size:11px;color:#767676;font-weight:600}
 .sidebar__l0-input{width:100%;border:1px solid #003781;border-radius:4px;padding:4px 8px;font-size:12px;outline:none;font-family:inherit;color:#333333}
-.sidebar__l0-name{font-size:13px;font-weight:600;color:#333333;cursor:pointer;display:inline-flex;align-items:center;gap:4px}
+.sidebar__l0-name{font-size:13px;font-weight:600;color:#003781;cursor:pointer;display:inline-flex;align-items:center;gap:4px}
 .sidebar__l0-name:hover{color:#003781}
-.sidebar__l1-header{padding:6px 16px 0;flex-shrink:0}
+.sidebar__l1-header{padding:8px 16px 0;flex-shrink:0;display:flex;align-items:center;justify-content:space-between}
+.sidebar__add-l1-inline{background:none;border:none;font-size:12px;color:#003781;font-weight:500;cursor:pointer;font-family:inherit;padding:0;white-space:nowrap}
+.sidebar__add-l1-inline:hover{text-decoration:underline}
 .sidebar__list-controls{display:flex;align-items:center;gap:6px;padding:6px 16px 8px;flex-shrink:0}
 .sidebar__search-wrap{position:relative;flex:1;display:flex;align-items:center}
 .sidebar__search-icon{position:absolute;left:7px;color:#a0a0a0;display:flex;align-items:center;pointer-events:none}
-.sidebar__search{width:100%;padding:5px 8px 5px 24px;border:1px solid #d4d4d4;border-radius:4px;font-size:11px;outline:none;font-family:inherit;color:#444444;transition:border-color .15s}
+.sidebar__search{width:100%;padding:7px 8px 7px 28px;border:1.5px solid #d4d4d4;border-radius:6px;font-size:12px;outline:none;font-family:inherit;color:#444444;transition:border-color .15s}
 .sidebar__search:focus{border-color:#003781}
 .sidebar__collapse-btn{background:none;border:1px solid #d4d4d4;border-radius:4px;padding:4px 7px;font-size:11px;color:#767676;cursor:pointer;white-space:nowrap;font-family:inherit;transition:all .1s;flex-shrink:0}
 .sidebar__collapse-btn:hover{color:#333333;border-color:#a0a0a0}
@@ -332,13 +334,14 @@ input,textarea,select{font-family:inherit}
 
 /* ── Document Panel ── */
 .doc-panel{width:260px;min-width:200px;max-width:420px;background:#fff;border-left:none;display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}
-.doc-panel__upload{padding:14px;border-bottom:1px solid #d4d4d4;flex-shrink:0}
-.doc-panel__sec-title{font-size:12px;font-weight:600;color:#333333;margin-bottom:10px}
-.doc-panel__dropzone{border:1.5px dashed #cccccc;border-radius:4px;padding:18px 12px;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;transition:all .15s;background:#fff}
+.doc-panel__upload{padding:16px 14px 12px;border-bottom:1px solid #ebebeb;flex-shrink:0}
+.doc-panel__sec-title{font-size:16px;font-weight:700;color:#003781;margin-bottom:4px}
+.doc-panel__sec-desc{font-size:11px;color:#767676;margin-bottom:10px;line-height:1.4}
+.doc-panel__dropzone{border:1.5px dashed #cccccc;border-radius:8px;padding:24px 12px 18px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transition:all .15s;background:#fff}
 .doc-panel__dropzone:hover,.doc-panel__dropzone.drag-over{border-color:#003781;background:#eef2fb}
-.doc-panel__dz-text{font-size:11px;color:#767676;text-align:center}
-.doc-panel__browse{color:#003781;font-weight:500;cursor:pointer}
-.doc-panel__browse:hover{text-decoration:underline}
+.doc-panel__dz-text{font-size:12px;color:#444444;text-align:center}
+.doc-panel__browse{color:#003781;font-weight:600;cursor:pointer;text-decoration:underline}
+.doc-panel__browse:hover{color:#002d6b}
 .doc-panel__dz-hint{font-size:10px;color:#a0a0a0;text-align:center}
 .doc-panel__docs{flex:1;display:flex;flex-direction:column;overflow:hidden;padding:12px 14px 0}
 .doc-panel__search-wrap{position:relative;display:flex;align-items:center;margin-bottom:8px}
@@ -424,7 +427,7 @@ input,textarea,select{font-family:inherit}
 .trace-badge--mismatch{background:#fce8e8;color:#aa0000;border:1px solid #f5b3b3}
 .trace-badge--tested{background:var(--srf2);color:var(--tx3);border:1px solid var(--bdr)}
 .ds-doc-del{background:none;border:none;cursor:pointer;color:var(--tx3);padding:2px;border-radius:3px;display:flex;align-items:center;flex-shrink:0;opacity:0;transition:all var(--tf)}
-.ds-doc-row:hover .ds-doc-del,.ds-doc-row--selected .ds-doc-del{opacity:1}
+.ds-doc-row:hover .ds-doc-del,.ds-doc-row--selected .ds-doc-del,.dlib__group-hdr:hover .ds-doc-del,.dlib__doc:hover .ds-doc-del{opacity:1}
 .ds-doc-del:hover{color:#cc0000;background:#fce8e8}
 .ds-empty{text-align:center;padding:12px;font-size:11px;color:var(--tx3)}
 /* Doc panel tabs */
@@ -536,9 +539,9 @@ input,textarea,select{font-family:inherit}
 .ws-test__doc-result{display:flex;align-items:center;flex-shrink:0;margin-top:2px}
 .ws-test__empty{font-size:11px;color:var(--tx3);padding:12px 0;text-align:center}
 /* Doc Library (simplified right panel) */
-.dlib__hdr{display:flex;align-items:center;justify-content:space-between;padding:8px 0 6px;flex-shrink:0}
-.dlib__title{font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em}
-.dlib__new-set{background:none;border:none;font-size:11px;color:var(--a);font-weight:500;cursor:pointer;font-family:inherit;padding:0}
+.dlib__hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 14px 8px;flex-shrink:0}
+.dlib__title{font-size:16px;font-weight:700;color:#003781;text-transform:none;letter-spacing:0}
+.dlib__new-set{background:none;border:none;font-size:12px;color:#003781;font-weight:500;cursor:pointer;font-family:inherit;padding:0}
 .dlib__new-set:hover{text-decoration:underline}
 .dlib__sets{flex:1;overflow-y:auto;padding:0 10px 8px;display:flex;flex-direction:column}
 .dlib__sets::-webkit-scrollbar{width:3px}.dlib__sets::-webkit-scrollbar-thumb{background:var(--bdr);border-radius:2px}
@@ -684,11 +687,16 @@ input,textarea,select{font-family:inherit}
 .lps-test-ctx__empty{padding:12px;color:var(--tx3);text-align:center;font-size:12px}
 .test-view__summary{display:flex;align-items:center;gap:14px;padding:8px 20px;background:var(--srf);border-top:1px solid var(--bdr);font-size:12px;color:var(--tx2);flex-shrink:0;flex-wrap:wrap}
 .test-view__empty{text-align:center;padding:56px 20px;font-size:13px;color:var(--tx3);line-height:1.8}
-/* Test Prompt button in toolbar */
-.cl-setup__test-btn{display:flex;align-items:center;gap:5px;padding:5px 14px;border-radius:var(--r);font-size:11px;font-weight:700;border:1.5px solid transparent;cursor:pointer;font-family:inherit;background:var(--a);color:#fff;transition:all var(--tf) var(--smooth);box-shadow:0 1px 3px var(--a-glow);white-space:nowrap;margin-left:auto}
-.cl-setup__test-btn:hover{background:var(--a-h);transform:translateY(-1px);box-shadow:0 3px 8px var(--a-glow)}
-.cl-setup__test-btn--back{background:transparent;color:var(--a);border-color:var(--a);box-shadow:none}
-.cl-setup__test-btn--back:hover{background:var(--a-lt);transform:none;box-shadow:none}
+/* Test Prompt button — now at bottom of prompt section */
+.cl-setup__test-btn{display:flex;align-items:center;gap:6px;padding:9px 20px;border-radius:6px;font-size:13px;font-weight:600;border:none;cursor:pointer;font-family:inherit;background:#003781;color:#fff;transition:all .15s;white-space:nowrap}
+.cl-setup__test-btn:hover{background:#002d6b}
+.cl-setup__test-btn--back{background:transparent;color:#003781;border:1.5px solid #003781;padding:8px 20px}
+.cl-setup__test-btn--back:hover{background:#eef2fb}
+/* Prompt bottom actions row */
+.prompt-actions{display:flex;align-items:center;justify-content:space-between;padding:12px 20px 16px;flex-shrink:0}
+.prompt-actions__save{background:none;border:none;font-size:13px;color:#003781;font-weight:500;cursor:pointer;font-family:inherit;text-decoration:underline;text-underline-offset:2px;padding:0}
+.prompt-actions__save:hover{color:#002d6b}
+.prompt-actions__save:disabled{color:#a0a0a0;cursor:not-allowed;text-decoration:none}
 .dlib__doc-size{font-size:10px;color:var(--tx3);white-space:nowrap;flex-shrink:0}
 
 /* ── Keyframes ── */
@@ -699,43 +707,47 @@ input,textarea,select{font-family:inherit}
 @keyframes spin{to{transform:rotate(360deg)}}
 
 /* ── Overview table pages ── */
-.ov-page{flex:1;overflow-y:auto;padding:28px 40px;margin-top:52px}
+.ov-page{flex:1;overflow-y:auto;padding:24px 32px;margin-top:52px;background:#fff}
 .ov-page::-webkit-scrollbar{width:5px}.ov-page::-webkit-scrollbar-track{background:transparent}.ov-page::-webkit-scrollbar-thumb{background:#d4d4d4;border-radius:3px}
-.ov-title{font-size:22px;font-weight:700;color:#333333;margin-bottom:24px}
+.ov-title{font-size:26px;font-weight:700;color:#003781;margin-bottom:16px}
 .ov-breadcrumb{display:flex;align-items:center;gap:6px;font-size:12px;color:#767676;margin-bottom:12px}
 .ov-bc-link{background:none;border:none;color:#767676;font-size:12px;cursor:pointer;padding:0;font-family:inherit}.ov-bc-link:hover{color:#003781;text-decoration:underline}
 .ov-bc-sep{color:#cccccc}.ov-bc-curr{color:#333333;font-weight:500}
-.ov-filter-row{display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+.ov-filters{margin-bottom:12px}
+.ov-filter-row{display:flex;align-items:flex-end;gap:16px;margin-bottom:10px;flex-wrap:wrap}
+.ov-filter-group{display:flex;flex-direction:column;gap:6px}
+.ov-filter-label{font-size:13px;font-weight:600;color:#003781}
 .ov-search-wrap{position:relative;display:flex;align-items:center}
-.ov-search-wrap svg{position:absolute;left:9px;pointer-events:none;color:#a0a0a0}
-.ov-search{padding:7px 10px 7px 30px;border:1px solid #cccccc;border-radius:4px;font-size:12px;outline:none;font-family:inherit;min-width:200px;transition:border-color .15s,box-shadow .15s}
-.ov-search:focus{border-color:#003781;box-shadow:0 0 0 2px rgba(0,55,129,.1)}
-.ov-select{padding:7px 28px 7px 10px;border:1px solid #cccccc;border-radius:4px;font-size:12px;outline:none;font-family:inherit;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 8px center;cursor:pointer;color:#444444;min-width:90px;appearance:none}
-.ov-table-wrap{background:#fff;border:1px solid #d4d4d4;border-radius:4px;overflow:hidden}
+.ov-search{padding:9px 12px;border:1.5px solid #cccccc;border-radius:6px;font-size:13px;outline:none;font-family:inherit;width:220px;transition:border-color .15s,box-shadow .15s;color:#1a1a2e}
+.ov-search:focus{border-color:#003781;box-shadow:0 0 0 3px rgba(0,55,129,.1)}
+.ov-select{padding:9px 36px 9px 12px;border:1.5px solid #cccccc;border-radius:6px;font-size:13px;outline:none;font-family:inherit;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 10px center;cursor:pointer;color:#1a1a2e;min-width:160px;appearance:none;transition:border-color .15s}
+.ov-select:focus{border-color:#003781;outline:none}
+.ov-filter-actions{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-bottom:12px}
+.ov-table-wrap{background:#fff;overflow:hidden}
 .ov-table{width:100%;border-collapse:collapse}
-.ov-table thead tr{border-bottom:2px solid #d4d4d4}
-.ov-table th{padding:10px 16px;font-size:12px;font-weight:600;color:#444444;text-align:left;white-space:nowrap;user-select:none}
-.ov-table th.sortable{cursor:pointer}.ov-table th.sortable:hover{color:#333333}
-.ov-table tbody tr{border-bottom:1px solid #f5f5f5;transition:background .1s}
-.ov-table tbody tr:last-child{border-bottom:none}.ov-table tbody tr:hover{background:#f5f5f5}
+.ov-table thead tr{border-bottom:2px solid #003781}
+.ov-table th{padding:12px 16px;font-size:13px;font-weight:700;color:#003781;text-align:left;white-space:nowrap;user-select:none}
+.ov-table th.sortable{cursor:pointer}.ov-table th.sortable:hover{color:#002d6b}
+.ov-table tbody tr{border-bottom:1px solid #ebebeb;transition:background .1s}
+.ov-table tbody tr:last-child{border-bottom:none}.ov-table tbody tr:hover{background:#f8f9fb}
 .ov-table td{padding:11px 16px;font-size:13px;color:#444444;vertical-align:middle}
-.tbl-name-link{color:#003781;font-weight:500;cursor:pointer;background:none;border:none;font-family:inherit;font-size:13px;padding:0;text-align:left}
-.tbl-name-link:hover{text-decoration:underline}
-.tbl-actions{display:flex;align-items:center;gap:8px}
+.tbl-name-link{color:#003781;font-weight:500;cursor:pointer;background:none;border:none;font-family:inherit;font-size:13px;padding:0;text-align:left;text-decoration:underline}
+.tbl-name-link:hover{color:#002d6b}
+.tbl-actions{display:flex;align-items:center;gap:10px}
 .tbl-view-btn{background:none;border:none;color:#003781;font-size:12px;font-weight:500;cursor:pointer;padding:0;font-family:inherit}
 .tbl-view-btn:hover{text-decoration:underline}
-.tbl-icon-btn{background:none;border:none;cursor:pointer;color:#767676;padding:4px;border-radius:4px;display:flex;align-items:center;transition:all .12s}
+.tbl-icon-btn{background:none;border:none;cursor:pointer;color:#aaaaaa;padding:4px;border-radius:4px;display:flex;align-items:center;transition:all .12s}
 .tbl-icon-btn:hover{color:#333333;background:#f5f5f5}.tbl-icon-btn.danger:hover{color:#cc0000;background:#fce8e8}
 .tbl-empty{text-align:center;color:#a0a0a0;padding:32px;font-size:13px}
 .badge-no-l2{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:500;background:#fff8d4;color:#6b3000;border:1px solid #ffd580}
 .tbl-count-cell{display:inline-flex;align-items:center;gap:6px}
-.tbl-count-num{font-size:13px;font-weight:600;color:var(--tx1)}
-.tbl-ver-badge{font-size:10px;font-weight:500;color:var(--tx3);background:var(--srf2);border:1px solid var(--bdr);border-radius:20px;padding:1px 7px;letter-spacing:.2px}
-.sort-both{font-size:10px;color:#a0a0a0;margin-left:3px}
-.status-chip{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:500;border:1px solid transparent}
-.status-chip--deployed{background:#e6f4e6;color:#008a00;border-color:#b3ddb3}
-.status-chip--failed{background:#fce8e8;color:#cc0000;border-color:#f5b3b3}
-.ov-pagination{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-top:1px solid #f5f5f5}
+.tbl-count-num{font-size:13px;font-weight:400;color:#444444}
+.tbl-ver-badge{font-size:13px;font-weight:400;color:#444444;background:none;border:none;padding:0}
+.sort-icon{font-size:11px;color:#aaaaaa;margin-left:4px}
+.status-chip{display:inline-flex;align-items:center;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:500;border:1px solid transparent}
+.status-chip--deployed{background:#e8f5d0;color:#3d6b00;border-color:#c5e090}
+.status-chip--failed{background:#fde8e8;color:#cc0000;border-color:#f5b3b3}
+.ov-pagination{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-top:1px solid #ebebeb}
 .ov-pagination__left{display:flex;align-items:center;gap:6px;font-size:12px;color:#767676}
 .ov-per-page{border:none;font-size:12px;color:#444444;background:transparent;cursor:pointer;outline:none;font-family:inherit}
 .ov-pagination__pages{display:flex;align-items:center;gap:2px}
@@ -1072,8 +1084,8 @@ body{font-family:'Allianz Neo','Helvetica Neue',Helvetica,Arial,sans-serif;backg
 .status-chip--failed{background:#fce8e8;color:#cc0000}
 
 /* Tables */
-.ov-table-wrap{border-radius:var(--r-md);border:1px solid var(--bdr);box-shadow:var(--sh-sm);overflow:hidden}
-.ov-table th{font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;background:#f8f9fb;border-bottom:1px solid var(--bdr);padding:10px 16px}
+.ov-table-wrap{overflow:hidden}
+.ov-table th{font-size:13px;font-weight:700;color:#003781;text-transform:none;letter-spacing:0;background:#fff;border-bottom:none;padding:12px 16px}
 .ov-table tbody tr{transition:background var(--tf) var(--smooth)}
 .ov-table tbody tr:hover{background:#f8f9fb}
 .version-table th{font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;background:#f8f9fb}
@@ -1275,19 +1287,18 @@ body{font-family:'Allianz Neo','Helvetica Neue',Helvetica,Arial,sans-serif;backg
 .main-panel{flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:0}
 .main-panel .detail-scroll__main{flex:1}
 /* ── Classification Setup wrap ── */
-.cl-setup-wrap{padding:12px 16px 12px;flex-shrink:0;background:var(--bg)}
+.cl-setup-wrap{padding:16px 20px 12px;flex-shrink:0;background:#fff;border-bottom:1px solid #ebebeb}
 .cl-setup-wrap .cl-setup{margin-bottom:0}
 
-/* ── Classification Setup bar (horizontal, top of center panel) ── */
-.cl-setup{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--srf);border:1px solid var(--bdr);border-radius:var(--r-md);margin-bottom:14px;box-shadow:var(--sh-sm);flex-wrap:wrap}
-.cl-setup__label{font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.07em;white-space:nowrap;flex-shrink:0;padding-right:6px;border-right:1px solid var(--bdr)}
-.cl-setup__row{display:flex;align-items:center;gap:6px;flex:1}
-.cl-setup__radio{display:flex;align-items:center;gap:6px;padding:6px 14px;border-radius:var(--r);border:1.5px solid var(--bdr);background:var(--srf2);cursor:pointer;user-select:none;transition:all var(--tf) var(--smooth);white-space:nowrap}
-.cl-setup__radio:hover{border-color:var(--a-mid);background:var(--a-lt)}
-.cl-setup__radio--active{border-color:var(--a) !important;background:var(--a-lt) !important}
-.cl-setup__radio input[type=radio]{accent-color:var(--a);width:13px;height:13px;cursor:pointer;flex-shrink:0}
-.cl-setup__radio-label{font-size:12px;font-weight:600;color:var(--tx1)}
-.cl-setup__radio--active .cl-setup__radio-label{color:var(--a)}
+/* ── Classification Setup bar ── */
+.cl-setup{display:flex;flex-direction:column;gap:10px}
+.cl-setup__label{font-size:16px;font-weight:700;color:#003781;white-space:nowrap;flex-shrink:0}
+.cl-setup__row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.cl-setup__radio{display:flex;align-items:center;gap:7px;padding:0;border:none;background:none;cursor:pointer;user-select:none;white-space:nowrap}
+.cl-setup__radio:hover .cl-setup__radio-label{color:#003781}
+.cl-setup__radio--active .cl-setup__radio-label{color:#003781;font-weight:600}
+.cl-setup__radio input[type=radio]{accent-color:#003781;width:15px;height:15px;cursor:pointer;flex-shrink:0}
+.cl-setup__radio-label{font-size:13px;font-weight:400;color:#444444;transition:color .12s}
 
 /* ── Dev Panel ── */
 .dev-panel{position:fixed;top:0;left:0;right:0;z-index:9999;background:#09090b;border-bottom:2px solid #f59e0b;font-family:ui-monospace,'SF Mono','Fira Code',monospace;font-size:11px;color:#71717a}
@@ -1896,7 +1907,7 @@ function LobOverview({lobs,onSelectLob,addToast,onOpenOutputFormat,onConfirm,onD
     if(sortKey===key)setSortDir(d=>d==='asc'?'desc':'asc');
     else{setSortKey(key);setSortDir('asc');}
   };
-  const SortIco=({col})=><span className="sort-both">{sortKey===col?(sortDir==='asc'?'↑':'↓'):'⇅'}</span>;
+  const SortIco=({col})=><span className="sort-icon">{sortKey===col?(sortDir==='asc'?'↑':'↓'):'↕'}</span>;
 
   const filtered=lobs
     .filter(l=>statusFilter==='All'||l.status===statusFilter)
@@ -1914,49 +1925,59 @@ function LobOverview({lobs,onSelectLob,addToast,onOpenOutputFormat,onConfirm,onD
   return(
     <div className="ov-page">
       <h1 className="ov-title">Classification Overview</h1>
-      <div className="ov-filter-row">
-        <div className="ov-search-wrap">
-          <IC.Search/>
-          <input className="ov-search" placeholder={`Search ${LABELS.l0.label}…`} value={search}
-            onChange={e=>{setSearch(e.target.value);setPage(1);}}/>
-          {search&&<button className="search-clear-btn" onClick={()=>{setSearch('');setPage(1);}}>×</button>}
+      <div className="ov-filters">
+        <div className="ov-filter-row">
+          <div className="ov-filter-group">
+            <span className="ov-filter-label">Search</span>
+            <div className="ov-search-wrap">
+              <input className="ov-search" placeholder={`Search ${LABELS.l0.label}…`} value={search}
+                onChange={e=>{setSearch(e.target.value);setPage(1);}}/>
+              {search&&<button className="search-clear-btn" style={{right:'8px'}} onClick={()=>{setSearch('');setPage(1);}}>×</button>}
+            </div>
+          </div>
+          <div className="ov-filter-group">
+            <span className="ov-filter-label">Status</span>
+            <select className="ov-select" value={statusFilter}
+              onChange={e=>{setStatusFilter(e.target.value);setPage(1);}}>
+              <option>All</option><option>Deployed</option><option>Failed</option>
+            </select>
+          </div>
+          {filtersActive&&<button className="btn btn-outline btn-sm"
+            style={{alignSelf:'flex-end'}}
+            onClick={()=>{setSearch('');setStatusFilter('All');setPage(1);}}>Reset filters</button>}
         </div>
-        <select className="ov-select" value={statusFilter}
-          onChange={e=>{setStatusFilter(e.target.value);setPage(1);}}>
-          <option>All</option><option>Deployed</option><option>Failed</option>
-        </select>
-        {filtersActive&&<button className="btn btn-outline btn-sm btn-filter-active"
-          onClick={()=>{setSearch('');setStatusFilter('All');setPage(1);}}>✕ Clear filters</button>}
-        <div style={{flex:1}}/>
-        {filtersActive&&<span style={{fontSize:'12px',color:'#6b7280'}}>{sorted.length} result{sorted.length!==1?'s':''}</span>}
-        <button className="btn btn-outline btn-sm"
-          onClick={onOpenOutputFormat}>Browse Classification Tree</button>
+        <div className="ov-filter-actions">
+          {filtersActive&&<span style={{fontSize:'12px',color:'#6b7280',marginRight:'auto'}}>{sorted.length} result{sorted.length!==1?'s':''}</span>}
+          <button className="btn btn-outline btn-sm" onClick={onOpenOutputFormat}>Browse classification tree</button>
+        </div>
       </div>
       <div className="ov-table-wrap">
         <table className="ov-table">
           <thead><tr>
-            <th className="sortable" onClick={()=>handleSort('name')}>{LABELS.l0.short} <SortIco col="name"/></th>
-            <th className="sortable" onClick={()=>handleSort('categories')}>{LABELS.l1.short} <SortIco col="categories"/></th>
+            <th className="sortable" onClick={()=>handleSort('name')}>L0 classes <SortIco col="name"/></th>
+            <th className="sortable" onClick={()=>handleSort('categories')}>No. classes <SortIco col="categories"/></th>
+            <th className="sortable" onClick={()=>handleSort('classL1Version')}>Active version <SortIco col="classL1Version"/></th>
             <th className="sortable" onClick={()=>handleSort('status')}>Status <SortIco col="status"/></th>
             <th className="sortable" onClick={()=>handleSort('confidence')}>Confidence <SortIco col="confidence"/></th>
             <th className="sortable" onClick={()=>handleSort('trainedBy')}>Trained by <SortIco col="trainedBy"/></th>
-            <th>Action</th>
+            <th className="sortable" onClick={()=>handleSort('action')}>Action <SortIco col="action"/></th>
           </tr></thead>
           <tbody>
             {rows.map(lob=>(
               <tr key={lob.id} onClick={()=>onSelectLob(lob)}>
                 <td><button className="tbl-name-link" onClick={e=>{e.stopPropagation();onSelectLob(lob);}}>{lob.name}</button></td>
-                <td><span className="tbl-count-cell"><span className="tbl-count-num">{lob.categories.length||'—'}</span>{lob.classL1Version&&<span className="tbl-ver-badge">{lob.classL1Version}</span>}</span></td>
+                <td>{lob.categories.length||'—'}</td>
+                <td>{lob.classL1Version||<span style={{color:'#aaaaaa'}}>—</span>}</td>
                 <td><span className={`status-chip status-chip--${lob.status.toLowerCase()}`}>{lob.status}</span></td>
                 <td>{lob.confidence}%</td>
-                <td>{lob.trainedBy}</td>
+                <td>{lob.trainedBy||<span style={{color:'#aaaaaa'}}>—</span>}</td>
                 <td><div className="tbl-actions" onClick={e=>e.stopPropagation()}>
                   <button className="tbl-icon-btn" title="Edit" onClick={()=>onSelectLob(lob)}><IC.Edit/></button>
                   <button className="tbl-icon-btn danger" title="Delete" onClick={()=>onConfirm({title:`Delete "${lob.name}"?`,message:`This will permanently remove this ${LABELS.l0.label} and all its ${LABELS.l1.plural.toLowerCase()}.`,confirmLabel:`Delete ${LABELS.l0.label}`,onConfirm:()=>onDeleteLob(lob.id)})}><IC.Trash/></button>
                 </div></td>
               </tr>
             ))}
-            {rows.length===0&&<tr><td colSpan={6} className="tbl-empty">{filtersActive?`No ${LABELS.l0.label} match your filters`:`No ${LABELS.l0.label} found`}</td></tr>}
+            {rows.length===0&&<tr><td colSpan={7} className="tbl-empty">{filtersActive?`No ${LABELS.l0.label} match your filters`:`No ${LABELS.l0.label} found`}</td></tr>}
           </tbody>
         </table>
         <Pagination page={page} totalPages={totalPages} perPage={perPage} setPage={setPage} setPerPage={p=>{setPerPage(p);setPage(1);}}/>
@@ -2308,11 +2329,14 @@ function Sidebar({promptLevel,l0Name,setL0Name,l1Items,setL1Items,showMenu,setSh
         :<span className="sidebar__l0-name" title="Click to rename" onClick={()=>{setL0Draft(l0Name);setEditingL0(true);}}>{l0Name} <IC.Edit/></span>}
       </div>
       <div className="sidebar__divider"/>
-      <div className="sidebar__l1-header"><span className="sidebar__level-lbl">{LABELS.l1.short}</span></div>
+      <div className="sidebar__l1-header">
+        <span className="sidebar__level-lbl" style={{marginBottom:0}}>{LABELS.l1.short}</span>
+        <button className="sidebar__add-l1-inline" onClick={()=>setShowAddL1(true)}>+ Add {LABELS.l1.label.toLowerCase()}</button>
+      </div>
       <div className="sidebar__list-controls">
         <div className="sidebar__search-wrap">
           <span className="sidebar__search-icon"><IC.Search/></span>
-          <input className="sidebar__search" placeholder="Search…" value={sidebarSearch} onChange={e=>setSidebarSearch(e.target.value)}/>
+          <input className="sidebar__search" placeholder="Type to search..." value={sidebarSearch} onChange={e=>setSidebarSearch(e.target.value)}/>
         </div>
         {l1Items.length>0&&<button className="sidebar__collapse-btn" onClick={toggleAllExpand}>{allExpanded?'⊖ All':'⊕ All'}</button>}
       </div>
@@ -2951,7 +2975,7 @@ function TestSection({docs,dataSets,toggleSel,onMarkTested,activePromptLabel}){
 }
 
 /* ── Document Panel (Doc Library — upload & organize only) ── */
-function DocumentPanel({docs,dataSets,onAddDocs,delDoc,addDataSet,style}){
+function DocumentPanel({docs,dataSets,onAddDocs,delDoc,addDataSet,delDataSet,style}){
   const [dragOver,setDragOver]=useState(false);
   const [pendingFiles,setPendingFiles]=useState([]);
   const [openSets,setOpenSets]=useState(()=>Object.fromEntries((dataSets||[]).map(ds=>[ds.id,true])));
@@ -2974,15 +2998,16 @@ function DocumentPanel({docs,dataSets,onAddDocs,delDoc,addDataSet,style}){
     <aside className="doc-panel" style={style}>
       {/* Upload zone */}
       <div className="doc-panel__upload">
-        <p className="doc-panel__sec-title">Upload documents</p>
+        <p className="doc-panel__sec-title">Upload files</p>
+        <p className="doc-panel__sec-desc">Up to 5 files, only PDF, PNG and JPEG files, filesize up to 5 MB</p>
         <div className={`doc-panel__dropzone${dragOver?' drag-over':''}`}
           onDragOver={e=>{e.preventDefault();setDragOver(true);}} onDragLeave={()=>setDragOver(false)}
           onDrop={e=>{e.preventDefault();setDragOver(false);processRawFiles(e.dataTransfer.files);}}
           onClick={()=>fileRef.current?.click()}>
           <input ref={fileRef} type="file" accept=".jpg,.jpeg,.png,.pdf" multiple style={{display:'none'}} onChange={e=>processRawFiles(e.target.files)}/>
           <IC.Upload/>
-          <p className="doc-panel__dz-text">Drag here or <span className="doc-panel__browse">browse</span></p>
-          <p className="doc-panel__dz-hint">PDF · JPG · PNG · max 5MB</p>
+          <p className="doc-panel__dz-text">Drag and drop files here or</p>
+          <span className="doc-panel__browse">Choose files</span>
         </div>
         {pendingFiles.map((p,i)=>(
           <div key={i} className="upload-pending">
@@ -3034,7 +3059,7 @@ function DocumentPanel({docs,dataSets,onAddDocs,delDoc,addDataSet,style}){
       <div className="dlib__sets">
         <div className="dlib__hdr">
           <span className="dlib__title">Document Library</span>
-          <button className="dlib__new-set" onClick={()=>{const n=window.prompt('New Data Set name:');if(n?.trim())addDataSet(n.trim());}}>+ New set</button>
+          <button className="dlib__new-set" onClick={()=>{const n=window.prompt('New Data Set name:');if(n?.trim())addDataSet(n.trim());}}>+ New dataset</button>
         </div>
         {dataSets.map(ds=>{
           const setDocs=docs.filter(d=>d.dataSetId===ds.id);
@@ -3045,6 +3070,7 @@ function DocumentPanel({docs,dataSets,onAddDocs,delDoc,addDataSet,style}){
                 <span className="dlib__group-dot" style={{background:ds.color}}/>
                 <span className="dlib__group-name">{ds.name}</span>
                 <span className="dlib__group-count">{setDocs.length}</span>
+                <button className="ds-doc-del" title="Delete data set" onClick={e=>{e.stopPropagation();if(window.confirm(`Delete "${ds.name}" and its ${setDocs.length} document(s)?`))delDataSet(ds.id);}}><IC.Trash/></button>
                 <span className={`dlib__group-chev${isOpen?' dlib__group-chev--open':''}`}><IC.ChevDown s={12}/></span>
               </div>
               {isOpen&&<div className="dlib__group-body">
@@ -3057,6 +3083,7 @@ function DocumentPanel({docs,dataSets,onAddDocs,delDoc,addDataSet,style}){
                       <div key={doc.id} className="dlib__doc">
                         <span className="dlib__doc-name" title={doc.name}>{doc.name}</span>
                         {doc.size&&<span className="dlib__doc-size">{doc.size}</span>}
+                        <span className={`dlib__doc-status dlib__doc-status--${st}`}>{stLabel}</span>
                         <button className="ds-doc-del" onClick={()=>delDoc(doc.id)} title="Remove"><IC.Trash/></button>
                       </div>
                     );
@@ -3456,6 +3483,7 @@ function App({devOverrides={}}){
   // Data Sets
   const [dataSets,setDataSets]=useState(ds.datasets);
   const addDataSet=name=>{const id=`ds-${Date.now()}`;setDataSets(prev=>[...prev,{id,name,color:'#6b7280'}]);return id;};
+  const delDataSet=id=>{setDataSets(prev=>prev.filter(d=>d.id!==id));setDocs(prev=>prev.filter(d=>d.dataSetId!==id));};
 
   // Global docs pool
   const [docs,setDocs]=useState(devOverrides.docs!==undefined?devOverrides.docs:[]);
@@ -3639,63 +3667,69 @@ function App({devOverrides={}}){
             {/* Prompt Management — always visible */}
             <div className="cl-setup-wrap">
               <div className="cl-setup">
-                <span className="cl-setup__label">Prompt Management</span>
+                <span className="cl-setup__label">Prompt management</span>
                 <div className="cl-setup__row">
-                  {[{id:'global',label:'Global'},{id:'l1',label:'L1'},{id:'l2',label:'L2'}].map(opt=>(
+                  {[{id:'global',label:'Global'},{id:'l1',label:'L1 - Document categories'},{id:'l2',label:'L2 - Document types'}].map(opt=>(
                     <label key={opt.id} className={`cl-setup__radio${promptLevel===opt.id?' cl-setup__radio--active':''}`} onClick={e=>e.stopPropagation()}>
                       <input type="radio" name="promptLevel" value={opt.id} checked={promptLevel===opt.id} onChange={()=>{setPromptLevel(opt.id);setTestMode(false);}}/>
                       <span className="cl-setup__radio-label">{opt.label}</span>
                     </label>
                   ))}
                 </div>
-                {testMode
-                  ?<button className="cl-setup__test-btn cl-setup__test-btn--back" onClick={exitTestMode}>← Edit prompt</button>
-                  :<button className="cl-setup__test-btn" onClick={()=>{setDocs(ds=>ds.map(d=>({...d,selected:true})));setTestMode(true);}}>▶ Test Prompt</button>
-                }
               </div>
             </div>
             {/* Center content — swaps based on promptLevel / testMode */}
             {(()=>{
               const activePromptLabel=(()=>{
                 if(promptLevel==='global')return`${l0Name} · Global Class`;
-                if(promptLevel==='l1'){const cat=l1Items.find(i=>i.id===activeCatId);return cat?`${cat.name} · L1 Class`:`${l0Name} · L1 Class`;}
+                if(promptLevel==='l1')return`${l0Name} · L1 Class`;
                 const cat=l1Items.find(i=>i.id===activeTab);return cat?`${cat.name} · L2 Class`:`${l0Name} · L2 Class`;
               })();
-              const currentPromptText=promptLevel==='l2'?(prompts[activeTab]||''):(prompts['l1']||'');
-              const promptKey=promptLevel==='l2'?activeTab:'l1';
+              const currentPromptText=promptLevel==='global'?(prompts['global']||''):promptLevel==='l2'?(prompts[activeTab]||''):(prompts['l1']||'');
+              const promptKey=promptLevel==='global'?'global':promptLevel==='l2'?activeTab:'l1';
               const publishedSnap=publishedPrompts[promptKey]||null;
               if(testMode)return(
                 <TestView promptText={currentPromptText} promptLabel={activePromptLabel}
                   docs={docs} dataSets={dataSets} toggleSel={toggleSel} onMarkTested={markTested}
                   onUpdateExpected={updateDocExpected}
-                  labelSuggestions={[...l1Items.map(i=>i.name),...l1Items.flatMap(i=>i.l2.map(l=>l.name))]}
+                  labelSuggestions={promptLevel==='global'?[...l1Items.map(i=>i.name),...l1Items.flatMap(i=>i.l2.map(l=>l.name))]:promptLevel==='l1'?l1Items.map(i=>i.name):(l1Items.find(i=>i.id===activeTab)?.l2.map(l=>l.name)||[])}
                   promptKey={promptKey} publishedSnap={publishedSnap} onPublish={publishPrompt}
                   onEditPrompt={newText=>{handleEdit(promptKey,newText);setSaveStates(s=>({...s,[promptKey]:'unsaved'}));}}
                   onBack={exitTestMode}/>
               );
+              const onTestPrompt=()=>{setDocs(prev=>prev.map(d=>({...d,selected:true})));setTestMode(true);};
               return promptLevel==='l2'
-                ?<Workspace activeL1Tab={activeL1Tab} setActiveL1Tab={setActiveL1Tab} activeTab={activeTab} setActiveTab={setActiveTab} l1Items={l1Items}
-                    prompts={prompts} defaultPrompts={defaultPrompts} tabMeta={tabMeta} saveStates={saveStates}
-                    onEdit={handleEdit} onSave={handleSave} onVersion={()=>setModal('version')}
-                    docs={docs} publishedPrompts={publishedPrompts}/>
-                :<div className="detail-scroll__main">
-                    <div className="detail-scroll__toolbar">
-                      <span className="detail-scroll__count">{promptLevel==='global'?'Global prompt':'Per-category prompts — '+l1Items.length+' categor'+(l1Items.length!==1?'ies':'y')}</span>
+                ?<div style={{display:'flex',flexDirection:'column',flex:1,overflow:'hidden'}}>
+                    <Workspace activeL1Tab={activeL1Tab} setActiveL1Tab={setActiveL1Tab} activeTab={activeTab} setActiveTab={setActiveTab} l1Items={l1Items}
+                      prompts={prompts} defaultPrompts={defaultPrompts} tabMeta={tabMeta} saveStates={saveStates}
+                      onEdit={handleEdit} onSave={handleSave} onVersion={()=>setModal('version')}
+                      docs={docs} publishedPrompts={publishedPrompts}/>
+                    <div className="prompt-actions">
+                      <button className="prompt-actions__save" onClick={()=>handleSave(activeTab)} disabled={saveStates[activeTab]!=='unsaved'}>Save draft</button>
+                      <button className="cl-setup__test-btn" onClick={onTestPrompt}>▶ Test prompt</button>
                     </div>
-                    <LobPromptSection
-                      lobName={l0Name} prompt={prompts['l1']||''} defaultPrompt={defaultPrompts['l1']||''}
-                      meta={tabMeta['l1']} saveState={saveStates['l1']}
-                      onEdit={val=>handleEdit('l1',val)} onSave={()=>handleSave('l1')}
-                      onVersion={()=>setModal('version')}
-                      hierarchyContext={buildHierarchy(promptLevel==='global'?'global':'l1',l1Items)}
-                      promptMode={promptLevel} publishedSnap={publishedSnap}
-                      lastTestCtx={lastTestCtx}/>
+                  </div>
+                :<div className="detail-scroll__main" style={{display:'flex',flexDirection:'column',flex:1,overflow:'hidden'}}>
+                    <div style={{flex:1,overflowY:'auto'}}>
+                      <LobPromptSection
+                        lobName={l0Name} prompt={prompts[promptKey]||''} defaultPrompt={defaultPrompts[promptKey]||''}
+                        meta={tabMeta[promptKey]} saveState={saveStates[promptKey]}
+                        onEdit={val=>handleEdit(promptKey,val)} onSave={()=>handleSave(promptKey)}
+                        onVersion={()=>setModal('version')}
+                        hierarchyContext={buildHierarchy(promptLevel==='global'?'global':'l1',l1Items)}
+                        promptMode={promptLevel} publishedSnap={publishedSnap}
+                        lastTestCtx={lastTestCtx}/>
+                    </div>
+                    <div className="prompt-actions">
+                      <button className="prompt-actions__save" onClick={()=>handleSave(promptKey)} disabled={saveStates[promptKey]!=='unsaved'}>Save draft</button>
+                      <button className="cl-setup__test-btn" onClick={()=>{setDocs(prev=>prev.map(d=>({...d,selected:true})));setTestMode(true);}}>▶ Test prompt</button>
+                    </div>
                   </div>;
             })()}
           </div>
           <ResizeHandle onResize={dx=>setDocPanelW(w=>Math.min(420,Math.max(200,w-dx)))}/>
           <DocumentPanel docs={docs} dataSets={dataSets} onAddDocs={onAddDocs}
-            delDoc={delDoc} addDataSet={addDataSet}
+            delDoc={delDoc} addDataSet={addDataSet} delDataSet={delDataSet}
             style={{width:docPanelW+'px',borderLeft:'1px solid var(--bdr)'}}/>
         </div>
         {modal==='version'&&<VersionModal lob={selectedLobFromState} onClose={()=>setModal(null)}/>}
