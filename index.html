@@ -2688,7 +2688,7 @@ function WorkspaceTabs({l1Items,activeL1Tab,setActiveL1Tab,activeTab,setActiveTa
   );
 }
 
-function Workspace({activeL1Tab,setActiveL1Tab,activeTab,setActiveTab,l1Items,prompts,defaultPrompts,tabMeta,saveStates,onEdit,onSave,onVersion,docs}){
+function Workspace({activeL1Tab,setActiveL1Tab,activeTab,setActiveTab,l1Items,prompts,defaultPrompts,tabMeta,saveStates,onEdit,onSave,onVersion,docs,dataSets=[],onRunTest}){
   const getMeta=tabId=>{
     const base=tabMeta?.[tabId]||DEFAULT_TAB_META;
     const item=l1Items.find(i=>i.id===tabId);
@@ -2701,7 +2701,19 @@ function Workspace({activeL1Tab,setActiveL1Tab,activeTab,setActiveTab,l1Items,pr
     return{level:'l2',chip:'L2 Class',scope:''};
   };
   const [showResetConfirm,setShowResetConfirm]=useState(false);
+  const [showSelectFile,setShowSelectFile]=useState(false);
+  const [selectedFiles,setSelectedFiles]=useState([]);
+  const [runningIds,setRunningIds]=useState(new Set());
   useEffect(()=>setShowResetConfirm(false),[activeTab]);
+  useEffect(()=>{setSelectedFiles([]);setRunningIds(new Set());setShowSelectFile(false);},[activeTab]);
+  useEffect(()=>{
+    setRunningIds(prev=>{
+      if(prev.size===0)return prev;
+      const next=new Set(prev);
+      docs.forEach(d=>{if(prev.has(d.id)&&d.lastTest)next.delete(d.id);});
+      return next.size===prev.size?prev:next;
+    });
+  },[docs]);
   const meta=getMeta(activeTab);
   const ctx=getCtx(activeTab);
   const prompt=prompts[activeTab]||'';
@@ -2711,10 +2723,10 @@ function Workspace({activeL1Tab,setActiveL1Tab,activeTab,setActiveTab,l1Items,pr
   const missing=['{{CLASSIFICATION_HIERARCHY}}'].filter(p=>!prompt.includes(p));
   const doReset=()=>{onEdit(activeTab,defaultPrompts?.[activeTab]||'');setShowResetConfirm(false);};
   return(
-    <main className="workspace">
+    <main className="workspace" style={{display:'flex',flexDirection:'column'}}>
       <div className="workspace__header"><span className="workspace__title">Classification Prompts</span></div>
       <WorkspaceTabs l1Items={l1Items} activeL1Tab={activeL1Tab} setActiveL1Tab={setActiveL1Tab} activeTab={activeTab} setActiveTab={setActiveTab}/>
-      <div className="workspace__body">
+      <div className="workspace__body" style={{flex:1,overflowY:'auto'}}>
         <div className="workspace__lv-header">
           <h3 className="workspace__lv-title">{meta.title}</h3>
           <button className="workspace__manage-btn" onClick={onVersion}>Manage version</button>
@@ -2758,7 +2770,55 @@ function Workspace({activeL1Tab,setActiveL1Tab,activeTab,setActiveTab,l1Items,pr
             <span className="char-count">{prompt.length.toLocaleString()} chars</span>
           </div>
         </div>
+        <div className="file-sel">
+          <div className="file-sel__hdr">
+            <span className="file-sel__hdr-label">File selected</span>
+            <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
+              {selectedFiles.length>0&&<button className="file-sel__select-link" style={{color:'var(--tx3)'}}
+                onClick={()=>{setSelectedFiles([]);setRunningIds(new Set());}}>Clear</button>}
+              <button className="file-sel__select-link" onClick={()=>setShowSelectFile(true)}>Select file</button>
+            </div>
+          </div>
+          {selectedFiles.length===0
+            ?<div className="file-sel__empty">No files selected</div>
+            :<div className="file-sel__selected-list">
+              <span className="file-sel__count">{selectedFiles.length} file{selectedFiles.length>1?'s':''} selected</span>
+              {selectedFiles.map(d=>{
+                const live=docs.find(x=>x.id===d.id);
+                const isRunning=runningIds.has(d.id);
+                const tested=live?.lastTest;
+                return(
+                  <span key={d.id} className="file-sel__item">
+                    {isRunning?<span style={{color:'var(--a)',fontSize:'11px'}}>⟳</span>
+                      :tested?(tested.match?<span style={{color:'#006b00',fontSize:'11px'}}>✓</span>:<span style={{color:'#cc0000',fontSize:'11px'}}>✗</span>)
+                      :<span style={{color:'var(--tx3)',fontSize:'11px'}}>·</span>}
+                    <span style={{flex:1,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{d.name}</span>
+                    {tested&&<span className={`dlib__doc-status dlib__doc-status--${tested.match?'tested':'failed'}`}>{tested.match?'Tested':'Failed'}</span>}
+                    {isRunning&&<span className="dlib__doc-status dlib__doc-status--pending">Running…</span>}
+                  </span>
+                );
+              })}
+            </div>
+          }
+        </div>
       </div>
+      <div className="run-test-bar">
+        <button className="run-test-btn" disabled={runningIds.size>0}
+          onClick={()=>{
+            const ids=selectedFiles.length>0?selectedFiles.map(d=>d.id):docs.map(d=>d.id);
+            setRunningIds(new Set(ids));
+            onRunTest?.(ids);
+          }}>
+          {runningIds.size>0?'Running…':'Run test'}
+        </button>
+      </div>
+      {showSelectFile&&<SelectFileModal docs={docs} dataSets={dataSets}
+        onConfirm={ids=>{
+          const sel=docs.filter(d=>ids.includes(d.id));
+          setSelectedFiles(sel);
+          setShowSelectFile(false);
+        }}
+        onClose={()=>setShowSelectFile(false)}/>}
     </main>
   );
 }
@@ -3855,15 +3915,6 @@ function App({devOverrides={}}){
               const promptKey=promptLevel==='global'?'global':promptLevel==='l2'?activeTab:'l1';
               const publishedSnap=publishedPrompts[promptKey]||null;
               const labelSuggestions=promptLevel==='global'?[...l1Items.map(i=>i.name),...l1Items.flatMap(i=>i.l2.map(l=>l.name))]:promptLevel==='l1'?l1Items.map(i=>i.name):(l1Items.find(i=>i.id===activeTab)?.l2.map(l=>l.name)||[]);
-              if(testMode&&promptLevel==='l2')return(
-                <TestView promptText={currentPromptText} promptLabel={activePromptLabel}
-                  docs={docs} dataSets={dataSets} toggleSel={toggleSel} onMarkTested={markTested}
-                  onUpdateExpected={updateDocExpected}
-                  labelSuggestions={labelSuggestions}
-                  promptKey={promptKey} publishedSnap={publishedSnap} onPublish={publishPrompt}
-                  onEditPrompt={newText=>{handleEdit(promptKey,newText);setSaveStates(s=>({...s,[promptKey]:'unsaved'}));}}
-                  onBack={exitTestMode}/>
-              );
               const onRunInline=(docIds)=>{
                 const sel=docs.filter(d=>docIds.includes(d.id));
                 const targets=labelSuggestions.map(name=>({id:name,name}));
@@ -3878,15 +3929,11 @@ function App({devOverrides={}}){
                 },900+i*500+Math.random()*300);});
               };
               return promptLevel==='l2'
-                ?<div style={{display:'flex',flexDirection:'column',flex:1,overflow:'hidden'}}>
-                    <Workspace activeL1Tab={activeL1Tab} setActiveL1Tab={setActiveL1Tab} activeTab={activeTab} setActiveTab={setActiveTab} l1Items={l1Items}
-                      prompts={prompts} defaultPrompts={defaultPrompts} tabMeta={tabMeta} saveStates={saveStates}
-                      onEdit={handleEdit} onSave={handleSave} onVersion={()=>setModal('version')}
-                      docs={docs} publishedPrompts={publishedPrompts}/>
-                    <div className="run-test-bar">
-                      <button className="run-test-btn" onClick={()=>{setDocs(prev=>prev.map(d=>({...d,selected:true})));setTestMode(true);}}>Run test</button>
-                    </div>
-                  </div>
+                ?<Workspace activeL1Tab={activeL1Tab} setActiveL1Tab={setActiveL1Tab} activeTab={activeTab} setActiveTab={setActiveTab} l1Items={l1Items}
+                    prompts={prompts} defaultPrompts={defaultPrompts} tabMeta={tabMeta} saveStates={saveStates}
+                    onEdit={handleEdit} onSave={handleSave} onVersion={()=>setModal('version')}
+                    docs={docs} dataSets={dataSets} publishedPrompts={publishedPrompts}
+                    onRunTest={onRunInline}/>
                 :<div className="detail-scroll__main" style={{display:'flex',flexDirection:'column',flex:1,overflow:'hidden'}}>
                     <div style={{flex:1,overflowY:'auto'}}>
                       <LobPromptSection key={promptKey}
