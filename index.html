@@ -2128,7 +2128,11 @@ function LobPromptSection({lobName,prompt,defaultPrompt,meta,saveState,onEdit,on
           <div className="file-sel">
             <div className="file-sel__hdr">
               <span className="file-sel__hdr-label">File selected</span>
-              <button className="file-sel__select-link" onClick={()=>setShowSelectFile(true)}>Select file</button>
+              <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
+                {selectedFiles.length>0&&<button className="file-sel__select-link" style={{color:'var(--tx3)'}}
+                  onClick={()=>{setSelectedFiles([]);setRunningIds(new Set());onSelectFiles?.([]);}}>Clear</button>}
+                <button className="file-sel__select-link" onClick={()=>setShowSelectFile(true)}>Select file</button>
+              </div>
             </div>
             {selectedFiles.length===0
               ?<div className="file-sel__empty">No files selected</div>
