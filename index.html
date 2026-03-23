@@ -699,6 +699,30 @@ input,textarea,select{font-family:inherit}
 .prompt-actions__save:disabled{color:#a0a0a0;cursor:not-allowed;text-decoration:none}
 .dlib__doc-size{font-size:10px;color:var(--tx3);white-space:nowrap;flex-shrink:0}
 
+/* ── Select File Modal ── */
+.sf-filters{display:flex;align-items:center;gap:6px;margin-bottom:10px}
+.sf-tab{padding:5px 12px;border-radius:20px;font-size:12px;font-weight:500;border:1px solid var(--bdr);background:var(--bg);color:var(--tx2);cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:5px;transition:all .12s}
+.sf-tab:hover{border-color:var(--a);color:var(--a)}
+.sf-tab--active{background:var(--a);color:#fff;border-color:var(--a)}
+.sf-tab__count{font-size:10px;font-weight:700;padding:1px 5px;border-radius:8px;background:rgba(255,255,255,.25)}
+.sf-tab:not(.sf-tab--active) .sf-tab__count{background:var(--srf2);color:var(--tx3)}
+.sf-ds-select{margin-left:auto;padding:5px 10px;border:1px solid var(--bdr);border-radius:var(--r);font-size:12px;color:var(--tx2);background:var(--bg);outline:none;cursor:pointer;font-family:inherit;min-width:120px}
+.sf-actions{display:flex;gap:12px;margin-bottom:8px}
+.sf-link{background:none;border:none;font-size:12px;color:var(--a);cursor:pointer;font-family:inherit;padding:0;text-decoration:underline;text-underline-offset:2px}
+.sf-table{width:100%;border-collapse:collapse;font-size:12px}
+.sf-table th{text-align:left;padding:8px 10px;font-size:11px;font-weight:700;color:var(--tx3);border-bottom:1px solid var(--bdr);text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+.sf-table td{padding:8px 10px;border-bottom:1px solid var(--bdr);color:var(--tx1);vertical-align:middle}
+.sf-table tbody tr:last-child td{border-bottom:none}
+.sf-table tbody tr:hover td{background:var(--srf2)}
+.sf-exp-cell{display:inline-block;padding:2px 8px;background:var(--srf2);border:1px solid var(--bdr);border-radius:var(--r);font-size:11px;color:var(--tx1)}
+.sf-status--pending{font-size:11px;color:var(--tx3)}
+.sf-status--tested{font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;background:#e6f4e6;color:#006b00}
+.sf-status--failed{font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;background:#fce8e8;color:#cc0000}
+.sf-doc-name{max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* File selected display */
+.file-sel__selected-list{padding:6px 12px 8px;display:flex;flex-direction:column;gap:3px}
+.file-sel__item{font-size:11px;color:var(--tx2);display:flex;align-items:center;gap:6px}
+.file-sel__count{font-size:11px;font-weight:600;color:var(--a);padding:0 12px 6px}
 /* ── Prompt label row (screenshot style) ── */
 .prompt-label-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
 .prompt-label-text{font-size:13px;font-weight:600;color:var(--tx1)}
@@ -2050,10 +2074,12 @@ function LastTestPanel({ctx}){
 /* ── LOB Prompt Section (Stage 1 — L1-only scroll mode) ── */
 /* targets = l1Items passed from App so classifier knows the category targets */
 function LobPromptSection({lobName,prompt,defaultPrompt,meta,saveState,onEdit,onSave,
-  onVersion,hierarchyContext,promptMode='l1',publishedSnap,lastTestCtx}){
+  onVersion,hierarchyContext,promptMode='l1',publishedSnap,lastTestCtx,docs=[],dataSets=[],onSelectFiles}){
   const [open,setOpen]=useState(true);
   const [showResetConfirm,setShowResetConfirm]=useState(false);
   const [showPreview,setShowPreview]=useState(false);
+  const [showSelectFile,setShowSelectFile]=useState(false);
+  const [selectedFiles,setSelectedFiles]=useState([]);
   const m=meta||{version:'V.1',score:'N/A',status:'Draft'};
   const ss=saveState;
   const missing=!prompt.includes('{{CLASSIFICATION_HIERARCHY}}');
@@ -2092,14 +2118,118 @@ function LobPromptSection({lobName,prompt,defaultPrompt,meta,saveState,onEdit,on
           <div className="file-sel">
             <div className="file-sel__hdr">
               <span className="file-sel__hdr-label">File selected</span>
-              <button className="file-sel__select-link">Select file</button>
+              <button className="file-sel__select-link" onClick={()=>setShowSelectFile(true)}>Select file</button>
             </div>
-            <div className="file-sel__empty">No files selected</div>
+            {selectedFiles.length===0
+              ?<div className="file-sel__empty">No files selected</div>
+              :<div className="file-sel__selected-list">
+                <span className="file-sel__count">{selectedFiles.length} file{selectedFiles.length>1?'s':''} selected</span>
+                {selectedFiles.slice(0,3).map(d=><span key={d.id} className="file-sel__item"><IC.Grid s={11}/>{d.name}</span>)}
+                {selectedFiles.length>3&&<span className="file-sel__item" style={{color:'var(--tx3)'}}>+{selectedFiles.length-3} more</span>}
+              </div>
+            }
           </div>
         </div>
         <LastTestPanel ctx={lastTestCtx}/>
       </div>}
       {showPreview&&<PreviewModal prompt={prompt} hierarchyContext={hierarchyContext} onClose={()=>setShowPreview(false)}/>}
+      {showSelectFile&&<SelectFileModal docs={docs} dataSets={dataSets}
+        onConfirm={ids=>{
+          const sel=docs.filter(d=>ids.includes(d.id));
+          setSelectedFiles(sel);
+          onSelectFiles?.(ids);
+          setShowSelectFile(false);
+        }}
+        onClose={()=>setShowSelectFile(false)}/>}
+    </div>
+  );
+}
+
+/* ── Select File Modal ── */
+function SelectFileModal({docs,dataSets,onConfirm,onClose}){
+  const [filter,setFilter]=useState('all');
+  const [datasetFilter,setDatasetFilter]=useState('');
+  const [selectedIds,setSelectedIds]=useState(new Set());
+  const getDocStatus=d=>{
+    if(!d.lastTest)return'pending';
+    return d.lastTest.match?'tested':'failed';
+  };
+  const counts={
+    all:docs.length,
+    untested:docs.filter(d=>!d.lastTest).length,
+    matched:docs.filter(d=>d.lastTest?.match).length,
+    failed:docs.filter(d=>d.lastTest&&!d.lastTest.match).length,
+  };
+  const filtered=docs.filter(d=>{
+    if(datasetFilter&&d.dataSetId!==datasetFilter)return false;
+    if(filter==='untested')return!d.lastTest;
+    if(filter==='matched')return d.lastTest?.match;
+    if(filter==='failed')return d.lastTest&&!d.lastTest.match;
+    return true;
+  });
+  const toggle=id=>setSelectedIds(s=>{const n=new Set(s);n.has(id)?n.delete(id):n.add(id);return n;});
+  const selectAll=()=>setSelectedIds(new Set(filtered.map(d=>d.id)));
+  const clear=()=>setSelectedIds(new Set());
+  const statusBadge=d=>{
+    const s=getDocStatus(d);
+    if(s==='tested')return<span className="sf-status--tested">Tested</span>;
+    if(s==='failed')return<span className="sf-status--failed">Failed</span>;
+    return<span className="sf-status--pending">Pending</span>;
+  };
+  return(
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal lg" style={{maxWidth:'680px'}} onClick={e=>e.stopPropagation()}>
+        <div className="modal__header">
+          <h3>Select file</h3>
+          <button className="modal__close" onClick={onClose}>×</button>
+        </div>
+        <div className="modal__body">
+          <div className="sf-filters">
+            {[['all','All'],['untested','Untested'],['matched','Matched'],['failed','Failed']].map(([key,label])=>(
+              <button key={key} className={`sf-tab${filter===key?' sf-tab--active':''}`} onClick={()=>setFilter(key)}>
+                {label}<span className="sf-tab__count">{counts[key]}</span>
+              </button>
+            ))}
+            <select className="sf-ds-select" value={datasetFilter} onChange={e=>setDatasetFilter(e.target.value)}>
+              <option value="">All dataset</option>
+              {dataSets.map(ds=><option key={ds.id} value={ds.id}>{ds.name}</option>)}
+            </select>
+          </div>
+          <div className="sf-actions">
+            <button className="sf-link" onClick={selectAll}>Select all</button>
+            <button className="sf-link" onClick={clear}>Clear</button>
+          </div>
+          <div style={{maxHeight:'300px',overflowY:'auto'}}>
+            <table className="sf-table">
+              <thead>
+                <tr>
+                  <th style={{width:'32px'}}></th>
+                  <th>Document</th>
+                  <th>Expected</th>
+                  <th>Confidence</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.length===0&&<tr><td colSpan={5} style={{textAlign:'center',color:'var(--tx3)',padding:'24px'}}>No documents</td></tr>}
+                {filtered.map(d=>(
+                  <tr key={d.id} style={{cursor:'pointer'}} onClick={()=>toggle(d.id)}>
+                    <td onClick={e=>e.stopPropagation()}><input type="checkbox" checked={selectedIds.has(d.id)} onChange={()=>toggle(d.id)}/></td>
+                    <td><span className="sf-doc-name" title={d.name}>{d.name}</span></td>
+                    <td>{d.expectedLabels?.length>0?<span className="sf-exp-cell">{d.expectedLabels.join(', ')}</span>:<span style={{color:'var(--tx3)'}}>—</span>}</td>
+                    <td>{d.lastTest?.conf!=null?`${Math.round(d.lastTest.conf*100)}%`:'—'}</td>
+                    <td>{statusBadge(d)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div className="modal__footer">
+          <button className="btn btn-outline btn-sm" onClick={onClose}>Cancel</button>
+          <button className="btn btn-primary btn-sm" disabled={selectedIds.size===0} onClick={()=>onConfirm([...selectedIds])}>Confirm</button>
+        </div>
+      </div>
     </div>
   );
 }
@@ -3716,10 +3846,16 @@ function App({devOverrides={}}){
                         onVersion={()=>setModal('version')}
                         hierarchyContext={buildHierarchy(promptLevel==='global'?'global':'l1',l1Items)}
                         promptMode={promptLevel} publishedSnap={publishedSnap}
-                        lastTestCtx={lastTestCtx}/>
+                        lastTestCtx={lastTestCtx}
+                        docs={docs} dataSets={dataSets}
+                        onSelectFiles={ids=>setDocs(prev=>prev.map(d=>({...d,selected:ids.includes(d.id)})))}/>
                     </div>
                     <div className="run-test-bar">
-                      <button className="run-test-btn" onClick={()=>{setDocs(prev=>prev.map(d=>({...d,selected:true})));setTestMode(true);}}>Run test</button>
+                      <button className="run-test-btn"
+                        onClick={()=>{
+                          if(!docs.some(d=>d.selected))setDocs(prev=>prev.map(d=>({...d,selected:true})));
+                          setTestMode(true);
+                        }}>Run test</button>
                     </div>
                   </div>;
             })()}
