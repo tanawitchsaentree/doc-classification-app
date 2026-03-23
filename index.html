@@ -2074,13 +2074,23 @@ function LastTestPanel({ctx}){
 /* ── LOB Prompt Section (Stage 1 — L1-only scroll mode) ── */
 /* targets = l1Items passed from App so classifier knows the category targets */
 function LobPromptSection({lobName,prompt,defaultPrompt,meta,saveState,onEdit,onSave,
-  onVersion,hierarchyContext,promptMode='l1',publishedSnap,lastTestCtx,docs=[],dataSets=[],onSelectFiles}){
+  onVersion,hierarchyContext,promptMode='l1',publishedSnap,lastTestCtx,docs=[],dataSets=[],onSelectFiles,onRunTest}){
   const [open,setOpen]=useState(true);
   const [showResetConfirm,setShowResetConfirm]=useState(false);
   const [showPreview,setShowPreview]=useState(false);
   const [showSelectFile,setShowSelectFile]=useState(false);
   const [selectedFiles,setSelectedFiles]=useState([]);
+  const [runningIds,setRunningIds]=useState(new Set());
   const m=meta||{version:'V.1',score:'N/A',status:'Draft'};
+  // clear runningIds as docs finish
+  useEffect(()=>{
+    setRunningIds(prev=>{
+      if(prev.size===0)return prev;
+      const next=new Set(prev);
+      docs.forEach(d=>{if(prev.has(d.id)&&d.lastTest)next.delete(d.id);});
+      return next.size===prev.size?prev:next;
+    });
+  },[docs]);
   const ss=saveState;
   const missing=!prompt.includes('{{CLASSIFICATION_HIERARCHY}}');
   const found=[...new Set(prompt.match(/\{\{[^}]+\}\}/g)||[])];
@@ -2124,14 +2134,37 @@ function LobPromptSection({lobName,prompt,defaultPrompt,meta,saveState,onEdit,on
               ?<div className="file-sel__empty">No files selected</div>
               :<div className="file-sel__selected-list">
                 <span className="file-sel__count">{selectedFiles.length} file{selectedFiles.length>1?'s':''} selected</span>
-                {selectedFiles.slice(0,3).map(d=><span key={d.id} className="file-sel__item"><IC.Grid s={11}/>{d.name}</span>)}
-                {selectedFiles.length>3&&<span className="file-sel__item" style={{color:'var(--tx3)'}}>+{selectedFiles.length-3} more</span>}
+                {selectedFiles.map(d=>{
+                  const live=docs.find(x=>x.id===d.id);
+                  const isRunning=runningIds.has(d.id);
+                  const tested=live?.lastTest;
+                  return(
+                    <span key={d.id} className="file-sel__item">
+                      {isRunning?<span style={{color:'var(--a)',fontSize:'11px'}}>⟳</span>
+                        :tested?(tested.match?<span style={{color:'#006b00',fontSize:'11px'}}>✓</span>:<span style={{color:'#cc0000',fontSize:'11px'}}>✗</span>)
+                        :<span style={{color:'var(--tx3)',fontSize:'11px'}}>·</span>}
+                      <span style={{flex:1,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{d.name}</span>
+                      {tested&&<span className={`dlib__doc-status dlib__doc-status--${tested.match?'tested':'failed'}`}>{tested.match?'Tested':'Failed'}</span>}
+                      {isRunning&&<span className="dlib__doc-status dlib__doc-status--pending">Running…</span>}
+                    </span>
+                  );
+                })}
               </div>
             }
           </div>
         </div>
         <LastTestPanel ctx={lastTestCtx}/>
       </div>}
+      <div className="run-test-bar">
+        <button className="run-test-btn" disabled={runningIds.size>0}
+          onClick={()=>{
+            const ids=selectedFiles.length>0?selectedFiles.map(d=>d.id):docs.map(d=>d.id);
+            setRunningIds(new Set(ids));
+            onRunTest?.(ids);
+          }}>
+          {runningIds.size>0?'Running…':'Run test'}
+        </button>
+      </div>
       {showPreview&&<PreviewModal prompt={prompt} hierarchyContext={hierarchyContext} onClose={()=>setShowPreview(false)}/>}
       {showSelectFile&&<SelectFileModal docs={docs} dataSets={dataSets}
         onConfirm={ids=>{
@@ -3817,16 +3850,29 @@ function App({devOverrides={}}){
               const currentPromptText=promptLevel==='global'?(prompts['global']||''):promptLevel==='l2'?(prompts[activeTab]||''):(prompts['l1']||'');
               const promptKey=promptLevel==='global'?'global':promptLevel==='l2'?activeTab:'l1';
               const publishedSnap=publishedPrompts[promptKey]||null;
-              if(testMode)return(
+              const labelSuggestions=promptLevel==='global'?[...l1Items.map(i=>i.name),...l1Items.flatMap(i=>i.l2.map(l=>l.name))]:promptLevel==='l1'?l1Items.map(i=>i.name):(l1Items.find(i=>i.id===activeTab)?.l2.map(l=>l.name)||[]);
+              if(testMode&&promptLevel==='l2')return(
                 <TestView promptText={currentPromptText} promptLabel={activePromptLabel}
                   docs={docs} dataSets={dataSets} toggleSel={toggleSel} onMarkTested={markTested}
                   onUpdateExpected={updateDocExpected}
-                  labelSuggestions={promptLevel==='global'?[...l1Items.map(i=>i.name),...l1Items.flatMap(i=>i.l2.map(l=>l.name))]:promptLevel==='l1'?l1Items.map(i=>i.name):(l1Items.find(i=>i.id===activeTab)?.l2.map(l=>l.name)||[])}
+                  labelSuggestions={labelSuggestions}
                   promptKey={promptKey} publishedSnap={publishedSnap} onPublish={publishPrompt}
                   onEditPrompt={newText=>{handleEdit(promptKey,newText);setSaveStates(s=>({...s,[promptKey]:'unsaved'}));}}
                   onBack={exitTestMode}/>
               );
-              const onTestPrompt=()=>{setDocs(prev=>prev.map(d=>({...d,selected:true})));setTestMode(true);};
+              const onRunInline=(docIds)=>{
+                const sel=docs.filter(d=>docIds.includes(d.id));
+                const targets=labelSuggestions.map(name=>({id:name,name}));
+                const eff=targets.length>0?targets:[{id:'unknown',name:'Unknown'}];
+                sel.forEach((doc,i)=>{setTimeout(()=>{
+                  const r=mockClassify(doc.name,eff);
+                  const pred=r?.classification||'Unknown';
+                  const conf=r?parseInt(r.confidence)||50:50;
+                  const expected=doc.expectedLabels?.[0];
+                  const match=expected?(pred===expected):null;
+                  markTested(doc.id,{ctx:activePromptLabel,pred,conf,match,testedAt:new Date().toISOString()});
+                },900+i*500+Math.random()*300);});
+              };
               return promptLevel==='l2'
                 ?<div style={{display:'flex',flexDirection:'column',flex:1,overflow:'hidden'}}>
                     <Workspace activeL1Tab={activeL1Tab} setActiveL1Tab={setActiveL1Tab} activeTab={activeTab} setActiveTab={setActiveTab} l1Items={l1Items}
@@ -3834,7 +3880,7 @@ function App({devOverrides={}}){
                       onEdit={handleEdit} onSave={handleSave} onVersion={()=>setModal('version')}
                       docs={docs} publishedPrompts={publishedPrompts}/>
                     <div className="run-test-bar">
-                      <button className="run-test-btn" onClick={onTestPrompt}>Run test</button>
+                      <button className="run-test-btn" onClick={()=>{setDocs(prev=>prev.map(d=>({...d,selected:true})));setTestMode(true);}}>Run test</button>
                     </div>
                   </div>
                 :<div className="detail-scroll__main" style={{display:'flex',flexDirection:'column',flex:1,overflow:'hidden'}}>
@@ -3848,14 +3894,8 @@ function App({devOverrides={}}){
                         promptMode={promptLevel} publishedSnap={publishedSnap}
                         lastTestCtx={lastTestCtx}
                         docs={docs} dataSets={dataSets}
-                        onSelectFiles={ids=>setDocs(prev=>prev.map(d=>({...d,selected:ids.includes(d.id)})))}/>
-                    </div>
-                    <div className="run-test-bar">
-                      <button className="run-test-btn"
-                        onClick={()=>{
-                          if(!docs.some(d=>d.selected))setDocs(prev=>prev.map(d=>({...d,selected:true})));
-                          setTestMode(true);
-                        }}>Run test</button>
+                        onSelectFiles={ids=>setDocs(prev=>prev.map(d=>({...d,selected:ids.includes(d.id)})))}
+                        onRunTest={onRunInline}/>
                     </div>
                   </div>;
             })()}
