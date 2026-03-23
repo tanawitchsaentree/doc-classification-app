@@ -3889,7 +3889,7 @@ function App({devOverrides={}}){
                   </div>
                 :<div className="detail-scroll__main" style={{display:'flex',flexDirection:'column',flex:1,overflow:'hidden'}}>
                     <div style={{flex:1,overflowY:'auto'}}>
-                      <LobPromptSection
+                      <LobPromptSection key={promptKey}
                         lobName={l0Name} prompt={prompts[promptKey]||''} defaultPrompt={defaultPrompts[promptKey]||''}
                         meta={tabMeta[promptKey]} saveState={saveStates[promptKey]}
                         onEdit={val=>handleEdit(promptKey,val)} onSave={()=>handleSave(promptKey)}
