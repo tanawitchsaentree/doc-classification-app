@@ -2768,19 +2768,14 @@ function Workspace({activeL1Tab,setActiveL1Tab,activeTab,setActiveTab,l1Items,pr
         <ReadinessChecklist l1Items={l1Items} docs={docs}/>
         {showWarn&&<div className="workspace__warn"><IC.Warn/><span>The <code>{'{{CLASSIFICATION_HIERARCHY}}'}</code> placeholder is required</span></div>}
         <div className="workspace__prompt-sec">
-          <div className="workspace__prompt-hdr">
-            <div style={{display:'flex',alignItems:'center',gap:'6px',minWidth:0,overflow:'hidden'}}>
-              <span className={`prompt-ctx-chip prompt-ctx-chip--${ctx.level}`}>{ctx.chip}</span>
-              <span className="workspace__prompt-lbl">Classification prompt</span>
-              {ctx.scope&&<span className="prompt-ctx-scope">· {ctx.scope}</span>}
-            </div>
-            <div className="workspace__prompt-hdr-right">
-              {ss==='unsaved'&&<span className="save-indicator unsaved">● Unsaved changes</span>}
-              {ss==='saved'&&<span className="save-indicator saved"><IC.Check/> Saved</span>}
+          <div className="prompt-label-row">
+            <span className="prompt-label-text">L2 classification prompt</span>
+            <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
+              <button className="save-link" onClick={()=>onSave(activeTab)} disabled={ss!=='unsaved'}>Save draft</button>
               <button className="workspace__reset-btn" onClick={()=>setShowResetConfirm(true)}>Reset</button>
             </div>
           </div>
-          <textarea className="workspace__textarea" value={prompt} onChange={e=>onEdit(activeTab,e.target.value)} spellCheck={false}/>
+          <textarea className="workspace__textarea" style={{minHeight:'200px',width:'100%'}} value={prompt} onChange={e=>onEdit(activeTab,e.target.value)} spellCheck={false}/>
           {showResetConfirm&&<div className="reset-confirm">
             <span>Reset prompt to default? This will discard all changes.</span>
             <div className="reset-confirm__actions">
@@ -2788,9 +2783,8 @@ function Workspace({activeL1Tab,setActiveL1Tab,activeTab,setActiveTab,l1Items,pr
               <button className="btn-sm btn-danger" onClick={doReset}>Reset</button>
             </div>
           </div>}
-          <div className="prompt-footer">
+          <div className="prompt-footer" style={{marginTop:'6px'}}>
             <div className="placeholder-row">
-              {(found.length>0||missing.length>0)&&<span className="placeholder-row__lbl">Placeholders:</span>}
               {found.map(p=><span key={p} className="ph-badge found"><IC.Check/> {p}</span>)}
               {missing.map(p=><span key={p} className="ph-badge missing">⚠ {p}</span>)}
             </div>
