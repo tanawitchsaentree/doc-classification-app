@@ -277,10 +277,13 @@ input,textarea,select{font-family:inherit}
 .sidebar__empty-l2{font-size:12px;color:#a0a0a0;padding:6px 8px;font-style:normal}
 .sidebar__l2-list{list-style:none;display:flex;flex-direction:column;gap:0}
 .sidebar__l2-item{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:4px;font-size:12px;color:#555555;transition:background .1s}
-.sidebar__l2-item:hover{background:#f5f5f5}
+.sidebar__l2-item:hover{background:#f0f4ff}
 .sidebar__l2-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#444444}
-.sidebar__l2-del{background:none;border:none;cursor:pointer;color:#c0c0c0;padding:2px;margin-left:auto;border-radius:3px;transition:color .1s;display:flex;align-items:center;flex-shrink:0}
-.sidebar__l2-del:hover{color:#cc0000}
+.sidebar__l2-actions{display:flex;align-items:center;gap:1px;opacity:0;transition:opacity .12s;flex-shrink:0}
+.sidebar__l2-item:hover .sidebar__l2-actions{opacity:1}
+.sidebar__l2-action-btn{background:none;border:none;cursor:pointer;color:#8a9ab5;padding:3px;border-radius:3px;display:flex;align-items:center;transition:color .1s,background .1s}
+.sidebar__l2-action-btn:hover{color:#003781;background:#dce8ff}
+.sidebar__l2-action-btn--del:hover{color:#cc0000;background:#fff0f0}
 .sidebar__add-input-wrap{display:flex;flex-direction:column;gap:5px;padding:4px 0}
 .sidebar__add-input{border:1px solid #003781;border-radius:4px;padding:5px 8px;font-size:12px;outline:none;font-family:inherit;color:#333333;width:100%}
 .sidebar__add-actions{display:flex;gap:5px}
@@ -2470,6 +2473,8 @@ function Sidebar({promptLevel,l0Name,setL0Name,l1Items,setL1Items,showMenu,setSh
   const [addModal,setAddModal]=useState(null);
   const [renamingId,setRenamingId]=useState(null);
   const [renameDraft,setRenameDraft]=useState('');
+  const [renamingL2,setRenamingL2]=useState(null); // {l1id, l2id}
+  const [renameDraftL2,setRenameDraftL2]=useState('');
   const [sidebarSearch,setSidebarSearch]=useState('');
   const filteredL1=sidebarSearch.trim()
     ?l1Items.filter(i=>i.name.toLowerCase().includes(sidebarSearch.toLowerCase())||i.l2.some(l2=>l2.name.toLowerCase().includes(sidebarSearch.toLowerCase())))
@@ -2480,6 +2485,9 @@ function Sidebar({promptLevel,l0Name,setL0Name,l1Items,setL1Items,showMenu,setSh
   const toggleL1=id=>setL1Items(items=>items.map(i=>i.id===id?{...i,expanded:!i.expanded}:i));
   const addL2=(id,name)=>{setL1Items(items=>items.map(i=>i.id===id?{...i,l2:[...i.l2,{id:Date.now().toString(),name}]}:i));addToast(`"${name}" added`);setAddModal(null);};
   const delL2=(l1id,l2id,n)=>{setL1Items(items=>items.map(i=>i.id===l1id?{...i,l2:i.l2.filter(x=>x.id!==l2id)}:i));addToast(`"${n}" removed`,'warning');};
+  const startRenameL2=(l1id,l2id)=>{const l1=l1Items.find(i=>i.id===l1id);const l2=l1?.l2.find(x=>x.id===l2id);setRenameDraftL2(l2?.name||'');setRenamingL2({l1id,l2id});};
+  const commitRenameL2=()=>{if(renameDraftL2.trim()&&renamingL2){const{l1id,l2id}=renamingL2;const l1=l1Items.find(i=>i.id===l1id);const l2=l1?.l2.find(x=>x.id===l2id);if(renameDraftL2.trim()!==l2?.name){setL1Items(items=>items.map(i=>i.id===l1id?{...i,l2:i.l2.map(x=>x.id===l2id?{...x,name:renameDraftL2.trim()}:x)}:i));addToast(`Renamed to "${renameDraftL2.trim()}"`);}setRenamingL2(null);}else{setRenamingL2(null);}};
+  const cancelRenameL2=()=>setRenamingL2(null);
   const startRenameL1=id=>{const item=l1Items.find(i=>i.id===id);setRenameDraft(item?.name||'');setRenamingId(id);setShowMenu(null);};
   const commitRename=()=>{if(renameDraft.trim()&&renamingId){const item=l1Items.find(i=>i.id===renamingId);if(renameDraft.trim()!==item?.name){setL1Items(items=>items.map(i=>i.id===renamingId?{...i,name:renameDraft.trim()}:i));addToast(`Renamed to "${renameDraft.trim()}"`);}setRenamingId(null);setRenameDraft('');}else{setRenamingId(null);}};
   const cancelRename=()=>{setRenamingId(null);setRenameDraft('');};
@@ -2551,8 +2559,23 @@ function Sidebar({promptLevel,l0Name,setL0Name,l1Items,setL1Items,showMenu,setSh
                 :<ul className="sidebar__l2-list">{item.l2.map(l2=>(
                   <li key={l2.id} className="sidebar__l2-item">
                     <IC.File/>
-                    <span className="sidebar__l2-name">{l2.name}</span>
-                    <button className="sidebar__l2-del" title="Delete" onClick={()=>delL2(item.id,l2.id,l2.name)}><IC.Trash/></button>
+                    {renamingL2?.l2id===l2.id
+                      ?<>
+                        <input className="sidebar__rename-input" style={{flex:1,fontSize:'12px',padding:'2px 6px'}}
+                          value={renameDraftL2} onChange={e=>setRenameDraftL2(e.target.value)}
+                          onBlur={commitRenameL2}
+                          onKeyDown={e=>{if(e.key==='Enter')commitRenameL2();if(e.key==='Escape')cancelRenameL2();}}
+                          autoFocus/>
+                        <button className="sidebar__rename-ok" onClick={commitRenameL2} disabled={!renameDraftL2.trim()}>✓</button>
+                        <button className="sidebar__rename-cancel" onClick={cancelRenameL2}>✕</button>
+                      </>
+                      :<>
+                        <span className="sidebar__l2-name">{l2.name}</span>
+                        <div className="sidebar__l2-actions">
+                          <button className="sidebar__l2-action-btn" title="Rename" onClick={e=>{e.stopPropagation();startRenameL2(item.id,l2.id);}}><IC.Edit/></button>
+                          <button className="sidebar__l2-action-btn sidebar__l2-action-btn--del" title="Delete" onClick={e=>{e.stopPropagation();delL2(item.id,l2.id,l2.name);}}><IC.Trash/></button>
+                        </div>
+                      </>}
                   </li>
                 ))}</ul>}
             </div>}
