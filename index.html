@@ -167,6 +167,23 @@ input,textarea,select{font-family:inherit}
 .modal__body::-webkit-scrollbar{width:4px}.modal__body::-webkit-scrollbar-thumb{background:#d4d4d4;border-radius:2px}
 .modal__footer{display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:12px 20px;border-top:1px solid #d4d4d4;flex-shrink:0}
 
+/* ── Add Class Modal ── */
+.acm{background:#fff;border-radius:10px;box-shadow:0 8px 32px rgba(0,0,0,.16);width:420px;max-width:94vw;padding:24px;display:flex;flex-direction:column;gap:14px}
+.acm__top{display:flex;align-items:center;gap:10px}
+.acm__badge{font-size:11px;font-weight:700;padding:3px 8px;border-radius:4px;letter-spacing:.04em;flex-shrink:0}
+.acm__badge--l1{background:#dbeafe;color:#1d4ed8}
+.acm__badge--l2{background:#d1fae5;color:#065f46}
+.acm__title{font-size:15px;font-weight:700;color:#111827;margin:0}
+.acm__desc{font-size:12px;color:#6b7280;line-height:1.6;margin:0;padding:12px 14px;background:#f9fafb;border-radius:6px;border-left:3px solid #d1d5db}
+.acm__ctx{display:flex;align-items:center;gap:8px;padding:8px 12px;background:#f0f4ff;border-radius:6px}
+.acm__ctx-lbl{font-size:11px;color:#6b7280;flex-shrink:0}
+.acm__ctx-val{font-size:12px;font-weight:600;color:#003781;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.acm__field{display:flex;flex-direction:column;gap:5px}
+.acm__lbl{font-size:12px;font-weight:600;color:#374151}
+.acm__input{border:1.5px solid #d1d5db;border-radius:6px;padding:9px 12px;font-size:13px;outline:none;font-family:inherit;color:#111827;background:#fff;transition:border-color .15s;width:100%;box-sizing:border-box}
+.acm__input:focus{border-color:#003781;box-shadow:0 0 0 3px rgba(0,55,129,.08)}
+.acm__footer{display:flex;align-items:center;justify-content:flex-end;gap:8px;padding-top:4px}
+
 /* ── Version table & badges ── */
 .version-table{width:100%;border-collapse:collapse}
 .version-table th{padding:8px 12px;font-size:12px;font-weight:600;color:#444444;text-align:left;background:#f5f5f5;border-bottom:1px solid #d4d4d4}
@@ -2544,39 +2561,46 @@ function Sidebar({promptLevel,l0Name,setL0Name,l1Items,setL1Items,showMenu,setSh
         ))}
       </div>
       {addModal&&(addModal.type==='l1'
-        ?<AddClassModal title={`Add ${LABELS.l1.label}`} placeholder={`${LABELS.l1.label} name…`} onConfirm={name=>addL1(name)} onClose={()=>setAddModal(null)}/>
-        :<AddClassModal title={`Add ${LABELS.l2.label}`} subtitle={addModal.parentName} placeholder={`${LABELS.l2.label} name…`} onConfirm={name=>addL2(addModal.parentId,name)} onClose={()=>setAddModal(null)}/>
+        ?<AddClassModal level="l1" lobName={l0Name} onConfirm={name=>addL1(name)} onClose={()=>setAddModal(null)}/>
+        :<AddClassModal level="l2" lobName={l0Name} parentName={addModal.parentName} onConfirm={name=>addL2(addModal.parentId,name)} onClose={()=>setAddModal(null)}/>
       )}
     </aside>
   );
 }
 
-function AddClassModal({title,subtitle,placeholder,onConfirm,onClose}){
+function AddClassModal({level='l1',lobName='',parentName='',onConfirm,onClose}){
   const [name,setName]=useState('');
   const inputRef=useRef(null);
   useEffect(()=>{inputRef.current?.focus();},[]);
   const submit=()=>{if(!name.trim())return;onConfirm(name.trim());};
+  const isL1=level==='l1';
+  const desc=isL1
+    ?`A Level 1 class is a document category under "${lobName}". It gets its own classification prompt to route incoming documents into the right category.`
+    :`A Level 2 class is a sub-type under "${parentName}". It enables fine-grained classification once a document has been routed to this category.`;
+  const eg=isL1?'e.g. Schadenmeldung, Schadenabschluss':'e.g. Sustainability Report, Claim Form';
   return(
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal" style={{maxWidth:'380px'}} onClick={e=>e.stopPropagation()}>
-        <div className="modal__header">
-          <div>
-            <h3>{title}</h3>
-            {subtitle&&<div style={{fontSize:'11px',color:'var(--tx3)',marginTop:'2px'}}>under {subtitle}</div>}
-          </div>
-          <button className="modal__close" onClick={onClose}>×</button>
+      <div className="acm" onClick={e=>e.stopPropagation()}>
+        <div className="acm__top">
+          <span className={`acm__badge acm__badge--${level}`}>{isL1?'L1':'L2'}</span>
+          <h3 className="acm__title">{isL1?'Add Level 1 class':'Add Level 2 class'}</h3>
+          <button className="modal__close" style={{marginLeft:'auto'}} onClick={onClose}>×</button>
         </div>
-        <div className="modal__body">
-          <input ref={inputRef} style={{width:'100%',border:'1px solid var(--bdr)',borderRadius:'var(--r)',padding:'8px 10px',fontSize:'13px',outline:'none',fontFamily:'inherit',color:'var(--tx1)',background:'var(--bg)',transition:'border-color var(--tf)'}}
-            onFocus={e=>e.target.style.borderColor='var(--a)'}
-            onBlur={e=>e.target.style.borderColor='var(--bdr)'}
+        <p className="acm__desc">{desc}</p>
+        <div className="acm__ctx">
+          <span className="acm__ctx-lbl">{isL1?'Under (Level 0)':'Under (Level 1)'}</span>
+          <span className="acm__ctx-val">{isL1?lobName:parentName}</span>
+        </div>
+        <div className="acm__field">
+          <label className="acm__lbl">Class name</label>
+          <input ref={inputRef} className="acm__input"
             value={name} onChange={e=>setName(e.target.value)}
             onKeyDown={e=>{if(e.key==='Enter')submit();if(e.key==='Escape')onClose();}}
-            placeholder={placeholder}/>
+            placeholder={eg}/>
         </div>
-        <div className="modal__footer">
+        <div className="acm__footer">
           <button className="btn btn-outline btn-sm" onClick={onClose}>Cancel</button>
-          <button className="btn btn-primary btn-sm" onClick={submit} disabled={!name.trim()}>Add</button>
+          <button className="btn btn-primary btn-sm" onClick={submit} disabled={!name.trim()}>Add class</button>
         </div>
       </div>
     </div>
