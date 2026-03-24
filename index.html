@@ -2751,76 +2751,78 @@ function Workspace({activeL1Tab,setActiveL1Tab,activeTab,setActiveTab,l1Items,pr
   const doReset=()=>{onEdit(activeTab,defaultPrompts?.[activeTab]||'');setShowResetConfirm(false);};
   return(
     <main className="workspace" style={{display:'flex',flexDirection:'column'}}>
-      <div className="workspace__header"><span className="workspace__title">Classification Prompts</span></div>
       <WorkspaceTabs l1Items={l1Items} activeL1Tab={activeL1Tab} setActiveL1Tab={setActiveL1Tab} activeTab={activeTab} setActiveTab={setActiveTab}/>
-      <div className="workspace__body" style={{flex:1,overflowY:'auto'}}>
-        <div className="workspace__lv-header">
-          <h3 className="workspace__lv-title">{meta.title}</h3>
-          <button className="workspace__manage-btn" onClick={onVersion}>Manage version</button>
-        </div>
-        <div className="workspace__ver-card">
-          <div className="workspace__ver-item"><span className="workspace__ver-lbl">Version</span><span className="workspace__ver-val">{meta.version}</span></div>
-          <div className="workspace__ver-div"/>
-          <div className="workspace__ver-item"><span className="workspace__ver-lbl">Confidence score</span><span className="workspace__ver-val">{meta.score}</span></div>
-          <div className="workspace__ver-div"/>
-          <div className="workspace__ver-item"><span className="workspace__ver-lbl">Status</span><span className={`workspace__status ${meta.status.toLowerCase()}`}>{meta.status}</span></div>
-        </div>
-        <ReadinessChecklist l1Items={l1Items} docs={docs}/>
-        {showWarn&&<div className="workspace__warn"><IC.Warn/><span>The <code>{'{{CLASSIFICATION_HIERARCHY}}'}</code> placeholder is required</span></div>}
-        <div className="workspace__prompt-sec">
-          <div className="prompt-label-row">
-            <span className="prompt-label-text">L2 classification prompt</span>
-            <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
-              <button className="save-link" onClick={()=>onSave(activeTab)} disabled={ss!=='unsaved'}>Save draft</button>
-              <button className="workspace__reset-btn" onClick={()=>setShowResetConfirm(true)}>Reset</button>
+      <div style={{flex:1,overflowY:'auto'}}>
+        <div className="l1-prompt-sec" id={`cat-sec-${activeTab}`}>
+          <div className="l1-prompt-sec__hdr" style={{cursor:'default'}}>
+            <span className="l1-prompt-sec__badge">Stage 2</span>
+            <span className="l1-prompt-sec__title">{meta.title}</span>
+            <div style={{display:'flex',alignItems:'center',gap:'6px',marginLeft:'auto'}}>
+              <span className="lps-ver-pill">{meta.version}</span>
+              {meta.score!=='N/A'&&<span className="lps-ver-pill">{meta.score}</span>}
+              <span className={`workspace__status ${meta.status.toLowerCase()}`}>{meta.status}</span>
+              <button className="workspace__manage-btn" onClick={e=>{e.stopPropagation();onVersion();}}>Manage version</button>
             </div>
           </div>
-          <textarea className="workspace__textarea" style={{minHeight:'200px',width:'100%'}} value={prompt} onChange={e=>onEdit(activeTab,e.target.value)} spellCheck={false}/>
-          {showResetConfirm&&<div className="reset-confirm">
-            <span>Reset prompt to default? This will discard all changes.</span>
-            <div className="reset-confirm__actions">
-              <button className="btn-sm btn-outline" onClick={()=>setShowResetConfirm(false)}>Cancel</button>
-              <button className="btn-sm btn-danger" onClick={doReset}>Reset</button>
+          <div className="l1-prompt-sec__body">
+            <div className="l1-prompt-sec__prompt">
+              {showWarn&&<div style={{display:'flex',alignItems:'center',gap:'7px',padding:'7px 10px',background:'#fffbeb',border:'1px solid #fde68a',borderRadius:'6px',marginBottom:'10px',fontSize:'11px',color:'#92400e'}}><IC.Warn/> The <code style={{fontFamily:'monospace',background:'#fef3c7',padding:'1px 4px',borderRadius:'3px'}}>{'{{CLASSIFICATION_HIERARCHY}}'}</code> placeholder is required</div>}
+              <div className="prompt-label-row">
+                <span className="prompt-label-text">L2 classification prompt</span>
+                <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
+                  <button className="save-link" onClick={()=>onSave(activeTab)} disabled={ss!=='unsaved'}>Save draft</button>
+                  <button className="workspace__reset-btn" onClick={()=>setShowResetConfirm(true)}>Reset</button>
+                </div>
+              </div>
+              <textarea className="workspace__textarea" style={{minHeight:'200px',width:'100%'}} value={prompt} onChange={e=>onEdit(activeTab,e.target.value)} spellCheck={false}/>
+              {showResetConfirm&&<div className="reset-confirm">
+                <span>Reset prompt to default? This will discard all changes.</span>
+                <div className="reset-confirm__actions">
+                  <button className="btn-sm btn-outline" onClick={()=>setShowResetConfirm(false)}>Cancel</button>
+                  <button className="btn-sm btn-danger" onClick={doReset}>Reset</button>
+                </div>
+              </div>}
+              <div className="prompt-footer" style={{marginTop:'6px'}}>
+                <div className="placeholder-row">
+                  {found.map(p=><span key={p} className="ph-badge found"><IC.Check/> {p}</span>)}
+                  {missing.map(p=><span key={p} className="ph-badge missing">⚠ {p}</span>)}
+                </div>
+                <span className="char-count">{prompt.length.toLocaleString()} chars</span>
+              </div>
+              <div className="file-sel">
+                <div className="file-sel__hdr">
+                  <span className="file-sel__hdr-label">File selected</span>
+                  <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
+                    {selectedFiles.length>0&&<button className="file-sel__select-link" style={{color:'var(--tx3)'}}
+                      onClick={()=>{setSelectedFiles([]);setRunningIds(new Set());}}>Clear</button>}
+                    <button className="file-sel__select-link" onClick={()=>setShowSelectFile(true)}>Select file</button>
+                  </div>
+                </div>
+                {selectedFiles.length===0
+                  ?<div className="file-sel__empty">No files selected</div>
+                  :<div className="file-sel__selected-list">
+                    <span className="file-sel__count">{selectedFiles.length} file{selectedFiles.length>1?'s':''} selected</span>
+                    {selectedFiles.map(d=>{
+                      const live=docs.find(x=>x.id===d.id);
+                      const isRunning=runningIds.has(d.id);
+                      const tested=live?.lastTest;
+                      return(
+                        <span key={d.id} className="file-sel__item">
+                          {isRunning?<span style={{color:'var(--a)',fontSize:'11px'}}>⟳</span>
+                            :tested?(tested.match?<span style={{color:'#006b00',fontSize:'11px'}}>✓</span>:<span style={{color:'#cc0000',fontSize:'11px'}}>✗</span>)
+                            :<span style={{color:'var(--tx3)',fontSize:'11px'}}>·</span>}
+                          <span style={{flex:1,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{d.name}</span>
+                          {tested&&<span className={`dlib__doc-status dlib__doc-status--${tested.match?'tested':'failed'}`}>{tested.match?'Tested':'Failed'}</span>}
+                          {isRunning&&<span className="dlib__doc-status dlib__doc-status--pending">Running…</span>}
+                        </span>
+                      );
+                    })}
+                  </div>
+                }
+              </div>
             </div>
-          </div>}
-          <div className="prompt-footer" style={{marginTop:'6px'}}>
-            <div className="placeholder-row">
-              {found.map(p=><span key={p} className="ph-badge found"><IC.Check/> {p}</span>)}
-              {missing.map(p=><span key={p} className="ph-badge missing">⚠ {p}</span>)}
-            </div>
-            <span className="char-count">{prompt.length.toLocaleString()} chars</span>
+            <LastTestPanel ctx={null}/>
           </div>
-        </div>
-        <div className="file-sel">
-          <div className="file-sel__hdr">
-            <span className="file-sel__hdr-label">File selected</span>
-            <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
-              {selectedFiles.length>0&&<button className="file-sel__select-link" style={{color:'var(--tx3)'}}
-                onClick={()=>{setSelectedFiles([]);setRunningIds(new Set());}}>Clear</button>}
-              <button className="file-sel__select-link" onClick={()=>setShowSelectFile(true)}>Select file</button>
-            </div>
-          </div>
-          {selectedFiles.length===0
-            ?<div className="file-sel__empty">No files selected</div>
-            :<div className="file-sel__selected-list">
-              <span className="file-sel__count">{selectedFiles.length} file{selectedFiles.length>1?'s':''} selected</span>
-              {selectedFiles.map(d=>{
-                const live=docs.find(x=>x.id===d.id);
-                const isRunning=runningIds.has(d.id);
-                const tested=live?.lastTest;
-                return(
-                  <span key={d.id} className="file-sel__item">
-                    {isRunning?<span style={{color:'var(--a)',fontSize:'11px'}}>⟳</span>
-                      :tested?(tested.match?<span style={{color:'#006b00',fontSize:'11px'}}>✓</span>:<span style={{color:'#cc0000',fontSize:'11px'}}>✗</span>)
-                      :<span style={{color:'var(--tx3)',fontSize:'11px'}}>·</span>}
-                    <span style={{flex:1,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{d.name}</span>
-                    {tested&&<span className={`dlib__doc-status dlib__doc-status--${tested.match?'tested':'failed'}`}>{tested.match?'Tested':'Failed'}</span>}
-                    {isRunning&&<span className="dlib__doc-status dlib__doc-status--pending">Running…</span>}
-                  </span>
-                );
-              })}
-            </div>
-          }
         </div>
       </div>
       <div className="run-test-bar">
