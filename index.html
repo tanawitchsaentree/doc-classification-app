@@ -1077,7 +1077,7 @@ body{font-family:'Allianz Neo','Helvetica Neue',Helvetica,Arial,sans-serif;backg
 .l1-prompt-sec__badge{background:#002d6b;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;letter-spacing:.04em;flex-shrink:0}
 .l1-prompt-sec__title{font-size:13px;font-weight:700;color:#001f52;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .l1-prompt-sec__body{overflow:hidden}
-.l1-prompt-sec__prompt{padding:18px 20px;display:flex;flex-direction:column;gap:12px}
+.l1-prompt-sec__prompt{padding:20px 24px;display:flex;flex-direction:column;gap:16px}
 .l1-prompt-sec__desc{font-size:12px;color:#4b72b8;line-height:1.5;padding:8px 12px;background:#eef2fb;border-radius:4px;border-left:3px solid #8faad4;margin-bottom:2px}
 /* Stage 2 label row */
 .stage2-label{display:flex;align-items:center;gap:8px;margin:4px 0 12px}
@@ -2752,7 +2752,7 @@ function Workspace({activeL1Tab,setActiveL1Tab,activeTab,setActiveTab,l1Items,pr
   return(
     <main className="workspace" style={{display:'flex',flexDirection:'column'}}>
       <WorkspaceTabs l1Items={l1Items} activeL1Tab={activeL1Tab} setActiveL1Tab={setActiveL1Tab} activeTab={activeTab} setActiveTab={setActiveTab}/>
-      <div style={{flex:1,overflowY:'auto'}}>
+      <div style={{flex:1,overflowY:'auto',padding:'16px 20px',background:'#f5f5f5'}}>
         <div className="l1-prompt-sec" id={`cat-sec-${activeTab}`}>
           <div className="l1-prompt-sec__hdr" style={{cursor:'default'}}>
             <span className="l1-prompt-sec__badge">Stage 2</span>
