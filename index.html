@@ -2277,6 +2277,7 @@ function LobPromptSection({lobName,prompt,defaultPrompt,meta,saveState,onEdit,on
           <span className="lps-ver-pill">{m.version}</span>
           {m.score!=='N/A'&&<span className="lps-ver-pill">{m.score}</span>}
           <span className={`workspace__status ${m.status.toLowerCase()}`}>{m.status}</span>
+          {publishedSnap?.text===prompt&&<span className="lps-pub-badge lps-pub-badge--ok">✓ Published</span>}
           <button className="workspace__manage-btn" onClick={e=>{e.stopPropagation();onVersion();}}>Manage version</button>
         </div>
       </div>
@@ -3519,86 +3520,6 @@ function TestView({promptText,promptLabel,docs,dataSets,toggleSel,onMarkTested,o
   );
 }
 
-/* ── Test Section — inline below prompt editor ── */
-function TestSection({docs,dataSets,toggleSel,onMarkTested,activePromptLabel}){
-  const [runningIds,setRunningIds]=useState(new Set());
-  const totalSelected=docs.filter(d=>d.selected).length;
-  const allSelected=docs.length>0&&docs.every(d=>d.selected);
-  const testedDocs=docs.filter(d=>d.lastTest);
-  const matchCount=testedDocs.filter(d=>d.lastTest.match===true).length;
-  const mismatchCount=testedDocs.filter(d=>d.lastTest.match===false).length;
-  const selectAll=()=>docs.forEach(d=>toggleSel(d.id,!allSelected));
-  const clearSel=()=>docs.filter(d=>d.selected).forEach(d=>toggleSel(d.id,false));
-  const runTest=()=>{
-    const sel=docs.filter(d=>d.selected);
-    if(!sel.length)return;
-    setRunningIds(new Set(sel.map(d=>d.id)));
-    sel.forEach((doc,i)=>{
-      const delay=900+i*500+Math.random()*300;
-      setTimeout(()=>{
-        const conf=Math.floor(62+Math.random()*33);
-        const match=conf>=78;
-        const pred=doc.expectedLabels?.[0]||'Unknown';
-        onMarkTested(doc.id,{ctx:activePromptLabel||'Prompt Test',pred,conf,match,testedAt:new Date().toISOString()});
-        setRunningIds(prev=>{const n=new Set(prev);n.delete(doc.id);return n;});
-      },delay);
-    });
-  };
-  return(
-    <div className="ws-test">
-      <div className="ws-test__hdr">
-        <div className="ws-test__hdr-left">
-          <span className="ws-test__title">Test Documents</span>
-          {docs.length>0&&<span className="tp-header__count">{docs.length}</span>}
-        </div>
-        <div className="ws-test__hdr-right">
-          {docs.length>0&&<button className="ws-test__sel-btn" onClick={selectAll}>{allSelected?'Deselect all':'Select all'}</button>}
-          {totalSelected>0&&<button className="ws-test__sel-btn ws-test__sel-btn--clear" onClick={clearSel}>Clear</button>}
-          <button className="tp-run-btn" disabled={totalSelected===0} onClick={runTest}>
-            ▶ Run Test{totalSelected>0?` (${totalSelected})`:''}
-          </button>
-        </div>
-      </div>
-      <div className="ws-test__list">
-        {docs.length===0
-          ?<div className="ws-test__empty">Upload documents in the right panel to test this prompt</div>
-          :docs.map(doc=>{
-            const ds=dataSets.find(s=>s.id===doc.dataSetId);
-            const running=runningIds.has(doc.id);
-            return(
-              <div key={doc.id} className={`ws-test__doc${doc.selected?' ws-test__doc--sel':''}`} onClick={()=>toggleSel(doc.id)}>
-                <input type="checkbox" checked={doc.selected} onChange={()=>toggleSel(doc.id)} onClick={e=>e.stopPropagation()}/>
-                <div className="ws-test__doc-body">
-                  <span className="ws-test__doc-name" title={doc.name}>{doc.name}</span>
-                  <div className="ws-test__doc-meta">
-                    {doc.size&&<span>{doc.size}</span>}
-                    {ds&&<span className="tp-doc__batch" style={{borderLeftColor:ds.color}}>{ds.name}</span>}
-                    {doc.expectedLabels?.map(l=><span key={l} className="expect-chip">{l}</span>)}
-                  </div>
-                  {(running||doc.lastTest)&&<div className="ws-test__doc-result">
-                    {running
-                      ?<span className="tp-doc__running"><span className="tr-row__spinner"/>classifying…</span>
-                      :<span className={`trace-badge trace-badge--${doc.lastTest.match?'match':'mismatch'}`} title={`via ${doc.lastTest.ctx}`}>
-                          {doc.lastTest.match?'✓':'✗'} {doc.lastTest.conf}% · {doc.lastTest.pred}
-                        </span>
-                    }
-                  </div>}
-                </div>
-              </div>
-            );
-          })
-        }
-      </div>
-      {docs.length>0&&<div className="tp-footer">
-        <span>{docs.length} doc{docs.length!==1?'s':''}</span>
-        {matchCount>0&&<><span className="tp-footer__dot"/><span className="tp-footer__match">✓ {matchCount} matched</span></>}
-        {mismatchCount>0&&<><span className="tp-footer__dot"/><span className="tp-footer__miss">✗ {mismatchCount} missed</span></>}
-        {runningIds.size>0&&<><span className="tp-footer__dot"/><span className="tp-footer__run">⟳ {runningIds.size} running</span></>}
-      </div>}
-    </div>
-  );
-}
-
 /* ── Document Panel (Doc Library — upload & organize only) ── */
 function UploadModal({rawFiles,dataSets,addDataSet,onConfirm,onClose}){
   const fmt=b=>b<1024?b+'B':b<1048576?(b/1024).toFixed(1)+'KB':(b/1048576).toFixed(1)+'MB';
@@ -4279,6 +4200,11 @@ function App({devOverrides={}}){
   const publishPrompt=(promptKey,snapshot)=>{
     setPublishedPrompts(prev=>({...prev,[promptKey]:snapshot}));
     setTabMeta(prev=>({...prev,[promptKey]:{...(prev[promptKey]||{}),status:'Active'}}));
+    if(selectedLobId&&snapshot.accuracy!=null){
+      setLobs(ls=>ls.map(l=>l.id===selectedLobId
+        ?{...l,status:'Active',confidence:snapshot.accuracy}
+        :l));
+    }
     addToast('Prompt approved & published ✓','success');
   };
   const exitTestMode=useCallback(()=>{
@@ -4491,7 +4417,7 @@ function Root(){
       ?{...d,status:'Tested',selected:false,lastTest:{ctx:'L1 Class',pred:'Other Class',                   conf:51,match:false,testedAt:'2025-03-01'}}
       :{...d,status:'Tested',selected:false,lastTest:{ctx:'L1 Class',pred:d.expectedLabels?.[0]||'Unknown',conf:84,match:true, testedAt:'2025-03-01'}});
     /* lowConf — random values frozen at memo-compute time, not at render time */
-    const lowConf =lobDocs.map(d=>({...d,status:'Tested',  selected:false,lastTest:{ctx:'L1 Class',pred:d.expectedLabels?.[0]||'Unknown',conf:Math.floor(45+Math.random()*20),match:false,testedAt:'2025-03-01'}}));
+    const lowConf =lobDocs.map(d=>{const conf=Math.floor(45+Math.random()*20);const pred=d.expectedLabels?.[0]||'Unknown';const match=d.expectedLabels?.[0]?(pred===d.expectedLabels[0]):null;return{...d,status:'Tested',selected:false,lastTest:{ctx:'L1 Class',pred,conf,match,testedAt:'2025-03-01'}};});
     return[
       {id:'ov-default',  group:'Overview', label:'Default',        state:{page:'lob-overview'}},
       {id:'ov-empty',    group:'Overview', label:'Empty — no LOBs',state:{page:'lob-overview',lobs:[]}},
