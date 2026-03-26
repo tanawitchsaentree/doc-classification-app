@@ -846,6 +846,7 @@ input,textarea,select{font-family:inherit}
 .run-test-rerun:hover{border-color:var(--a);color:var(--a)}
 .run-test-publish{padding:8px 16px;border-radius:6px;font-size:12px;font-weight:700;border:none;cursor:pointer;font-family:inherit;background:#006b00;color:#fff;white-space:nowrap}
 .run-test-publish:hover{background:#005200}
+.run-test-pub-badge{font-size:11px;font-weight:600;color:#006b00;background:#e6f4e6;border:1px solid #b7ddb7;border-radius:var(--r);padding:3px 10px;white-space:nowrap}
 .run-test-btn{padding:9px 28px;border-radius:6px;font-size:13px;font-weight:600;border:none;cursor:pointer;font-family:inherit;background:#8faad4;color:#fff;transition:all .15s}
 /* Publish confirmation modal */
 .pub-modal{background:#fff;border-radius:10px;width:380px;max-width:96vw;display:flex;flex-direction:column;box-shadow:0 8px 32px rgba(0,0,0,.18)}
@@ -2339,6 +2340,8 @@ function LobPromptSection({lobName,prompt,defaultPrompt,meta,saveState,onEdit,on
         const accuracy=validated.length>0?Math.round(matched.length/validated.length*100):null;
         const tier=accuracy===null?null:accuracy>=80?'good':accuracy>=60?'warn':'fail';
         const stale=testedPromptSnap!==null&&prompt!==testedPromptSnap&&tested.length>0;
+        const isPublished=publishedSnap?.text===prompt;
+        const pubDate=isPublished?new Date(publishedSnap.publishedAt).toLocaleDateString('en-GB',{day:'numeric',month:'short'}):null;
         const runTest=()=>{const ids=selectedFiles.length>0?selectedFiles.map(d=>d.id):docs.map(d=>d.id);setRunningIds(new Set(ids));setTestedPromptSnap(prompt);onRunTest?.(ids);};
         return(
           <div className="run-test-bar">
@@ -2356,9 +2359,13 @@ function LobPromptSection({lobName,prompt,defaultPrompt,meta,saveState,onEdit,on
             </div>
             <div style={{display:'flex',gap:'8px',alignItems:'center'}}>
               {accuracy!==null&&!runningIds.size&&<button className="run-test-rerun" onClick={runTest}>Re-run</button>}
-              {accuracy!==null&&!stale&&!runningIds.size&&onPublish&&(
-                <button className="run-test-publish" onClick={()=>setShowPublishModal(true)}>✓ Approve & Publish</button>
-              )}
+              {isPublished
+                ?<span className="run-test-pub-badge">✓ Published · {publishedSnap.accuracy}% · {pubDate}</span>
+                :accuracy!==null&&!stale&&!runningIds.size&&onPublish&&(
+                  <button className="run-test-publish" onClick={()=>setShowPublishModal(true)}>
+                    {publishedSnap?'↑ Republish':'✓ Approve & Publish'}
+                  </button>
+                )}
               <button className="run-test-btn" disabled={runningIds.size>0||selectedFiles.length===0} onClick={runTest}>
                 {runningIds.size>0?'Running…':'Run test'}
               </button>
@@ -3157,6 +3164,7 @@ function Workspace({activeL1Tab,setActiveL1Tab,activeTab,setActiveTab,l1Items,pr
         </div>
       </div>
       {(()=>{
+        const publishedSnap=publishedPrompts?.[activeTab]||null;
         const live=selectedFiles.map(d=>docs.find(x=>x.id===d.id)||d);
         const tested=live.filter(d=>d.lastTest);
         const matched=tested.filter(d=>d.lastTest?.match===true);
@@ -3164,6 +3172,8 @@ function Workspace({activeL1Tab,setActiveL1Tab,activeTab,setActiveTab,l1Items,pr
         const accuracy=validated.length>0?Math.round(matched.length/validated.length*100):null;
         const tier=accuracy===null?null:accuracy>=80?'good':accuracy>=60?'warn':'fail';
         const stale=testedPromptSnap!==null&&prompt!==testedPromptSnap&&tested.length>0;
+        const isPublished=publishedSnap?.text===prompt;
+        const pubDate=isPublished?new Date(publishedSnap.publishedAt).toLocaleDateString('en-GB',{day:'numeric',month:'short'}):null;
         const runTest=()=>{const ids=selectedFiles.length>0?selectedFiles.map(d=>d.id):docs.map(d=>d.id);setRunningIds(new Set(ids));setTestedPromptSnap(prompt);onRunTest?.(ids);};
         return(
           <div className="run-test-bar">
@@ -3181,9 +3191,13 @@ function Workspace({activeL1Tab,setActiveL1Tab,activeTab,setActiveTab,l1Items,pr
             </div>
             <div style={{display:'flex',gap:'8px',alignItems:'center'}}>
               {accuracy!==null&&!runningIds.size&&<button className="run-test-rerun" onClick={runTest}>Re-run</button>}
-              {accuracy!==null&&!stale&&!runningIds.size&&onPublish&&(
-                <button className="run-test-publish" onClick={()=>setShowPublishModal(true)}>✓ Approve & Publish</button>
-              )}
+              {isPublished
+                ?<span className="run-test-pub-badge">✓ Published · {publishedSnap.accuracy}% · {pubDate}</span>
+                :accuracy!==null&&!stale&&!runningIds.size&&onPublish&&(
+                  <button className="run-test-publish" onClick={()=>setShowPublishModal(true)}>
+                    {publishedSnap?'↑ Republish':'✓ Approve & Publish'}
+                  </button>
+                )}
               <button className="run-test-btn" disabled={runningIds.size>0||selectedFiles.length===0} onClick={runTest}>
                 {runningIds.size>0?'Running…':'Run test'}
               </button>
@@ -4264,6 +4278,7 @@ function App({devOverrides={}}){
   const markTested=(id,testMeta)=>setDocs(prev=>prev.map(d=>d.id===id?{...d,status:'Tested',selected:false,lastTest:testMeta||d.lastTest}:d));
   const publishPrompt=(promptKey,snapshot)=>{
     setPublishedPrompts(prev=>({...prev,[promptKey]:snapshot}));
+    setTabMeta(prev=>({...prev,[promptKey]:{...(prev[promptKey]||{}),status:'Active'}}));
     addToast('Prompt approved & published ✓','success');
   };
   const exitTestMode=useCallback(()=>{
@@ -4357,6 +4372,8 @@ function App({devOverrides={}}){
                       <span className="cl-setup__radio-label">{opt.label}</span>
                     </label>
                   ))}
+                  {!testMode&&docs.length>0&&<button className="cl-setup__test-btn" style={{marginLeft:'auto'}} onClick={()=>{setDocs(prev=>prev.map(d=>({...d,selected:true})));setTestMode(true);}}>▶ Test Prompt</button>}
+                  {testMode&&<button className="cl-setup__test-btn cl-setup__test-btn--back" style={{marginLeft:'auto'}} onClick={exitTestMode}>← Edit Prompt</button>}
                 </div>
               </div>
             </div>
@@ -4384,7 +4401,13 @@ function App({devOverrides={}}){
                   markTested(doc.id,{ctx:activePromptLabel,pred,conf,match,testedAt:new Date().toISOString()});
                 },900+i*500+Math.random()*300);});
               };
-              return promptLevel==='l2'
+              return testMode
+                ?<TestView promptText={currentPromptText} promptLabel={activePromptLabel}
+                    docs={docs} dataSets={dataSets}
+                    toggleSel={toggleSel} onMarkTested={markTested} onUpdateExpected={updateDocExpected}
+                    labelSuggestions={labelSuggestions} promptKey={promptKey} publishedSnap={publishedSnap}
+                    onPublish={publishPrompt} onEditPrompt={val=>handleEdit(promptKey,val)} onBack={exitTestMode}/>
+                :promptLevel==='l2'
                 ?<Workspace activeL1Tab={activeL1Tab} setActiveL1Tab={setActiveL1Tab} activeTab={activeTab} setActiveTab={setActiveTab} l1Items={l1Items}
                     prompts={prompts} defaultPrompts={defaultPrompts} tabMeta={tabMeta} saveStates={saveStates}
                     onEdit={handleEdit} onSave={handleSave} onVersion={()=>setModal('version')}
