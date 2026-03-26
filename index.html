@@ -3654,21 +3654,41 @@ function App({devOverrides={}}){
   const deployPrompt=(promptKey)=>{
     const snapshot=approvedPrompts[promptKey];
     if(!snapshot)return;
+    const newScore=snapshot.accuracy!=null?`${snapshot.accuracy}%`:'N/A';
+    const isLobLevel=promptKey==='l1'||promptKey==='global';
     setTabMeta(p=>({...p,[promptKey]:{...(p[promptKey]||{}),status:'Deploying'}}));
     setTimeout(()=>{
       setPublishedPrompts(pp=>({...pp,[promptKey]:snapshot}));
-      setTabMeta(p=>({...p,[promptKey]:{...(p[promptKey]||{}),status:'Active'}}));
+      /* update header badge: increment version number + new score */
+      setTabMeta(p=>{
+        const curr=p[promptKey]||{};
+        const currNum=parseInt((curr.version||'V.0').replace(/[^0-9]/g,''))||0;
+        const nextVer='V.'+(currNum+1);
+        return{...p,[promptKey]:{...curr,status:'Active',version:nextVer,score:newScore}};
+      });
       setLobs(ls=>ls.map(l=>{
         if(!selectedLobId||l.id!==selectedLobId)return l;
-        const existing=(l.versions||[]).map(v=>({...v,status:'Archived'}));
-        const nextVer='V.'+(existing.length+1);
-        const newEntry={
-          v:nextVer,
-          date:new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}),
-          score:snapshot.accuracy!=null?`${snapshot.accuracy}%`:'N/A',
-          status:'Active',note:snapshot.note||'',createdBy:'User',
-        };
-        return{...l,status:'Active',confidence:snapshot.accuracy??l.confidence,versions:[...existing,newEntry]};
+        if(isLobLevel){
+          /* L1/Global deploy — version history lives at LOB level */
+          const existing=(l.versions||[]).map(v=>({...v,status:'Archived'}));
+          const nextVer='V.'+(existing.length+1);
+          const newEntry={
+            v:nextVer,
+            date:new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}),
+            score:newScore,status:'Active',note:snapshot.note||'',createdBy:'User',
+          };
+          return{...l,status:'Active',confidence:snapshot.accuracy??l.confidence,
+            classL1Version:nextVer,versions:[...existing,newEntry]};
+        } else {
+          /* L2 deploy — update only the specific category, don't touch LOB-level status */
+          const updatedCats=l.categories.map(c=>{
+            if(c.id!==promptKey)return c;
+            const catNum=parseInt((c.activeVersion||'V.0').replace(/[^0-9]/g,''))||0;
+            return{...c,status:'Active',confidence:snapshot.accuracy??c.confidence,
+              activeVersion:'V.'+(catNum+1)};
+          });
+          return{...l,categories:updatedCats};
+        }
       }));
       addToast('Prompt deployed & active ✓','success');
     },1500);
