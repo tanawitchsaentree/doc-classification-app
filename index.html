@@ -505,7 +505,33 @@ input,textarea,select{font-family:inherit}
 .upload-pending__chip{font-size:10px;font-weight:500;padding:1px 6px;border-radius:20px;background:var(--a-lt);color:var(--a);border:1px solid var(--a-mid);display:flex;align-items:center;gap:3px}
 .upload-pending__chip-rm{cursor:pointer;color:var(--a);font-weight:700;line-height:1}
 .upload-pending__chip-rm:hover{color:#aa0000}
-.upload-pending__actions{display:flex;gap:6px;justify-content:flex-end;margin-top:2px}
+/* Upload Modal (upm) */
+.upm{background:#fff;border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.18);width:560px;max-width:96vw;max-height:86vh;display:flex;flex-direction:column;overflow:hidden}
+.upm__hdr{display:flex;align-items:center;justify-content:space-between;padding:18px 20px 14px;border-bottom:1px solid var(--bdr);flex-shrink:0}
+.upm__title{font-size:16px;font-weight:700;color:var(--tx1)}
+.upm__title span{font-weight:400;font-size:14px;color:var(--tx3)}
+.upm__bulk{padding:14px 20px;background:#f8f9fb;border-bottom:1px solid var(--bdr);flex-shrink:0;display:flex;flex-direction:column;gap:7px}
+.upm__bulk-hdr{display:flex;align-items:center;justify-content:space-between}
+.upm__bulk-title{font-size:11px;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.04em}
+.upm__apply-btn{font-size:11px;font-weight:600;color:var(--a);background:none;border:1px solid var(--a-mid);border-radius:var(--r);padding:3px 10px;cursor:pointer;font-family:inherit}
+.upm__apply-btn:hover{background:white}
+.upm__body{flex:1;overflow-y:auto;padding:12px 20px;display:flex;flex-direction:column;gap:8px}
+.upm__row{border:1px solid var(--bdr);border-radius:var(--r);padding:10px 12px;display:flex;flex-direction:column;gap:7px}
+.upm__row-hdr{display:flex;align-items:center;gap:6px}
+.upm__fname{font-size:12px;font-weight:600;color:var(--tx1);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.upm__fsize{font-size:10px;color:var(--tx3);flex-shrink:0}
+.upm__remove{background:none;border:none;color:var(--tx3);cursor:pointer;font-size:16px;padding:0 2px;line-height:1;flex-shrink:0}
+.upm__remove:hover{color:#cc0000}
+.upm__ftr{display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:12px 20px;border-top:1px solid var(--bdr);flex-shrink:0}
+.upm__create-ds{display:flex;align-items:center;gap:6px;padding:8px 10px;background:#fff;border:1px dashed var(--a-mid);border-radius:var(--r);margin-top:4px}
+.upm__create-ds input{flex:1;font-size:11px;border:1px solid var(--bdr);border-radius:var(--r);padding:3px 8px;font-family:inherit;outline:none}
+.upm__create-ds input:focus{border-color:var(--a)}
+.upm__create-ds-ok{font-size:11px;font-weight:600;background:var(--a);color:#fff;border:none;border-radius:var(--r);padding:3px 10px;cursor:pointer;font-family:inherit;white-space:nowrap}
+.upm__create-ds-ok:disabled{opacity:.4;cursor:default}
+.upm__create-ds-cancel{font-size:11px;color:var(--tx3);background:none;border:none;cursor:pointer;font-family:inherit}
+.upm__create-ds-cancel:hover{color:var(--tx1)}
+.upm__new-ds-link{font-size:11px;color:var(--a);background:none;border:none;cursor:pointer;font-family:inherit;padding:0;text-decoration:underline;white-space:nowrap}
+.upm__empty-ds{font-size:12px;color:var(--tx3);padding:6px 0}
 /* ── Test Panel ── */
 .tp-context{display:flex;align-items:center;gap:6px;padding:7px 12px;background:#eef2fb;border-bottom:1px solid #dbeafe;flex-shrink:0}
 .tp-context__dot{width:7px;height:7px;border-radius:50%;background:var(--a);flex-shrink:0}
@@ -586,6 +612,7 @@ input,textarea,select{font-family:inherit}
 .dlib__doc-status--tested{background:#e6f4e6;color:#006b00}
 .dlib__doc-status--failed{background:#fce8e8;color:#aa0000}
 .dlib__doc-status--pending{background:var(--srf2);color:var(--tx3);border:1px solid var(--bdr)}
+.dlib__doc-status--no-label{background:#e8f0fe;color:#1967d2}
 /* ── Test View (dedicated test mode) ── */
 .test-view{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--bg)}
 .test-view__hdr{display:flex;align-items:center;gap:10px;padding:14px 20px;background:var(--srf);border-top:1px solid var(--bdr);border-bottom:1px solid var(--bdr);flex-shrink:0}
@@ -739,7 +766,7 @@ input,textarea,select{font-family:inherit}
 .sfm__filter-opt{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--tx1);cursor:pointer;padding:2px 0}
 .sfm__filter-opt input{accent-color:var(--a);cursor:pointer}
 .sfm__actions{display:flex;gap:12px;padding:8px 20px 4px;flex-shrink:0}
-.sfm__table-wrap{flex:1;overflow-y:auto;min-height:0}
+.sfm__table-wrap{max-height:340px;overflow-y:auto;flex-shrink:0}
 .sfm__table-wrap::-webkit-scrollbar{width:4px}.sfm__table-wrap::-webkit-scrollbar-thumb{background:#d4d4d4;border-radius:2px}
 .sfm__ds-row{background:#f8f9fb}
 .sfm__ds-row td{padding:6px 10px;border-bottom:1px solid var(--bdr);border-top:1px solid var(--bdr)}
@@ -747,7 +774,7 @@ input,textarea,select{font-family:inherit}
 .sfm__ds-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;display:inline-block}
 .sfm__ds-name{font-size:12px;font-weight:700;color:var(--tx1)}
 .sfm__ds-count{font-size:11px;color:var(--tx3)}
-.sfm__ds-sel{margin-left:auto;font-size:11px}
+.sfm__ds-sel{font-size:11px}
 .sfm__doc-row{cursor:pointer}
 .sfm__doc-row:hover td{background:var(--srf2)}
 .sfm__doc-row--sel td{background:#eef4ff}
@@ -777,6 +804,7 @@ input,textarea,select{font-family:inherit}
 .sf-status--pending{font-size:11px;color:var(--tx3)}
 .sf-status--tested{font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;background:#e6f4e6;color:#006b00}
 .sf-status--failed{font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;background:#fce8e8;color:#cc0000}
+.sf-status--no-label{font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;background:#e8f0fe;color:#1967d2}
 .sf-doc-name{max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
 /* File selected display */
 .file-sel__selected-list{padding:6px 12px 8px;display:flex;flex-direction:column;gap:3px}
@@ -793,9 +821,46 @@ input,textarea,select{font-family:inherit}
 .file-sel__hdr-label{font-size:12px;font-weight:600;color:var(--tx1)}
 .file-sel__select-link{background:none;border:none;font-size:12px;color:var(--a);font-weight:500;cursor:pointer;font-family:inherit;text-decoration:underline;text-underline-offset:2px;padding:0}
 .file-sel__empty{font-size:12px;color:var(--tx3);text-align:center;padding:16px 12px}
+/* File selector guide card (empty state) */
+.file-sel__guide{padding:14px 16px 16px;display:flex;align-items:flex-start;gap:0;position:relative}
+.file-sel__guide-content{display:flex;gap:10px;align-items:flex-start;flex:1}
+.file-sel__guide-icon{width:34px;height:34px;border-radius:8px;background:var(--a-lt);border:1px solid var(--a-mid);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--a);margin-top:1px}
+.file-sel__guide-title{font-size:12px;font-weight:700;color:var(--tx1);margin-bottom:5px}
+.file-sel__guide-story{font-size:11px;color:var(--tx2);line-height:1.6;margin-bottom:8px}
+.file-sel__guide-steps{display:flex;flex-direction:column;gap:3px;list-style:none;padding:0;margin:0}
+.file-sel__guide-step{font-size:11px;color:var(--tx2);display:flex;align-items:baseline;gap:6px}
+.file-sel__guide-step-num{font-size:10px;font-weight:700;color:var(--a);background:var(--a-lt);border-radius:50%;width:16px;height:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.file-sel__guide-arrow{flex-shrink:0;padding-top:2px;opacity:.55}
 /* Run test bar */
-.run-test-bar{display:flex;justify-content:flex-end;padding:12px 20px 16px;flex-shrink:0}
+.run-test-bar{display:flex;align-items:center;padding:10px 20px 14px;gap:12px;flex-shrink:0}
+.run-test-bar__info{flex:1;display:flex;align-items:center;gap:10px}
+.run-test-stale{display:flex;align-items:center;gap:5px;font-size:11px;color:#92400e;background:#fef3c7;border:1px solid #fde68a;border-radius:var(--r);padding:4px 10px;white-space:nowrap}
+.run-test-acc{display:flex;align-items:center;gap:8px}
+.run-test-acc__num{font-size:20px;font-weight:800;line-height:1}
+.run-test-acc__num--good{color:#006b00}.run-test-acc__num--warn{color:#e07000}.run-test-acc__num--fail{color:#cc0000}
+.run-test-acc__bar{width:56px;height:5px;border-radius:3px;background:var(--bdr);overflow:hidden;flex-shrink:0}
+.run-test-acc__fill{height:100%;border-radius:3px;transition:width .4s}
+.run-test-acc__fill--good{background:#006b00}.run-test-acc__fill--warn{background:#e07000}.run-test-acc__fill--fail{background:#cc0000}
+.run-test-acc__sub{font-size:10px;color:var(--tx3);line-height:1.4}
+.run-test-rerun{padding:7px 12px;border-radius:6px;font-size:12px;font-weight:600;border:1px solid var(--bdr);cursor:pointer;font-family:inherit;background:#fff;color:var(--tx2);white-space:nowrap}
+.run-test-rerun:hover{border-color:var(--a);color:var(--a)}
+.run-test-publish{padding:8px 16px;border-radius:6px;font-size:12px;font-weight:700;border:none;cursor:pointer;font-family:inherit;background:#006b00;color:#fff;white-space:nowrap}
+.run-test-publish:hover{background:#005200}
 .run-test-btn{padding:9px 28px;border-radius:6px;font-size:13px;font-weight:600;border:none;cursor:pointer;font-family:inherit;background:#8faad4;color:#fff;transition:all .15s}
+/* Publish confirmation modal */
+.pub-modal{background:#fff;border-radius:10px;width:380px;max-width:96vw;display:flex;flex-direction:column;box-shadow:0 8px 32px rgba(0,0,0,.18)}
+.pub-modal__hdr{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 12px;border-bottom:1px solid var(--bdr)}
+.pub-modal__hdr-title{font-size:15px;font-weight:700;color:var(--tx1)}
+.pub-modal__body{padding:20px;display:flex;flex-direction:column;gap:12px}
+.pub-modal__score{display:flex;align-items:baseline;gap:8px}
+.pub-modal__score-num{font-size:40px;font-weight:800;line-height:1}
+.pub-modal__score-label{font-size:13px;color:var(--tx2)}
+.pub-modal__stats{font-size:12px;color:var(--tx2)}
+.pub-modal__warn{font-size:11px;color:#92400e;background:#fef3c7;border:1px solid #fde68a;border-radius:var(--r);padding:8px 10px}
+.pub-modal__note-label{font-size:11px;font-weight:600;color:var(--tx2);margin-bottom:2px}
+.pub-modal__note{width:100%;min-height:60px;resize:vertical;font-size:12px;border:1px solid var(--bdr);border-radius:var(--r);padding:8px 10px;font-family:inherit;color:var(--tx1);background:var(--srf);box-sizing:border-box}
+.pub-modal__note:focus{outline:none;border-color:var(--a)}
+.pub-modal__ftr{display:flex;justify-content:flex-end;gap:8px;padding:12px 20px;border-top:1px solid var(--bdr)}
 .run-test-btn:enabled{background:#003781}.run-test-btn:enabled:hover{background:#002d6b}
 /* Version pills in prompt header */
 .lps-ver-pill{font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;background:var(--srf2);border:1px solid var(--bdr);color:var(--tx2);flex-shrink:0}
@@ -1670,6 +1735,14 @@ const mockClassify=(docName,targets)=>{
 
 const NAV_ITEMS = ['Home','Classification','Completion','Validation','Export','Report'];
 
+/* ── Shared helpers ── */
+function docStatus(doc){
+  if(!doc?.lastTest)return'pending';
+  if(doc.lastTest.match===true)return'tested';
+  if(doc.lastTest.match===false)return'failed';
+  return'no-label';
+}
+
 /* ── Icons ── */
 const IC = {
   ChevDown:({s=14})=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M6 9l6 6 6-6"/></svg>,
@@ -2132,15 +2205,53 @@ function LastTestPanel({ctx}){
   );
 }
 
+/* ── Publish Confirmation Modal ── */
+function PublishModal({accuracy,testedCount,matchedCount,onConfirm,onClose}){
+  const [note,setNote]=useState('');
+  const tier=accuracy>=80?'good':accuracy>=60?'warn':'fail';
+  const color=tier==='good'?'#006b00':tier==='warn'?'#e07000':'#cc0000';
+  return(
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="pub-modal" onClick={e=>e.stopPropagation()}>
+        <div className="pub-modal__hdr">
+          <span className="pub-modal__hdr-title">Approve & Publish</span>
+          <button className="modal__close" onClick={onClose}>×</button>
+        </div>
+        <div className="pub-modal__body">
+          <div className="pub-modal__score">
+            <span className="pub-modal__score-num" style={{color}}>{accuracy}%</span>
+            <span className="pub-modal__score-label">accuracy</span>
+          </div>
+          <div className="pub-modal__stats">{matchedCount} of {testedCount} document{testedCount!==1?'s':''} matched expected label</div>
+          {tier!=='good'&&<div className="pub-modal__warn">⚠ Accuracy below 80% — consider refining the prompt before publishing.</div>}
+          <div>
+            <div className="pub-modal__note-label">Version note (optional)</div>
+            <textarea className="pub-modal__note" placeholder="e.g. Improved handling of invoice edge cases…" value={note} onChange={e=>setNote(e.target.value)}/>
+          </div>
+        </div>
+        <div className="pub-modal__ftr">
+          <button className="btn btn-outline" onClick={onClose}>Cancel</button>
+          <button className="btn btn-primary" onClick={()=>onConfirm(note)}>
+            {tier==='good'?'✓ Publish':'Publish anyway'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ── LOB Prompt Section (Stage 1 — L1-only scroll mode) ── */
 /* targets = l1Items passed from App so classifier knows the category targets */
 function LobPromptSection({lobName,prompt,defaultPrompt,meta,saveState,onEdit,onSave,
-  onVersion,hierarchyContext,promptMode='l1',publishedSnap,lastTestCtx,docs=[],dataSets=[],onSelectFiles,onRunTest}){
+  onVersion,hierarchyContext,promptMode='l1',publishedSnap,lastTestCtx,docs=[],dataSets=[],onSelectFiles,onRunTest,onPublish}){
   const [open,setOpen]=useState(true);
   const [showResetConfirm,setShowResetConfirm]=useState(false);
   const [showPreview,setShowPreview]=useState(false);
   const [showSelectFile,setShowSelectFile]=useState(false);
   const [selectedFiles,setSelectedFiles]=useState([]);
+  const [testedPromptSnap,setTestedPromptSnap]=useState(null);
+  const [showPublishModal,setShowPublishModal]=useState(false);
+  const selectFileBtnRef=useRef(null);
   const [runningIds,setRunningIds]=useState(new Set());
   const m=meta||{version:'V.1',score:'N/A',status:'Draft'};
   // clear runningIds as docs finish
@@ -2192,7 +2303,7 @@ function LobPromptSection({lobName,prompt,defaultPrompt,meta,saveState,onEdit,on
               <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
                 {selectedFiles.length>0&&<button className="file-sel__select-link" style={{color:'var(--tx3)'}}
                   onClick={()=>{setSelectedFiles([]);setRunningIds(new Set());onSelectFiles?.([]);}}>Clear</button>}
-                <button className="file-sel__select-link" onClick={()=>setShowSelectFile(true)}>Select file</button>
+                <button ref={selectFileBtnRef} className="file-sel__select-link" onClick={()=>setShowSelectFile(true)}>Select file</button>
               </div>
             </div>
             {selectedFiles.length===0
@@ -2206,10 +2317,10 @@ function LobPromptSection({lobName,prompt,defaultPrompt,meta,saveState,onEdit,on
                   return(
                     <span key={d.id} className="file-sel__item">
                       {isRunning?<span style={{color:'var(--a)',fontSize:'11px'}}>⟳</span>
-                        :tested?(tested.match?<span style={{color:'#006b00',fontSize:'11px'}}>✓</span>:<span style={{color:'#cc0000',fontSize:'11px'}}>✗</span>)
+                        :tested?(tested.match===true?<span style={{color:'#006b00',fontSize:'11px'}}>✓</span>:tested.match===false?<span style={{color:'#cc0000',fontSize:'11px'}}>✗</span>:<span style={{color:'#1967d2',fontSize:'11px'}}>?</span>)
                         :<span style={{color:'var(--tx3)',fontSize:'11px'}}>·</span>}
                       <span style={{flex:1,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{d.name}</span>
-                      {tested&&<span className={`dlib__doc-status dlib__doc-status--${tested.match?'tested':'failed'}`}>{tested.match?'Tested':'Failed'}</span>}
+                      {tested&&(()=>{const st=docStatus(live||d);return<span className={`dlib__doc-status dlib__doc-status--${st}`}>{st==='tested'?'Tested':st==='failed'?'Failed':'No Label'}</span>;})()}
                       {isRunning&&<span className="dlib__doc-status dlib__doc-status--pending">Running…</span>}
                     </span>
                   );
@@ -2220,16 +2331,47 @@ function LobPromptSection({lobName,prompt,defaultPrompt,meta,saveState,onEdit,on
         </div>
         <LastTestPanel ctx={lastTestCtx}/>
       </div>}
-      <div className="run-test-bar">
-        <button className="run-test-btn" disabled={runningIds.size>0}
-          onClick={()=>{
-            const ids=selectedFiles.length>0?selectedFiles.map(d=>d.id):docs.map(d=>d.id);
-            setRunningIds(new Set(ids));
-            onRunTest?.(ids);
-          }}>
-          {runningIds.size>0?'Running…':'Run test'}
-        </button>
-      </div>
+      {(()=>{
+        const live=selectedFiles.map(d=>docs.find(x=>x.id===d.id)||d);
+        const tested=live.filter(d=>d.lastTest);
+        const matched=tested.filter(d=>d.lastTest?.match===true);
+        const validated=tested.filter(d=>d.lastTest?.match!==null);
+        const accuracy=validated.length>0?Math.round(matched.length/validated.length*100):null;
+        const tier=accuracy===null?null:accuracy>=80?'good':accuracy>=60?'warn':'fail';
+        const stale=testedPromptSnap!==null&&prompt!==testedPromptSnap&&tested.length>0;
+        const runTest=()=>{const ids=selectedFiles.length>0?selectedFiles.map(d=>d.id):docs.map(d=>d.id);setRunningIds(new Set(ids));setTestedPromptSnap(prompt);onRunTest?.(ids);};
+        return(
+          <div className="run-test-bar">
+            <div className="run-test-bar__info">
+              {stale&&<div className="run-test-stale">⚠ Prompt edited — results may be outdated</div>}
+              {!stale&&accuracy!==null&&(
+                <div className="run-test-acc">
+                  <span className={`run-test-acc__num run-test-acc__num--${tier}`}>{accuracy}%</span>
+                  <div>
+                    <div className="run-test-acc__bar"><div className={`run-test-acc__fill run-test-acc__fill--${tier}`} style={{width:accuracy+'%'}}/></div>
+                    <div className="run-test-acc__sub">{matched.length}/{validated.length} validated</div>
+                  </div>
+                </div>
+              )}
+            </div>
+            <div style={{display:'flex',gap:'8px',alignItems:'center'}}>
+              {accuracy!==null&&!runningIds.size&&<button className="run-test-rerun" onClick={runTest}>Re-run</button>}
+              {accuracy!==null&&!stale&&!runningIds.size&&onPublish&&(
+                <button className="run-test-publish" onClick={()=>setShowPublishModal(true)}>✓ Approve & Publish</button>
+              )}
+              <button className="run-test-btn" disabled={runningIds.size>0||selectedFiles.length===0} onClick={runTest}>
+                {runningIds.size>0?'Running…':'Run test'}
+              </button>
+            </div>
+            {showPublishModal&&accuracy!==null&&(
+              <PublishModal accuracy={accuracy} testedCount={validated.length} matchedCount={matched.length}
+                onConfirm={note=>{onPublish({text:prompt,accuracy,testedCount:validated.length,matchedCount:matched.length,note,publishedAt:new Date().toISOString()});setShowPublishModal(false);}}
+                onClose={()=>setShowPublishModal(false)}/>
+            )}
+          </div>
+        );
+      })()}
+      {selectedFiles.length===0&&<FileSelectorAnnotation targetRef={selectFileBtnRef}/>}
       {showPreview&&<PreviewModal prompt={prompt} hierarchyContext={hierarchyContext} onClose={()=>setShowPreview(false)}/>}
       {showSelectFile&&<SelectFileModal docs={docs} dataSets={dataSets}
         onConfirm={ids=>{
@@ -2243,6 +2385,66 @@ function LobPromptSection({lobName,prompt,defaultPrompt,meta,saveState,onEdit,on
   );
 }
 
+/* ── File Selector Annotation (floating card + arrow) ── */
+function FileSelectorAnnotation({targetRef}){
+  const cardRef=useRef(null);
+  const lineRef=useRef(null);
+  const dotRef=useRef(null);
+  useEffect(()=>{
+    const update=()=>{
+      if(!targetRef?.current||!cardRef.current||!lineRef.current)return;
+      const btn=targetRef.current.getBoundingClientRect();
+      const card=cardRef.current.getBoundingClientRect();
+      const x1=btn.right+6, y1=btn.top+btn.height/2;
+      const x2=card.left-4, y2=card.top+card.height*0.38;
+      lineRef.current.setAttribute('x1',x1);lineRef.current.setAttribute('y1',y1);
+      lineRef.current.setAttribute('x2',x2);lineRef.current.setAttribute('y2',y2);
+      if(dotRef.current){dotRef.current.setAttribute('cx',x1);dotRef.current.setAttribute('cy',y1);}
+    };
+    const tid=setTimeout(update,60);
+    window.addEventListener('resize',update);
+    return()=>{clearTimeout(tid);window.removeEventListener('resize',update);};
+  },[targetRef]);
+  return(
+    <>
+      <svg style={{position:'fixed',inset:0,width:'100%',height:'100%',pointerEvents:'none',zIndex:998}}>
+        <defs>
+          <marker id="fsa-arr" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+            <polygon points="0 0,8 3,0 6" fill="#e03131"/>
+          </marker>
+        </defs>
+        <line ref={lineRef} x1="0" y1="0" x2="0" y2="0" stroke="#e03131" strokeWidth="1.5" markerEnd="url(#fsa-arr)"/>
+        <circle ref={dotRef} cx="0" cy="0" r="3.5" fill="#e03131"/>
+      </svg>
+      <div ref={cardRef} style={{position:'fixed',bottom:'40px',right:'28px',width:'232px',background:'#fff',borderRadius:'12px',boxShadow:'0 8px 32px rgba(0,0,0,.22)',overflow:'hidden',zIndex:998}}>
+        <div style={{height:'88px',background:'linear-gradient(135deg,#0c2461 0%,#1e3799 100%)',display:'flex',alignItems:'center',justifyContent:'center',gap:'16px'}}>
+          <svg width="40" height="52" viewBox="0 0 40 52" fill="none">
+            <rect x="2" y="0" width="30" height="40" rx="3" fill="white" opacity=".92"/>
+            <rect x="7" y="7" width="16" height="2" rx="1" fill="#0c2461" opacity=".4"/>
+            <rect x="7" y="13" width="20" height="2" rx="1" fill="#0c2461" opacity=".4"/>
+            <rect x="7" y="19" width="12" height="2" rx="1" fill="#0c2461" opacity=".4"/>
+            <rect x="7" y="25" width="18" height="2" rx="1" fill="#0c2461" opacity=".4"/>
+            <circle cx="30" cy="42" r="10" fill="#e03131"/>
+            <path d="M25 42 L28 45 L35 38" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          <div style={{display:'flex',flexDirection:'column',gap:'5px'}}>
+            {['Select file','Set expected label','Run test'].map((s,i)=>(
+              <div key={i} style={{display:'flex',alignItems:'center',gap:'6px'}}>
+                <span style={{width:'16px',height:'16px',borderRadius:'50%',background:'rgba(255,255,255,.15)',border:'1px solid rgba(255,255,255,.35)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'9px',fontWeight:'700',color:'#fff',flexShrink:0}}>{i+1}</span>
+                <span style={{fontSize:'10px',color:'rgba(255,255,255,.85)',fontWeight:'500'}}>{s}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div style={{padding:'12px 14px'}}>
+          <div style={{fontSize:'12px',fontWeight:'700',color:'#111',marginBottom:'5px',lineHeight:'1.3'}}>Test your prompt with real documents</div>
+          <div style={{fontSize:'11px',color:'#555',lineHeight:'1.6'}}>Your prompt is written — but does it actually work? Pick documents, set expected labels, and run the test to measure accuracy before publishing.</div>
+        </div>
+      </div>
+    </>
+  );
+}
+
 /* ── Select File Modal ── */
 function SelectFileModal({docs,dataSets,onConfirm,onClose}){
   const [filter,setFilter]=useState('all');
@@ -2250,17 +2452,17 @@ function SelectFileModal({docs,dataSets,onConfirm,onClose}){
   const [selectedIds,setSelectedIds]=useState(new Set());
   const [showFilterPop,setShowFilterPop]=useState(false);
   const dsMap=Object.fromEntries(dataSets.map(ds=>[ds.id,ds]));
-  const getDocStatus=d=>{if(!d.lastTest)return'pending';return d.lastTest.match?'tested':'failed';};
+  const getDocStatus=d=>docStatus(d);
   const counts={
     all:docs.length,
     untested:docs.filter(d=>!d.lastTest).length,
-    matched:docs.filter(d=>d.lastTest?.match).length,
-    failed:docs.filter(d=>d.lastTest&&!d.lastTest.match).length,
+    matched:docs.filter(d=>d.lastTest?.match===true).length,
+    failed:docs.filter(d=>d.lastTest?.match===false).length,
   };
   const statusFiltered=docs.filter(d=>{
     if(filter==='untested')return!d.lastTest;
-    if(filter==='matched')return d.lastTest?.match;
-    if(filter==='failed')return d.lastTest&&!d.lastTest.match;
+    if(filter==='matched')return d.lastTest?.match===true;
+    if(filter==='failed')return d.lastTest?.match===false;
     return true;
   });
   const filtered=datasetFilters.size>0?statusFiltered.filter(d=>datasetFilters.has(d.dataSetId||'')):statusFiltered;
@@ -2287,6 +2489,7 @@ function SelectFileModal({docs,dataSets,onConfirm,onClose}){
     const s=getDocStatus(d);
     if(s==='tested')return<span className="sf-status--tested">Tested</span>;
     if(s==='failed')return<span className="sf-status--failed">Failed</span>;
+    if(s==='no-label')return<span className="sf-status--no-label">No Label</span>;
     return<span className="sf-status--pending">Pending</span>;
   };
   const expectedCell=d=>{
@@ -2840,7 +3043,7 @@ function WorkspaceTabs({l1Items,activeL1Tab,setActiveL1Tab,activeTab,setActiveTa
   );
 }
 
-function Workspace({activeL1Tab,setActiveL1Tab,activeTab,setActiveTab,l1Items,prompts,defaultPrompts,tabMeta,saveStates,onEdit,onSave,onVersion,docs,dataSets=[],onRunTest}){
+function Workspace({activeL1Tab,setActiveL1Tab,activeTab,setActiveTab,l1Items,prompts,defaultPrompts,tabMeta,saveStates,onEdit,onSave,onVersion,docs,dataSets=[],onRunTest,onPublish}){
   const getMeta=tabId=>{
     const base=tabMeta?.[tabId]||DEFAULT_TAB_META;
     const item=l1Items.find(i=>i.id===tabId);
@@ -2855,6 +3058,9 @@ function Workspace({activeL1Tab,setActiveL1Tab,activeTab,setActiveTab,l1Items,pr
   const [showResetConfirm,setShowResetConfirm]=useState(false);
   const [showSelectFile,setShowSelectFile]=useState(false);
   const [selectedFiles,setSelectedFiles]=useState([]);
+  const [testedPromptSnap,setTestedPromptSnap]=useState(null);
+  const [showPublishModal,setShowPublishModal]=useState(false);
+  const selectFileBtnRef=useRef(null);
   const [runningIds,setRunningIds]=useState(new Set());
   useEffect(()=>setShowResetConfirm(false),[activeTab]);
   useEffect(()=>{setSelectedFiles([]);setRunningIds(new Set());setShowSelectFile(false);},[activeTab]);
@@ -2920,7 +3126,7 @@ function Workspace({activeL1Tab,setActiveL1Tab,activeTab,setActiveTab,l1Items,pr
                   <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
                     {selectedFiles.length>0&&<button className="file-sel__select-link" style={{color:'var(--tx3)'}}
                       onClick={()=>{setSelectedFiles([]);setRunningIds(new Set());}}>Clear</button>}
-                    <button className="file-sel__select-link" onClick={()=>setShowSelectFile(true)}>Select file</button>
+                    <button ref={selectFileBtnRef} className="file-sel__select-link" onClick={()=>setShowSelectFile(true)}>Select file</button>
                   </div>
                 </div>
                 {selectedFiles.length===0
@@ -2934,10 +3140,10 @@ function Workspace({activeL1Tab,setActiveL1Tab,activeTab,setActiveTab,l1Items,pr
                       return(
                         <span key={d.id} className="file-sel__item">
                           {isRunning?<span style={{color:'var(--a)',fontSize:'11px'}}>⟳</span>
-                            :tested?(tested.match?<span style={{color:'#006b00',fontSize:'11px'}}>✓</span>:<span style={{color:'#cc0000',fontSize:'11px'}}>✗</span>)
+                            :tested?(tested.match===true?<span style={{color:'#006b00',fontSize:'11px'}}>✓</span>:tested.match===false?<span style={{color:'#cc0000',fontSize:'11px'}}>✗</span>:<span style={{color:'#1967d2',fontSize:'11px'}}>?</span>)
                             :<span style={{color:'var(--tx3)',fontSize:'11px'}}>·</span>}
                           <span style={{flex:1,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{d.name}</span>
-                          {tested&&<span className={`dlib__doc-status dlib__doc-status--${tested.match?'tested':'failed'}`}>{tested.match?'Tested':'Failed'}</span>}
+                          {tested&&(()=>{const st=docStatus(live||d);return<span className={`dlib__doc-status dlib__doc-status--${st}`}>{st==='tested'?'Tested':st==='failed'?'Failed':'No Label'}</span>;})()}
                           {isRunning&&<span className="dlib__doc-status dlib__doc-status--pending">Running…</span>}
                         </span>
                       );
@@ -2950,16 +3156,47 @@ function Workspace({activeL1Tab,setActiveL1Tab,activeTab,setActiveTab,l1Items,pr
           </div>
         </div>
       </div>
-      <div className="run-test-bar">
-        <button className="run-test-btn" disabled={runningIds.size>0}
-          onClick={()=>{
-            const ids=selectedFiles.length>0?selectedFiles.map(d=>d.id):docs.map(d=>d.id);
-            setRunningIds(new Set(ids));
-            onRunTest?.(ids);
-          }}>
-          {runningIds.size>0?'Running…':'Run test'}
-        </button>
-      </div>
+      {(()=>{
+        const live=selectedFiles.map(d=>docs.find(x=>x.id===d.id)||d);
+        const tested=live.filter(d=>d.lastTest);
+        const matched=tested.filter(d=>d.lastTest?.match===true);
+        const validated=tested.filter(d=>d.lastTest?.match!==null);
+        const accuracy=validated.length>0?Math.round(matched.length/validated.length*100):null;
+        const tier=accuracy===null?null:accuracy>=80?'good':accuracy>=60?'warn':'fail';
+        const stale=testedPromptSnap!==null&&prompt!==testedPromptSnap&&tested.length>0;
+        const runTest=()=>{const ids=selectedFiles.length>0?selectedFiles.map(d=>d.id):docs.map(d=>d.id);setRunningIds(new Set(ids));setTestedPromptSnap(prompt);onRunTest?.(ids);};
+        return(
+          <div className="run-test-bar">
+            <div className="run-test-bar__info">
+              {stale&&<div className="run-test-stale">⚠ Prompt edited — results may be outdated</div>}
+              {!stale&&accuracy!==null&&(
+                <div className="run-test-acc">
+                  <span className={`run-test-acc__num run-test-acc__num--${tier}`}>{accuracy}%</span>
+                  <div>
+                    <div className="run-test-acc__bar"><div className={`run-test-acc__fill run-test-acc__fill--${tier}`} style={{width:accuracy+'%'}}/></div>
+                    <div className="run-test-acc__sub">{matched.length}/{validated.length} validated</div>
+                  </div>
+                </div>
+              )}
+            </div>
+            <div style={{display:'flex',gap:'8px',alignItems:'center'}}>
+              {accuracy!==null&&!runningIds.size&&<button className="run-test-rerun" onClick={runTest}>Re-run</button>}
+              {accuracy!==null&&!stale&&!runningIds.size&&onPublish&&(
+                <button className="run-test-publish" onClick={()=>setShowPublishModal(true)}>✓ Approve & Publish</button>
+              )}
+              <button className="run-test-btn" disabled={runningIds.size>0||selectedFiles.length===0} onClick={runTest}>
+                {runningIds.size>0?'Running…':'Run test'}
+              </button>
+            </div>
+            {showPublishModal&&accuracy!==null&&(
+              <PublishModal accuracy={accuracy} testedCount={validated.length} matchedCount={matched.length}
+                onConfirm={note=>{onPublish(activeTab,{text:prompt,accuracy,testedCount:validated.length,matchedCount:matched.length,note,publishedAt:new Date().toISOString()});setShowPublishModal(false);}}
+                onClose={()=>setShowPublishModal(false)}/>
+            )}
+          </div>
+        );
+      })()}
+      {selectedFiles.length===0&&<FileSelectorAnnotation targetRef={selectFileBtnRef}/>}
       {showSelectFile&&<SelectFileModal docs={docs} dataSets={dataSets}
         onConfirm={ids=>{
           const sel=docs.filter(d=>ids.includes(d.id));
@@ -3274,8 +3511,8 @@ function TestSection({docs,dataSets,toggleSel,onMarkTested,activePromptLabel}){
   const totalSelected=docs.filter(d=>d.selected).length;
   const allSelected=docs.length>0&&docs.every(d=>d.selected);
   const testedDocs=docs.filter(d=>d.lastTest);
-  const matchCount=testedDocs.filter(d=>d.lastTest.match).length;
-  const mismatchCount=testedDocs.filter(d=>d.lastTest&&!d.lastTest.match).length;
+  const matchCount=testedDocs.filter(d=>d.lastTest.match===true).length;
+  const mismatchCount=testedDocs.filter(d=>d.lastTest.match===false).length;
   const selectAll=()=>docs.forEach(d=>toggleSel(d.id,!allSelected));
   const clearSel=()=>docs.filter(d=>d.selected).forEach(d=>toggleSel(d.id,false));
   const runTest=()=>{
@@ -3349,24 +3586,138 @@ function TestSection({docs,dataSets,toggleSel,onMarkTested,activePromptLabel}){
 }
 
 /* ── Document Panel (Doc Library — upload & organize only) ── */
+function UploadModal({rawFiles,dataSets,addDataSet,onConfirm,onClose}){
+  const fmt=b=>b<1024?b+'B':b<1048576?(b/1024).toFixed(1)+'KB':(b/1048576).toFixed(1)+'MB';
+  const [items,setItems]=useState(()=>rawFiles.map(f=>({file:f,dataSetId:dataSets[0]?.id||'',expectedLabels:[],addLabelInput:''})));
+  const [bulkDs,setBulkDs]=useState(dataSets[0]?.id||'');
+  const [bulkLabels,setBulkLabels]=useState([]);
+  const [bulkLabelInput,setBulkLabelInput]=useState('');
+  const [showCreateDs,setShowCreateDs]=useState(dataSets.length===0);
+  const [createDsName,setCreateDsName]=useState('');
+
+  const upd=(i,patch)=>setItems(it=>it.map((x,j)=>j===i?{...x,...patch}:x));
+  const remove=i=>setItems(it=>{const n=it.filter((_,j)=>j!==i);if(!n.length)onClose();return n;});
+  const addExp=(i,label)=>{if(!label.trim())return;setItems(it=>it.map((x,j)=>j===i&&x.expectedLabels.length<2&&!x.expectedLabels.includes(label.trim())?{...x,expectedLabels:[...x.expectedLabels,label.trim()],addLabelInput:''}:x));};
+  const rmExp=(i,label)=>setItems(it=>it.map((x,j)=>j===i?{...x,expectedLabels:x.expectedLabels.filter(l=>l!==label)}:x));
+  const addBulkLabel=label=>{if(!label.trim()||bulkLabels.length>=2||bulkLabels.includes(label.trim()))return;setBulkLabels(l=>[...l,label.trim()]);setBulkLabelInput('');};
+  const applyToAll=()=>setItems(it=>it.map(x=>({...x,dataSetId:bulkDs,expectedLabels:[...bulkLabels]})));
+
+  const handleCreateDs=()=>{
+    if(!createDsName.trim())return;
+    const id=addDataSet(createDsName.trim());
+    setBulkDs(id);
+    setItems(it=>it.map(x=>({...x,dataSetId:id})));
+    setCreateDsName('');
+    setShowCreateDs(false);
+  };
+
+  const canAdd=items.length>0&&items.every(x=>x.dataSetId||bulkDs);
+  const handleConfirm=()=>{
+    const newDocs=items.map(x=>{
+      const dsId=x.dataSetId||bulkDs;
+      if(!dsId)return null;
+      return{id:Date.now()+Math.random(),name:x.file.name,size:fmt(x.file.size),dataSetId:dsId,
+        expectedLabels:x.expectedLabels.length?x.expectedLabels:[...bulkLabels],
+        status:'Pending',selected:false,lastTest:null};
+    }).filter(Boolean);
+    if(newDocs.length)onConfirm(newDocs);
+  };
+
+  return(
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="upm" onClick={e=>e.stopPropagation()}>
+        <div className="upm__hdr">
+          <span className="upm__title">Add files <span>({items.length})</span></span>
+          <button className="modal__close" onClick={onClose}>×</button>
+        </div>
+        <div className="upm__bulk">
+          <div className="upm__bulk-hdr">
+            <span className="upm__bulk-title">Apply to all</span>
+            {items.length>1&&<button className="upm__apply-btn" onClick={applyToAll}>Apply ↓</button>}
+          </div>
+          <div className="upload-pending__row">
+            <span className="upload-pending__label">Data Set</span>
+            {dataSets.length===0&&!showCreateDs
+              ?<span className="upm__empty-ds">No datasets yet —</span>
+              :<select className="upload-pending__sel" value={bulkDs}
+                  onChange={e=>setBulkDs(e.target.value)}>
+                  {dataSets.map(ds=><option key={ds.id} value={ds.id}>{ds.name}</option>)}
+                </select>
+            }
+            <button className="upm__new-ds-link" onClick={()=>setShowCreateDs(s=>!s)}>
+              {showCreateDs?'Cancel':'+ New'}
+            </button>
+          </div>
+          {showCreateDs&&(
+            <div className="upm__create-ds">
+              <input autoFocus placeholder="Dataset name…" value={createDsName}
+                onChange={e=>setCreateDsName(e.target.value)}
+                onKeyDown={e=>{if(e.key==='Enter')handleCreateDs();if(e.key==='Escape')setShowCreateDs(false);}}/>
+              <button className="upm__create-ds-ok" onClick={handleCreateDs} disabled={!createDsName.trim()}>Create</button>
+            </div>
+          )}
+          <div className="upload-pending__row">
+            <span className="upload-pending__label">Expect</span>
+            <div className="upload-pending__chips">
+              {bulkLabels.map(l=><span key={l} className="upload-pending__chip">{l}<span className="upload-pending__chip-rm" onClick={()=>setBulkLabels(ls=>ls.filter(x=>x!==l))}>×</span></span>)}
+              {bulkLabels.length<2&&<input className="upload-pending__input" style={{width:'90px'}} placeholder="Add label…" value={bulkLabelInput}
+                onChange={e=>setBulkLabelInput(e.target.value)}
+                onKeyDown={e=>{if(e.key==='Enter'||e.key===',')addBulkLabel(bulkLabelInput);}}/>}
+            </div>
+          </div>
+        </div>
+        <div className="upm__body">
+          {items.map((x,i)=>(
+            <div key={i} className="upm__row">
+              <div className="upm__row-hdr">
+                <span className="upm__fname" title={x.file.name}>{x.file.name}</span>
+                <span className="upm__fsize">{fmt(x.file.size)}</span>
+                <button className="upm__remove" onClick={()=>remove(i)} title="Remove">×</button>
+              </div>
+              <div className="upload-pending__row">
+                <span className="upload-pending__label">Data Set</span>
+                <select className="upload-pending__sel" value={x.dataSetId}
+                  onChange={e=>upd(i,{dataSetId:e.target.value})}>
+                  {dataSets.map(ds=><option key={ds.id} value={ds.id}>{ds.name}</option>)}
+                  {!x.dataSetId&&<option value="">— select —</option>}
+                </select>
+              </div>
+              <div className="upload-pending__row">
+                <span className="upload-pending__label">Expect</span>
+                <div className="upload-pending__chips">
+                  {x.expectedLabels.map(l=><span key={l} className="upload-pending__chip">{l}<span className="upload-pending__chip-rm" onClick={()=>rmExp(i,l)}>×</span></span>)}
+                  {x.expectedLabels.length<2&&<input className="upload-pending__input" style={{width:'90px'}} placeholder="Add label…" value={x.addLabelInput||''}
+                    onChange={e=>upd(i,{addLabelInput:e.target.value})}
+                    onKeyDown={e=>{if(e.key==='Enter'||e.key===',')addExp(i,x.addLabelInput||'');}}/>}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="upm__ftr">
+          <button className="btn btn-outline" onClick={onClose}>Cancel</button>
+          <button className="btn btn-primary" onClick={handleConfirm} disabled={!canAdd}>
+            Add {items.length} file{items.length>1?'s':''}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function DocumentPanel({docs,dataSets,onAddDocs,delDoc,addDataSet,delDataSet,style}){
   const [dragOver,setDragOver]=useState(false);
-  const [pendingFiles,setPendingFiles]=useState([]);
+  const [rawFiles,setRawFiles]=useState([]);
   const [openSets,setOpenSets]=useState(()=>Object.fromEntries((dataSets||[]).map(ds=>[ds.id,true])));
   const fileRef=useRef(null);
 
   const processRawFiles=files=>{
     const valid=Array.from(files).filter(f=>['image/jpeg','image/png','application/pdf'].includes(f.type)&&f.size<=5*1024*1024);
     if(!valid.length)return;
-    setPendingFiles(valid.map(f=>({file:f,dataSetId:dataSets[0]?.id||'',expectedLabels:[],newSetName:'',isNew:false,addLabelInput:''})));
+    setRawFiles(valid);
   };
-
-  const updatePending=(i,patch)=>setPendingFiles(pf=>pf.map((p,j)=>j===i?{...p,...patch}:p));
-  const addExpLabel=(i,label)=>{
-    if(!label.trim())return;
-    setPendingFiles(pf=>pf.map((p,j)=>j===i&&p.expectedLabels.length<2&&!p.expectedLabels.includes(label.trim())?{...p,expectedLabels:[...p.expectedLabels,label.trim()],addLabelInput:''}:p));
-  };
-  const rmExpLabel=(i,label)=>setPendingFiles(pf=>pf.map((p,j)=>j===i?{...p,expectedLabels:p.expectedLabels.filter(l=>l!==label)}:p));
+  const handleUploadConfirm=newDocs=>{onAddDocs(newDocs);setRawFiles([]);};
+  const handleUploadClose=()=>setRawFiles([]);
 
   return(
     <aside className="doc-panel" style={style}>
@@ -3383,51 +3734,8 @@ function DocumentPanel({docs,dataSets,onAddDocs,delDoc,addDataSet,delDataSet,sty
           <p className="doc-panel__dz-text">Drag and drop files here or</p>
           <span className="doc-panel__browse">Choose files</span>
         </div>
-        {pendingFiles.map((p,i)=>(
-          <div key={i} className="upload-pending">
-            <div className="upload-pending__file" title={p.file.name}>{p.file.name}</div>
-            <div className="upload-pending__row">
-              <span className="upload-pending__label">Data Set</span>
-              <select className="upload-pending__sel" value={p.isNew?'__new__':p.dataSetId}
-                onChange={e=>{const v=e.target.value;updatePending(i,v==='__new__'?{isNew:true,dataSetId:''}:{isNew:false,dataSetId:v});}}>
-                {dataSets.map(ds=><option key={ds.id} value={ds.id}>{ds.name}</option>)}
-                <option value="__new__">+ New Data Set…</option>
-              </select>
-            </div>
-            {p.isNew&&<div className="upload-pending__row">
-              <span className="upload-pending__label">Set name</span>
-              <input className="upload-pending__input" placeholder="e.g. Invoice Batch Feb"
-                value={p.newSetName} onChange={e=>updatePending(i,{newSetName:e.target.value})}/>
-            </div>}
-            <div className="upload-pending__row">
-              <span className="upload-pending__label">Expect</span>
-              <div className="upload-pending__chips">
-                {p.expectedLabels.map(l=>(
-                  <span key={l} className="upload-pending__chip">{l}
-                    <span className="upload-pending__chip-rm" onClick={()=>rmExpLabel(i,l)}>×</span>
-                  </span>
-                ))}
-                {p.expectedLabels.length<2&&<input className="upload-pending__input" style={{width:'90px'}}
-                  placeholder="Add label…" value={p.addLabelInput||''}
-                  onChange={e=>updatePending(i,{addLabelInput:e.target.value})}
-                  onKeyDown={e=>{if(e.key==='Enter'||e.key===','){addExpLabel(i,p.addLabelInput||'');}}}/>}
-              </div>
-            </div>
-            <div className="upload-pending__actions">
-              <button className="btn btn-outline btn-sm" onClick={()=>setPendingFiles(pf=>pf.filter((_,j)=>j!==i))}>Cancel</button>
-              <button className="btn btn-primary btn-sm"
-                onClick={()=>{
-                  let dsId=p.dataSetId;
-                  if(p.isNew&&p.newSetName.trim()){dsId=addDataSet(p.newSetName.trim());}
-                  if(!dsId)return;
-                  onAddDocs([{id:Date.now()+Math.random(),name:p.file.name,dataSetId:dsId,expectedLabels:p.expectedLabels,status:'Pending',selected:false,lastTest:null}]);
-                  setPendingFiles(pf=>pf.filter((_,j)=>j!==i));
-                }}
-                disabled={!p.dataSetId&&!(p.isNew&&p.newSetName.trim())}>Add</button>
-            </div>
-          </div>
-        ))}
       </div>
+      {rawFiles.length>0&&<UploadModal rawFiles={rawFiles} dataSets={dataSets} addDataSet={addDataSet} onConfirm={handleUploadConfirm} onClose={handleUploadClose}/>}
 
       {/* Dataset library */}
       <div className="dlib__sets">
@@ -3451,8 +3759,8 @@ function DocumentPanel({docs,dataSets,onAddDocs,delDoc,addDataSet,delDataSet,sty
                 {setDocs.length===0
                   ?<div className="ds-empty">No documents yet</div>
                   :setDocs.map(doc=>{
-                    const st=doc.lastTest?(doc.lastTest.match?'tested':'failed'):'pending';
-                    const stLabel=st==='tested'?'✓ Tested':st==='failed'?'✗ Failed':'Pending';
+                    const st=docStatus(doc);
+                    const stLabel=st==='tested'?'✓ Tested':st==='failed'?'✗ Failed':st==='no-label'?'No Label':'Pending';
                     return(
                       <div key={doc.id} className="dlib__doc">
                         <span className="dlib__doc-name" title={doc.name}>{doc.name}</span>
@@ -4081,7 +4389,7 @@ function App({devOverrides={}}){
                     prompts={prompts} defaultPrompts={defaultPrompts} tabMeta={tabMeta} saveStates={saveStates}
                     onEdit={handleEdit} onSave={handleSave} onVersion={()=>setModal('version')}
                     docs={docs} dataSets={dataSets} publishedPrompts={publishedPrompts}
-                    onRunTest={onRunInline}/>
+                    onRunTest={onRunInline} onPublish={publishPrompt}/>
                 :<div className="detail-scroll__main" style={{display:'flex',flexDirection:'column',flex:1,overflow:'hidden'}}>
                     <div style={{flex:1,overflowY:'auto'}}>
                       <LobPromptSection key={promptKey}
@@ -4094,7 +4402,8 @@ function App({devOverrides={}}){
                         lastTestCtx={lastTestCtx}
                         docs={docs} dataSets={dataSets}
                         onSelectFiles={ids=>setDocs(prev=>prev.map(d=>({...d,selected:ids.includes(d.id)})))}
-                        onRunTest={onRunInline}/>
+                        onRunTest={onRunInline}
+                        onPublish={snapshot=>publishPrompt(promptKey,snapshot)}/>
                     </div>
                   </div>;
             })()}
