@@ -4213,10 +4213,21 @@ function App({devOverrides={}}){
   const publishPrompt=(promptKey,snapshot)=>{
     setPublishedPrompts(prev=>({...prev,[promptKey]:snapshot}));
     setTabMeta(prev=>({...prev,[promptKey]:{...(prev[promptKey]||{}),status:'Active'}}));
-    if(selectedLobId&&snapshot.accuracy!=null){
-      setLobs(ls=>ls.map(l=>l.id===selectedLobId
-        ?{...l,status:'Active',confidence:snapshot.accuracy}
-        :l));
+    if(selectedLobId){
+      setLobs(ls=>ls.map(l=>{
+        if(l.id!==selectedLobId)return l;
+        const existing=(l.versions||[]).map(v=>({...v,status:'Archived'}));
+        const nextVer='V.'+(existing.length+1);
+        const newEntry={
+          v:nextVer,
+          date:new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}),
+          score:snapshot.accuracy!=null?`${snapshot.accuracy}%`:'N/A',
+          status:'Active',
+          note:snapshot.note||'',
+          createdBy:'User',
+        };
+        return{...l,status:'Active',confidence:snapshot.accuracy??l.confidence,versions:[...existing,newEntry]};
+      }));
     }
     addToast('Prompt approved & published ✓','success');
   };
