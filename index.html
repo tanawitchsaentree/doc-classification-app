@@ -332,7 +332,7 @@ input,textarea,select{font-family:inherit}
 .workspace__ver-val{font-size:13px;font-weight:600;color:#333333}
 .workspace__ver-div{width:1px;background:#d4d4d4;height:32px;flex-shrink:0;margin:0 16px}
 .workspace__status{font-size:12px;font-weight:600;padding:2px 8px;border-radius:4px;display:inline-flex;align-items:center}
-.workspace__status.active{background:#e6f4e6;color:#008a00}.workspace__status.draft{background:#f5f5f5;color:#767676}.workspace__status.failed{background:#fce8e8;color:#cc0000}.workspace__status.approved{background:#fff3e0;color:#b45309}.workspace__status.deploying{background:#f0f4ff;color:#3b5bdb;animation:status-pulse 1s ease-in-out infinite}
+.workspace__status.active{background:#e6f4e6;color:#008a00}.workspace__status.deployed{background:#e6f4e6;color:#008a00}.workspace__status.draft{background:#f5f5f5;color:#767676}.workspace__status.failed{background:#fce8e8;color:#cc0000}.workspace__status.approved{background:#fff3e0;color:#b45309}.workspace__status.deploying{background:#f0f4ff;color:#3b5bdb;animation:status-pulse 1s ease-in-out infinite}
 @keyframes status-pulse{0%,100%{opacity:1}50%{opacity:.45}}
 .workspace__warn{display:flex;align-items:center;gap:8px;padding:9px 12px;background:#fffbeb;border:1px solid #ffd580;border-radius:4px;font-size:12px;color:#6b3000}
 .workspace__warn code{background:#fff3e0;border-radius:3px;padding:1px 5px;font-family:monospace;font-size:11px}
@@ -3581,7 +3581,7 @@ function App({devOverrides={}}){
   const [prompts,setPrompts]=useState(devOverrides.prompts||{});
   const [defaultPrompts,setDefaultPrompts]=useState(devOverrides.defaultPrompts||{});
   const [saveStates,setSaveStates]=useState(devOverrides.saveStates||{});
-  const [publishedPrompts,setPublishedPrompts]=useState({});
+  const [publishedPrompts,setPublishedPrompts]=useState(devOverrides.publishedPrompts||{});
   const [approvedPrompts,setApprovedPrompts]=useState({});
   const saveTimers=useRef({});
   const [showMenu,setShowMenu]=useState(null);
@@ -3657,6 +3657,23 @@ function App({devOverrides={}}){
       meta[c.id]={version:c.activeVersion||'V.1',score:`${c.confidence}%`,status:c.status};
       c.types.forEach(t=>{meta[t.id]={version:c.activeVersion||'V.1',score:`${c.confidence}%`,status:c.status};});
     });
+    // Seed publishedPrompts for keys already Deployed/Active in source data
+    const isLive=s=>s==='Deployed'||s==='Active';
+    const seedPub={};
+    if(isLive(lob.status)){
+      const latestVer=lob.versions?.[lob.versions.length-1];
+      const publishedAt=latestVer?new Date(latestVer.date+' 00:00:00').toISOString():new Date().toISOString();
+      const accuracy=typeof lob.confidence==='number'?lob.confidence:parseInt(lob.confidence)||null;
+      seedPub['l1']={text:lob.lobPrompt||'',accuracy,publishedAt,note:latestVer?.note||''};
+    }
+    lob.categories.forEach(c=>{
+      if(isLive(c.status)){
+        const accuracy=typeof c.confidence==='number'?c.confidence:parseInt(c.confidence)||null;
+        const publishedAt=new Date().toISOString();
+        seedPub[c.id]={text:c.prompt||'',accuracy,publishedAt,note:''};
+        c.types.forEach(t=>{seedPub[t.id]={text:t.prompt||'',accuracy,publishedAt,note:''};});
+      }
+    });
     // L2 mode: land on first category; L1/Global: land on clicked category or first
     const startTab=promptLevel==='l2'?(newL1Items[0]?.id||''):(cat?cat.id:(newL1Items[0]?.id||''));
     const startL1Tab=startTab;
@@ -3670,6 +3687,8 @@ function App({devOverrides={}}){
     setActiveTab(startTab);
     setActiveL1Tab(startL1Tab);
     setDocs(ds.getDocsForLob(lob.id));
+    setPublishedPrompts(seedPub);
+    setApprovedPrompts({});
     setPage('detail');
     setActiveNav('classification');
   };
@@ -3877,10 +3896,27 @@ function Root(){
         ...lob.categories.reduce((acc,c)=>{acc[c.id]=opts.catPrompt!==undefined?opts.catPrompt:(c.prompt||'');c.types.forEach(t=>{acc[t.id]=t.prompt||'';});return acc;},{})};
       const tabMeta={global:{version:'1.0',score:'N/A',status:'Active'},l1:{version:lob.classL1Version||'V.1',score:`${lob.confidence}%`,status:lob.status}};
       lob.categories.forEach(c=>{tabMeta[c.id]={version:c.activeVersion||'V.1',score:`${c.confidence}%`,status:c.status};c.types.forEach(t=>{tabMeta[t.id]={version:c.activeVersion||'V.1',score:`${c.confidence}%`,status:c.status};});});
+      const isLive=s=>s==='Deployed'||s==='Active';
+      const seedPub={};
+      if(isLive(lob.status)){
+        const latestVer=lob.versions?.[lob.versions.length-1];
+        const publishedAt=latestVer?new Date(latestVer.date+' 00:00:00').toISOString():new Date().toISOString();
+        const accuracy=typeof lob.confidence==='number'?lob.confidence:parseInt(lob.confidence)||null;
+        seedPub['l1']={text:lob.lobPrompt||'',accuracy,publishedAt,note:latestVer?.note||''};
+      }
+      lob.categories.forEach(c=>{
+        if(isLive(c.status)){
+          const accuracy=typeof c.confidence==='number'?c.confidence:parseInt(c.confidence)||null;
+          const publishedAt=new Date().toISOString();
+          seedPub[c.id]={text:c.prompt||'',accuracy,publishedAt,note:''};
+          c.types.forEach(t=>{seedPub[t.id]={text:t.prompt||'',accuracy,publishedAt,note:''};});
+        }
+      });
       const firstCatId=l1Items[0]?.id||'l1';
       return{page:'detail',selectedLobId:lob.id,l0Name:lob.name,l1Items,prompts,defaultPrompts:prompts,
         tabMeta,activeTab:firstCatId,activeL1Tab:firstCatId,
         promptLevel:opts.promptLevel||'l1',
+        publishedPrompts:seedPub,
         ...(opts.docs!==undefined?{docs:opts.docs}:{}),
         ...(opts.lobs!==undefined?{lobs:opts.lobs}:{}),
         ...(opts.saveStates!==undefined?{saveStates:opts.saveStates}:{})};
