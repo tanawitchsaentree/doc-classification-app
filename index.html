@@ -533,62 +533,6 @@ input,textarea,select{font-family:inherit}
 .upm__create-ds-cancel:hover{color:var(--tx1)}
 .upm__new-ds-link{font-size:11px;color:var(--a);background:none;border:none;cursor:pointer;font-family:inherit;padding:0;text-decoration:underline;white-space:nowrap}
 .upm__empty-ds{font-size:12px;color:var(--tx3);padding:6px 0}
-/* ── Test Panel ── */
-.tp-context{display:flex;align-items:center;gap:6px;padding:7px 12px;background:#eef2fb;border-bottom:1px solid #dbeafe;flex-shrink:0}
-.tp-context__dot{width:7px;height:7px;border-radius:50%;background:var(--a);flex-shrink:0}
-.tp-context__label{font-size:10px;font-weight:700;color:#8faad4;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
-.tp-context__prompt{font-size:11px;font-weight:600;color:#002d6b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
-.tp-header{display:flex;align-items:center;justify-content:space-between;padding:10px 12px 0;flex-shrink:0}
-.tp-header__left{display:flex;align-items:center;gap:6px}
-.tp-header__title{font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em}
-.tp-header__count{font-size:10px;font-weight:700;padding:1px 6px;border-radius:20px;background:var(--srf2);color:var(--tx3);border:1px solid var(--bdr)}
-.tp-run-btn{display:flex;align-items:center;gap:5px;padding:5px 13px;border-radius:var(--r);font-size:11px;font-weight:700;border:none;cursor:pointer;font-family:inherit;transition:all var(--tf) var(--smooth);background:var(--a);color:#fff;box-shadow:0 1px 3px var(--a-glow)}
-.tp-run-btn:hover:not(:disabled){background:var(--a-h);transform:translateY(-1px);box-shadow:0 3px 8px var(--a-glow)}
-.tp-run-btn:disabled{background:var(--srf2);color:var(--tx3);box-shadow:none;cursor:default;border:1px solid var(--bdr)}
-.tp-sel-bar{display:flex;align-items:center;justify-content:space-between;padding:5px 12px 6px;flex-shrink:0}
-.tp-sel-btn{background:none;border:none;font-size:10px;color:var(--a);font-weight:500;cursor:pointer;font-family:inherit;padding:0}
-.tp-sel-btn:hover{text-decoration:underline}
-.tp-sel-btn--clear{color:var(--tx3)}.tp-sel-btn--clear:hover{color:var(--tx1)}
-.tp-list{flex:1;overflow-y:auto;display:flex;flex-direction:column;padding:0 10px 4px}
-.tp-list::-webkit-scrollbar{width:3px}.tp-list::-webkit-scrollbar-thumb{background:var(--bdr);border-radius:2px}
-.tp-doc{display:flex;align-items:flex-start;gap:7px;padding:7px 8px;border-radius:var(--r-md);border:1px solid transparent;cursor:pointer;transition:all var(--tf) var(--smooth);margin-bottom:2px}
-.tp-doc:hover{background:var(--srf);border-color:var(--bdr)}
-.tp-doc:hover .ds-doc-del{opacity:1}
-.tp-doc--selected{background:var(--a-lt);border-color:var(--a-mid)}
-.tp-doc--selected .ds-doc-del{opacity:1}
-.tp-doc input[type=checkbox]{accent-color:var(--a);flex-shrink:0;width:13px;height:13px;cursor:pointer;margin-top:2px}
-.tp-doc__body{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
-.tp-doc__name{font-size:11px;font-weight:500;color:var(--tx1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.tp-doc__meta{display:flex;align-items:center;gap:4px;flex-wrap:wrap;font-size:10px;color:var(--tx3)}
-.tp-doc__batch{padding-left:5px;border-left-style:solid;border-left-width:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:80px}
-.tp-doc__result{display:flex;align-items:center;gap:4px;margin-top:2px}
-.tp-doc__running{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--a)}
-.tp-footer{display:flex;align-items:center;gap:6px;padding:7px 12px;border-top:1px solid var(--bdr);font-size:10px;color:var(--tx3);flex-shrink:0;flex-wrap:wrap}
-.tp-footer__dot{width:3px;height:3px;border-radius:50%;background:#cccccc;flex-shrink:0}
-.tp-footer__match{color:#006b00;font-weight:600}
-.tp-footer__miss{color:#aa0000;font-weight:600}
-.tp-footer__run{color:var(--a);font-weight:600}
-.tp-empty{text-align:center;padding:32px 12px;font-size:11px;color:var(--tx3);line-height:1.6}
-/* ── Inline Test Section (inside workspace) ── */
-.ws-test{border-top:1px solid var(--bdr);padding:14px 20px 20px;display:flex;flex-direction:column;gap:8px;flex-shrink:0}
-.ws-test__hdr{display:flex;align-items:center;justify-content:space-between;gap:8px}
-.ws-test__hdr-left{display:flex;align-items:center;gap:6px}
-.ws-test__title{font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em}
-.ws-test__hdr-right{display:flex;align-items:center;gap:6px}
-.ws-test__sel-btn{background:none;border:none;font-size:10px;color:var(--a);font-weight:500;cursor:pointer;font-family:inherit;padding:0}
-.ws-test__sel-btn:hover{text-decoration:underline}
-.ws-test__sel-btn--clear{color:var(--tx3)}.ws-test__sel-btn--clear:hover{color:var(--tx1)}
-.ws-test__list{display:flex;flex-direction:column;gap:2px;max-height:220px;overflow-y:auto}
-.ws-test__list::-webkit-scrollbar{width:3px}.ws-test__list::-webkit-scrollbar-thumb{background:var(--bdr);border-radius:2px}
-.ws-test__doc{display:flex;align-items:flex-start;gap:7px;padding:6px 8px;border-radius:var(--r);border:1px solid transparent;cursor:pointer;transition:background var(--tf) var(--smooth)}
-.ws-test__doc:hover{background:var(--srf);border-color:var(--bdr)}
-.ws-test__doc--sel{background:var(--a-lt);border-color:var(--a-mid)}
-.ws-test__doc input[type=checkbox]{accent-color:var(--a);flex-shrink:0;width:13px;height:13px;cursor:pointer;margin-top:2px}
-.ws-test__doc-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
-.ws-test__doc-name{font-size:11px;font-weight:500;color:var(--tx1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.ws-test__doc-meta{display:flex;align-items:center;gap:4px;flex-wrap:wrap;font-size:10px;color:var(--tx3)}
-.ws-test__doc-result{display:flex;align-items:center;flex-shrink:0;margin-top:2px}
-.ws-test__empty{font-size:11px;color:var(--tx3);padding:12px 0;text-align:center}
 /* Doc Library (simplified right panel) */
 .dlib__hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 14px 8px;flex-shrink:0}
 .dlib__title{font-size:16px;font-weight:700;color:#003781;text-transform:none;letter-spacing:0}
@@ -614,141 +558,10 @@ input,textarea,select{font-family:inherit}
 .dlib__doc-status--failed{background:#fce8e8;color:#aa0000}
 .dlib__doc-status--pending{background:var(--srf2);color:var(--tx3);border:1px solid var(--bdr)}
 .dlib__doc-status--no-label{background:#e8f0fe;color:#1967d2}
-/* ── Test View (dedicated test mode) ── */
-.test-view{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--bg)}
-.test-view__hdr{display:flex;align-items:center;gap:10px;padding:14px 20px;background:var(--srf);border-top:1px solid var(--bdr);border-bottom:1px solid var(--bdr);flex-shrink:0}
-.test-view__back{background:none;border:none;font-size:12px;color:var(--a);font-weight:500;cursor:pointer;font-family:inherit;padding:0;white-space:nowrap;display:flex;align-items:center;gap:4px}
-.test-view__back:hover{text-decoration:underline}
-.test-view__title{flex:1;font-size:13px;font-weight:600;color:var(--tx1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.test-view__accuracy{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;white-space:nowrap;flex-shrink:0}
-.test-view__accuracy--good{background:#e6f4e6;color:#006b00}
-.test-view__accuracy--ok{background:#fff3e0;color:#6b3000}
-.test-view__accuracy--bad{background:#fce8e8;color:#aa0000}
-.test-view__prompt{padding:8px 20px;border-bottom:1px solid var(--bdr);flex-shrink:0;background:var(--bg)}
-.test-view__prompt--editing{background:var(--srf);border-bottom:2px solid var(--a)}
-.test-view__prompt-hdr{display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none}
-.test-view__prompt-hdr--editing{cursor:default}
-.test-view__prompt-label{font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.05em}
-.test-view__prompt-label--editing{color:var(--a)}
-.test-view__prompt-toggle{font-size:10px;color:var(--tx3);margin-left:auto}
-.test-view__prompt-preview{font-size:11px;color:var(--tx2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;margin-top:3px;font-family:monospace}
-.test-view__prompt-full{font-size:11px;color:var(--tx2);white-space:pre-wrap;margin-top:6px;max-height:120px;overflow-y:auto;font-family:monospace;background:var(--srf2);border-radius:var(--r);padding:8px 10px;border:1px solid var(--bdr)}
-/* Inline prompt editor in TestView */
-.tv-prompt-edit-btn{font-size:11px;font-weight:600;color:var(--a);background:none;border:1px solid var(--a);border-radius:var(--r);padding:2px 8px;cursor:pointer;font-family:inherit;margin-left:auto;transition:all .15s;flex-shrink:0}
-.tv-prompt-edit-btn:hover{background:var(--a-lt)}
-.tv-prompt-textarea{width:100%;min-height:120px;max-height:260px;font-size:12px;font-family:monospace;color:var(--tx1);background:var(--bg);border:1px solid var(--bdr);border-radius:var(--r);padding:10px 12px;resize:vertical;outline:none;margin-top:8px;line-height:1.6}
-.tv-prompt-textarea:focus{border-color:var(--a);box-shadow:0 0 0 2px var(--a-glow)}
-.tv-prompt-edit-footer{display:flex;align-items:center;justify-content:space-between;margin-top:6px}
-.tv-prompt-char{font-size:11px;color:var(--tx3)}
-.tv-prompt-save-btn{display:flex;align-items:center;gap:5px;padding:6px 14px;border-radius:var(--r);font-size:12px;font-weight:700;border:none;cursor:pointer;font-family:inherit;background:var(--a);color:#fff;transition:background .15s}
-.tv-prompt-save-btn:hover{background:var(--a-h)}
-.tv-prompt-cancel-btn{font-size:11px;color:var(--tx3);background:none;border:none;cursor:pointer;font-family:inherit;padding:0 6px}
-.tv-prompt-cancel-btn:hover{color:var(--tx1)}
-.test-view__controls{display:flex;align-items:center;gap:8px;padding:8px 20px;border-bottom:1px solid var(--bdr);flex-shrink:0;background:var(--srf)}
-.test-view__ctrl-info{flex:1;font-size:11px;color:var(--tx3)}
-.test-view__body{flex:1;overflow-y:auto;padding:0 20px 16px}
-.test-view__body::-webkit-scrollbar{width:4px}.test-view__body::-webkit-scrollbar-thumb{background:var(--bdr);border-radius:2px}
-.test-matrix{width:100%;border-collapse:collapse;font-size:12px;margin-top:4px}
-.test-matrix thead th{font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.04em;padding:8px 10px 6px;border-bottom:2px solid var(--bdr);text-align:left;white-space:nowrap;position:sticky;top:0;z-index:2;background:var(--bg)}
-.test-matrix td{padding:7px 10px;border-bottom:1px solid var(--bdr);vertical-align:middle}
-.test-matrix tr:last-child td{border-bottom:none}
-.test-matrix tr.match>td{background:rgba(220,252,231,.2)}
-.test-matrix tr.mismatch>td{background:rgba(254,226,226,.2)}
-.test-matrix tbody tr:not(.tm-section):hover>td{background:var(--srf2)}
-.test-matrix__doc-name{font-weight:500;color:var(--tx1);display:block;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.test-matrix__batch{display:block;font-size:10px;color:var(--tx3);padding-left:5px;border-left-style:solid;border-left-width:2px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px}
-/* Dataset section header row */
-.tm-section td{padding:6px 10px;background:var(--srf);border-bottom:1px solid var(--bdr);border-top:2px solid var(--bdr)}
-.tm-section:first-child td{border-top:none}
-.tm-sec__inner{display:flex;align-items:center;gap:8px}
-.tm-sec__dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.tm-sec__name{font-size:11px;font-weight:700;color:var(--tx1)}
-.tm-sec__count{font-size:10px;color:var(--tx3);background:var(--srf2);border:1px solid var(--bdr);border-radius:10px;padding:0 6px}
-.tm-sec__stats{display:flex;align-items:center;gap:6px;margin-left:auto;font-size:10px}
-.tm-sec__match{color:#006b00;font-weight:600}
-.tm-sec__miss{color:#b91c1c;font-weight:600}
-.tm-sec__pending{color:var(--tx3)}
-.result-badge{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;font-size:11px;font-weight:700;flex-shrink:0}
-.result-badge--match{background:#e6f4e6;color:#006b00}
-.result-badge--mismatch{background:#fce8e8;color:#aa0000}
-.result-badge--pending{background:var(--srf2);color:var(--tx3);font-size:16px;line-height:1}
-.result-badge--no-exp{background:none;color:var(--tx3);font-size:18px;line-height:1}
-/* Expected column inline edit */
-.tm-exp-cell{cursor:pointer;min-width:80px}
-.tm-exp-chip{display:inline-flex;align-items:center;gap:4px;background:var(--srf2);border:1px solid var(--bdr);border-radius:4px;padding:2px 6px;font-size:12px;color:var(--tx1);cursor:pointer;transition:border-color .15s}
-.tm-exp-chip:hover{border-color:var(--a)}
-.tm-exp-chip__rm{color:var(--tx3);font-size:14px;line-height:1;cursor:pointer;padding:0 1px}
-.tm-exp-chip__rm:hover{color:#cc0000}
-.tm-exp-empty{color:var(--tx3);font-size:12px;cursor:pointer;padding:2px 0}
-.tm-exp-empty:hover{color:var(--a);text-decoration:underline}
-.tm-exp-input{border:none;border-bottom:1.5px solid var(--a);outline:none;font-size:12px;font-family:inherit;color:var(--tx1);background:transparent;width:120px;padding:1px 2px}
-/* Autocomplete dropdown */
-.tm-exp-wrap{position:relative;display:inline-block}
-.tm-exp-dropdown{position:absolute;top:100%;left:0;z-index:20;background:var(--srf);border:1px solid var(--bdr);border-radius:var(--r);box-shadow:0 4px 12px rgba(0,0,0,.12);min-width:160px;max-height:160px;overflow-y:auto;margin-top:2px}
-.tm-exp-dropdown__item{padding:6px 10px;font-size:12px;cursor:pointer;color:var(--tx1)}
-.tm-exp-dropdown__item:hover{background:var(--a-lt);color:var(--a)}
-/* Filter bar */
-.tm-filter-bar{display:flex;align-items:center;gap:4px;padding:8px 20px;border-bottom:1px solid var(--bdr);background:var(--bg);flex-shrink:0;flex-wrap:wrap}
-.tm-filter-btn{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:var(--r);border:1px solid var(--bdr);background:var(--srf);font-size:11px;font-weight:500;color:var(--tx2);cursor:pointer;font-family:inherit;transition:all .15s}
-.tm-filter-btn:hover{border-color:var(--a);color:var(--a)}
-.tm-filter-btn.active{background:var(--a-lt);border-color:var(--a);color:var(--a);font-weight:700}
-.tm-filter-count{background:var(--srf2);border-radius:10px;padding:0 5px;font-size:10px;color:var(--tx3)}
-.tm-filter-btn.active .tm-filter-count{background:rgba(0,55,129,.12);color:var(--a)}
-.tm-filter-sep{width:1px;height:16px;background:var(--bdr);margin:0 4px}
-.tm-filter-ds{padding:3px 8px;border:1px solid var(--bdr);border-radius:var(--r);font-size:11px;font-family:inherit;background:var(--srf);color:var(--tx1);cursor:pointer;outline:none}
-.tm-filter-ds:focus{border-color:var(--a)}
-/* Bulk set expected in section header */
-.tm-bulk-wrap{display:inline-flex;align-items:center;gap:4px;margin-left:8px}
-.tm-bulk-input{border:none;border-bottom:1.5px solid var(--a);outline:none;font-size:11px;font-family:inherit;color:var(--tx1);background:transparent;width:130px;padding:1px 2px}
-.tm-bulk-btn{font-size:10px;font-weight:600;color:var(--a);background:none;border:none;cursor:pointer;font-family:inherit;padding:0 4px}
-.tm-bulk-btn:hover{text-decoration:underline}
-.tm-sec__set-all{font-size:10px;color:var(--tx3);background:none;border:none;cursor:pointer;font-family:inherit;margin-left:8px;padding:0}
-.tm-sec__set-all:hover{color:var(--a);text-decoration:underline}
-/* Re-run failed button */
-.tp-rerun-btn{display:flex;align-items:center;gap:5px;padding:5px 13px;border-radius:var(--r);font-size:11px;font-weight:700;border:1.5px solid #b91c1c;cursor:pointer;font-family:inherit;background:transparent;color:#b91c1c;transition:all .15s;white-space:nowrap}
-.tp-rerun-btn:hover{background:#fce8e8}
-/* Approve / Publish */
-.tp-approve-btn{display:flex;align-items:center;gap:5px;padding:5px 14px;border-radius:var(--r);font-size:11px;font-weight:700;border:none;cursor:pointer;font-family:inherit;background:#b45309;color:#fff;transition:all .15s;white-space:nowrap;margin-left:auto}
-.tp-approve-btn:hover{background:#92400e}
-.tp-approve-btn--re{background:#7c3aed}
-.tp-approve-btn--re:hover{background:#6d28d9}
-.tp-pub-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:3px 8px;border-radius:4px;white-space:nowrap}
-.tp-pub-badge--ok{background:#e6f4e6;color:#006b00}
-.tp-pub-badge--draft{background:#fff3e0;color:#e07000}
-.tp-fix-prompt-btn{display:flex;align-items:center;gap:5px;padding:5px 14px;border-radius:var(--r);font-size:11px;font-weight:700;border:1.5px solid #b91c1c;cursor:pointer;font-family:inherit;background:#fce8e8;color:#b91c1c;transition:all .15s;white-space:nowrap;margin-left:auto}
-.tp-fix-prompt-btn:hover{background:#fbd5d5}
-.tv-fail-banner{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:12px 0 4px;padding:10px 14px;background:#fce8e8;border:1px solid #f5b3b3;border-radius:var(--r-md);font-size:12px;color:#b91c1c;font-weight:500}
-.tv-fail-banner__btn{font-size:11px;font-weight:700;color:#b91c1c;background:#fff;border:1.5px solid #b91c1c;border-radius:var(--r);padding:4px 12px;cursor:pointer;font-family:inherit;white-space:nowrap;transition:all .15s;flex-shrink:0}
-.tv-fail-banner__btn:hover{background:#fce8e8}
 /* Published badge in prompt editor header */
 .lps-pub-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;white-space:nowrap;flex-shrink:0}
 .lps-pub-badge--ok{background:#e6f4e6;color:#006b00;border:1px solid #b3ddb3}
 .lps-pub-badge--draft{background:#fff3e0;color:#e07000;border:1px solid #ffd699}
-/* Last test context panel in prompt editor */
-.lps-test-ctx{margin-top:10px;border:1px solid var(--bdr);border-radius:var(--r-md);overflow:hidden;font-size:12px}
-.lps-test-ctx__hdr{display:flex;align-items:center;gap:8px;padding:7px 12px;background:var(--srf);cursor:pointer;user-select:none;font-weight:600}
-.lps-test-ctx__hdr:hover{background:var(--srf2)}
-.lps-test-ctx__hdr--fail{color:#b91c1c}
-.lps-test-ctx__hdr--ok{color:#006b00}
-.lps-test-ctx__toggle{margin-left:auto;color:var(--tx3);font-size:10px}
-.lps-test-ctx__body{border-top:1px solid var(--bdr);background:var(--bg)}
-.lps-test-ctx__row{display:grid;grid-template-columns:1fr auto auto auto auto;align-items:center;gap:8px;padding:6px 12px;border-bottom:1px solid var(--bdr)}
-.lps-test-ctx__row:last-child{border-bottom:none}
-.lps-test-ctx__row--pass{opacity:.55}
-.lps-test-ctx__doc{font-weight:500;color:var(--tx1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
-.lps-test-ctx__exp{color:var(--tx2);white-space:nowrap;font-size:11px}
-.lps-test-ctx__arrow{color:var(--tx3);font-size:11px}
-.lps-test-ctx__pred--fail{color:#b91c1c;font-weight:600;white-space:nowrap}
-.lps-test-ctx__pred--ok{color:#006b00;font-weight:600;white-space:nowrap}
-.lps-test-ctx__conf{font-size:11px;color:var(--tx3);white-space:nowrap}
-.lps-test-ctx__empty{padding:12px;color:var(--tx3);text-align:center;font-size:12px}
-.test-view__summary{display:flex;align-items:center;gap:14px;padding:8px 20px;background:var(--srf);border-top:1px solid var(--bdr);font-size:12px;color:var(--tx2);flex-shrink:0;flex-wrap:wrap}
-.test-view__empty{text-align:center;padding:56px 20px;font-size:13px;color:var(--tx3);line-height:1.8}
-/* Test Prompt button — now at bottom of prompt section */
-.cl-setup__test-btn{display:flex;align-items:center;gap:6px;padding:9px 20px;border-radius:6px;font-size:13px;font-weight:600;border:none;cursor:pointer;font-family:inherit;background:#003781;color:#fff;transition:all .15s;white-space:nowrap}
-.cl-setup__test-btn:hover{background:#002d6b}
-.cl-setup__test-btn--back{background:transparent;color:#003781;border:1.5px solid #003781;padding:8px 20px}
-.cl-setup__test-btn--back:hover{background:#eef2fb}
 /* Prompt bottom actions row */
 .prompt-actions{display:flex;align-items:center;justify-content:space-between;padding:12px 20px 16px;flex-shrink:0}
 .prompt-actions__save{background:none;border:none;font-size:13px;color:#003781;font-weight:500;cursor:pointer;font-family:inherit;text-decoration:underline;text-underline-offset:2px;padding:0}
@@ -854,8 +667,6 @@ input,textarea,select{font-family:inherit}
 .run-test-publish:hover{background:#92400e}
 .run-test-deploy-btn{padding:8px 16px;border-radius:6px;font-size:12px;font-weight:700;border:none;cursor:pointer;font-family:inherit;background:#006b00;color:#fff;white-space:nowrap}
 .run-test-deploy-btn:hover{background:#005200}
-.tp-deploy-btn{display:flex;align-items:center;gap:5px;padding:5px 14px;border-radius:var(--r);font-size:11px;font-weight:700;border:none;cursor:pointer;font-family:inherit;background:#006b00;color:#fff;transition:all .15s;white-space:nowrap;margin-left:auto}
-.tp-deploy-btn:hover{background:#005200}
 .run-test-pub-badge{font-size:11px;font-weight:600;color:#006b00;background:#e6f4e6;border:1px solid #b7ddb7;border-radius:var(--r);padding:3px 10px;white-space:nowrap}
 .run-test-btn{padding:9px 28px;border-radius:6px;font-size:13px;font-weight:600;border:none;cursor:pointer;font-family:inherit;background:#8faad4;color:#fff;transition:all .15s}
 /* Publish confirmation modal */
@@ -2172,49 +1983,6 @@ function LobOverview({lobs,onSelectLob,addToast,onOpenOutputFormat,onConfirm,onD
   );
 }
 
-/* ── Last Test Context Panel — shown in prompt editor after returning from TestView ── */
-function LastTestPanel({ctx}){
-  const [open,setOpen]=useState(true);
-  const [showAll,setShowAll]=useState(false);
-  if(!ctx||ctx.testedCount===0)return null;
-  const hasFail=ctx.failedDocs.length>0;
-  const rows=showAll?[...ctx.failedDocs,...ctx.passedDocs]:ctx.failedDocs;
-  return(
-    <div className="lps-test-ctx">
-      <div className={`lps-test-ctx__hdr lps-test-ctx__hdr--${hasFail?'fail':'ok'}`} onClick={()=>setOpen(o=>!o)}>
-        <span>{hasFail?'✗':'✓'}</span>
-        <span>Last test: {ctx.accuracy!==null?`${ctx.accuracy}% accuracy · `:''}
-          {ctx.failedDocs.length>0?`${ctx.failedDocs.length} failure${ctx.failedDocs.length!==1?'s':''}`:ctx.testedCount+' passed'}
-          {' · '}{ctx.testedCount} docs tested
-        </span>
-        <span className="lps-test-ctx__toggle">{open?'▴ hide':'▾ show'}</span>
-      </div>
-      {open&&<div className="lps-test-ctx__body">
-        {rows.length===0
-          ?<div className="lps-test-ctx__empty">All {ctx.testedCount} documents matched ✓</div>
-          :rows.map(d=>{
-            const isFail=ctx.failedDocs.some(f=>f.id===d.id);
-            return(
-              <div key={d.id} className={`lps-test-ctx__row${isFail?'':' lps-test-ctx__row--pass'}`}>
-                <span className="lps-test-ctx__doc" title={d.name}>{d.name}</span>
-                <span className="lps-test-ctx__exp">{d.expected||<span style={{color:'var(--tx3)'}}>no expected</span>}</span>
-                <span className="lps-test-ctx__arrow">→</span>
-                <span className={`lps-test-ctx__pred--${isFail?'fail':'ok'}`}>{d.predicted}</span>
-                <span className="lps-test-ctx__conf">{d.conf}%</span>
-              </div>
-            );
-          })
-        }
-        {ctx.passedDocs.length>0&&<div style={{padding:'5px 12px',borderTop:'1px solid var(--bdr)'}}>
-          <button style={{fontSize:'11px',color:'var(--tx3)',background:'none',border:'none',cursor:'pointer',fontFamily:'inherit'}}
-            onClick={()=>setShowAll(s=>!s)}>
-            {showAll?'▴ Hide passed docs':`▾ Show ${ctx.passedDocs.length} passed docs`}
-          </button>
-        </div>}
-      </div>}
-    </div>
-  );
-}
 
 /* ── Publish Confirmation Modal ── */
 function PublishModal({accuracy,testedCount,matchedCount,onConfirm,onClose}){
@@ -2254,7 +2022,7 @@ function PublishModal({accuracy,testedCount,matchedCount,onConfirm,onClose}){
 /* ── LOB Prompt Section (Stage 1 — L1-only scroll mode) ── */
 /* targets = l1Items passed from App so classifier knows the category targets */
 function LobPromptSection({lobName,prompt,defaultPrompt,meta,saveState,onEdit,onSave,
-  onVersion,hierarchyContext,promptMode='l1',publishedSnap,approvedSnap,lastTestCtx,docs=[],dataSets=[],onSelectFiles,onRunTest,onApprove,onDeploy}){
+  onVersion,hierarchyContext,promptMode='l1',publishedSnap,approvedSnap,docs=[],dataSets=[],onSelectFiles,onRunTest,onApprove,onDeploy}){
   const [open,setOpen]=useState(true);
   const [showResetConfirm,setShowResetConfirm]=useState(false);
   const [showPreview,setShowPreview]=useState(false);
@@ -2341,7 +2109,6 @@ function LobPromptSection({lobName,prompt,defaultPrompt,meta,saveState,onEdit,on
             }
           </div>
         </div>
-        <LastTestPanel ctx={lastTestCtx}/>
       </div>}
       {(()=>{
         const live=selectedFiles.map(d=>docs.find(x=>x.id===d.id)||d);
@@ -3175,7 +2942,6 @@ function Workspace({activeL1Tab,setActiveL1Tab,activeTab,setActiveTab,l1Items,pr
                 }
               </div>
             </div>
-            <LastTestPanel ctx={null}/>
           </div>
         </div>
       </div>
@@ -3244,313 +3010,6 @@ function Workspace({activeL1Tab,setActiveL1Tab,activeTab,setActiveTab,l1Items,pr
   );
 }
 
-/* ── Test View — dedicated test mode (replaces workspace content) ── */
-function TestView({promptText,promptLabel,docs,dataSets,toggleSel,onMarkTested,onUpdateExpected,labelSuggestions=[],promptKey,publishedSnap,approvedSnap,onApprove,onDeploy,onEditPrompt,onBack}){
-  const [runningIds,setRunningIds]=useState(new Set());
-  const [promptOpen,setPromptOpen]=useState(false);
-  const [editingPrompt,setEditingPrompt]=useState(false);
-  const [draftPrompt,setDraftPrompt]=useState('');
-  const [editingId,setEditingId]=useState(null);
-  const [editingVal,setEditingVal]=useState('');
-  const [filter,setFilter]=useState('all');       // all|untested|matched|failed
-  const [filterDs,setFilterDs]=useState('all');   // all|ds.id
-  const [bulkDsId,setBulkDsId]=useState(null);
-  const [bulkVal,setBulkVal]=useState('');
-
-  const totalSelected=docs.filter(d=>d.selected).length;
-  const testedDocs=docs.filter(d=>d.lastTest);
-  const failedDocs=docs.filter(d=>d.lastTest?.match===false);
-  /* accuracy = only docs where match is boolean (has expected label) */
-  const validatedDocs=testedDocs.filter(d=>d.lastTest.match!==null);
-  const matchCount=validatedDocs.filter(d=>d.lastTest.match).length;
-  const accuracy=validatedDocs.length>0?Math.round(matchCount/validatedDocs.length*100):null;
-  const avgConf=testedDocs.length>0?Math.round(testedDocs.reduce((s,d)=>s+d.lastTest.conf,0)/testedDocs.length):null;
-
-  const selectAll=()=>docs.forEach(d=>toggleSel(d.id,true));
-  const clearSel=()=>docs.forEach(d=>toggleSel(d.id,false));
-
-  const _runDocs=(sel)=>{
-    if(!sel.length)return;
-    setRunningIds(prev=>{const n=new Set(prev);sel.forEach(d=>n.add(d.id));return n;});
-    const targets=labelSuggestions.map(name=>({id:name,name}));
-    const effectiveTargets=targets.length>0?targets:[{id:'unknown',name:'Unknown'}];
-    sel.forEach((doc,i)=>{
-      setTimeout(()=>{
-        const r=mockClassify(doc.name,effectiveTargets);
-        const pred=r?.classification||'Unknown';
-        const conf=r?parseInt(r.confidence)||50:50;
-        const expected=doc.expectedLabels?.[0];
-        const match=expected?(pred===expected):null;
-        onMarkTested(doc.id,{ctx:promptLabel,pred,conf,match,testedAt:new Date().toISOString()});
-        setRunningIds(prev=>{const n=new Set(prev);n.delete(doc.id);return n;});
-      },900+i*500+Math.random()*300);
-    });
-  };
-  const runTest=()=>_runDocs(docs.filter(d=>d.selected));
-  const rerunFailed=()=>_runDocs(failedDocs);
-
-  /* inline expected edit */
-  const saveExpected=(docId,val)=>{onUpdateExpected(docId,val.trim());setEditingId(null);setEditingVal('');};
-  const startEdit=(doc)=>{if(runningIds.has(doc.id))return;setEditingId(doc.id);setEditingVal(doc.expectedLabels?.[0]||'');};
-
-  /* bulk set all docs in a dataset */
-  const applyBulk=(dsId,gDocs)=>{
-    const v=bulkVal.trim();
-    gDocs.forEach(d=>onUpdateExpected(d.id,v));
-    setBulkDsId(null);setBulkVal('');
-  };
-
-  /* filter counts */
-  const countFilter=(f)=>f==='all'?docs.length:f==='untested'?docs.filter(d=>!d.lastTest).length:f==='matched'?docs.filter(d=>d.lastTest?.match===true).length:failedDocs.length;
-
-  /* apply filters to a doc list */
-  const applyFilters=(list)=>list
-    .filter(d=>filterDs==='all'||d.dataSetId===filterDs)
-    .filter(d=>filter==='all'||(filter==='untested'&&!d.lastTest)||(filter==='matched'&&d.lastTest?.match===true)||(filter==='failed'&&d.lastTest?.match===false));
-
-  /* inline prompt editing */
-  const startEditPrompt=()=>{setDraftPrompt(promptText);setEditingPrompt(true);setPromptOpen(true);};
-  const cancelEditPrompt=()=>{setEditingPrompt(false);setDraftPrompt('');};
-  const saveAndRerun=()=>{
-    if(draftPrompt.trim()===promptText){setEditingPrompt(false);setDraftPrompt('');return;}
-    onEditPrompt(draftPrompt.trim());
-    setEditingPrompt(false);setDraftPrompt('');
-    /* auto-select all + run */
-    docs.forEach(d=>toggleSel(d.id,true));
-    setTimeout(()=>_runDocs(docs),50);
-  };
-
-  /* label suggestions for autocomplete */
-  const allSuggestions=[...new Set(labelSuggestions)];
-  const getSuggestions=(val)=>val.trim()?allSuggestions.filter(s=>s.toLowerCase().includes(val.toLowerCase())&&s!==val):allSuggestions.slice(0,6);
-
-  return(
-    <div className="test-view">
-      {/* Header */}
-      <div className="test-view__hdr">
-        <button className="test-view__back" onClick={onBack}><IC.Back/> Edit prompt</button>
-        <span className="test-view__title">{promptLabel}</span>
-        {accuracy!==null&&<span className={`test-view__accuracy test-view__accuracy--${accuracy>=80?'good':accuracy>=60?'ok':'bad'}`}>{accuracy}% accuracy</span>}
-      </div>
-
-      {/* Prompt snapshot — collapsible + inline editable */}
-      <div className={`test-view__prompt${editingPrompt?' test-view__prompt--editing':''}`}>
-        <div className={`test-view__prompt-hdr${editingPrompt?' test-view__prompt-hdr--editing':''}`}
-          onClick={()=>!editingPrompt&&setPromptOpen(o=>!o)}>
-          <span className={`test-view__prompt-label${editingPrompt?' test-view__prompt-label--editing':''}`}>
-            {editingPrompt?'Editing prompt':'Prompt being tested'}
-          </span>
-          {!editingPrompt&&<span className="test-view__prompt-toggle">{promptOpen?'▴ hide':'▾ show'}</span>}
-          {!editingPrompt
-            ?<button className="tv-prompt-edit-btn" onClick={e=>{e.stopPropagation();startEditPrompt();}}>✎ Edit</button>
-            :<button className="tv-prompt-cancel-btn" onClick={e=>{e.stopPropagation();cancelEditPrompt();}}>✕ Cancel</button>
-          }
-        </div>
-        {editingPrompt
-          ?<>
-              <textarea className="tv-prompt-textarea" value={draftPrompt}
-                onChange={e=>setDraftPrompt(e.target.value)}
-                onClick={e=>e.stopPropagation()}
-                onKeyDown={e=>{if(e.key==='Enter'&&(e.metaKey||e.ctrlKey))saveAndRerun();}}/>
-              <div className="tv-prompt-edit-footer">
-                <span className="tv-prompt-char">{draftPrompt.length} chars · ⌘Enter to save & run</span>
-                <button className="tv-prompt-save-btn" onClick={saveAndRerun}>
-                  Save &amp; Re-run ▶
-                </button>
-              </div>
-            </>
-          :promptOpen
-            ?<pre className="test-view__prompt-full">{promptText}</pre>
-            :<span className="test-view__prompt-preview">{(promptText||'').replace(/\s+/g,' ').slice(0,140)}…</span>
-        }
-      </div>
-
-      {/* Controls */}
-      <div className="test-view__controls">
-        <button className="ws-test__sel-btn" onClick={selectAll}>Select all</button>
-        {totalSelected>0&&<button className="ws-test__sel-btn ws-test__sel-btn--clear" onClick={clearSel}>Clear ({totalSelected})</button>}
-        <span className="test-view__ctrl-info">{testedDocs.length} / {docs.length} tested</span>
-        {failedDocs.length>0&&
-          <button className="tp-rerun-btn" onClick={rerunFailed}>↺ Re-run failed ({failedDocs.length})</button>
-        }
-        <button className="tp-run-btn" disabled={totalSelected===0} onClick={runTest}>
-          ▶ Run Test{totalSelected>0?` (${totalSelected})`:''}
-        </button>
-      </div>
-
-      {/* Filter bar */}
-      <div className="tm-filter-bar">
-        {[['all','All'],['untested','Untested'],['matched','✓ Matched'],['failed','✗ Failed']].map(([f,label])=>(
-          <button key={f} className={`tm-filter-btn${filter===f?' active':''}`} onClick={()=>setFilter(f)}>
-            {label}<span className="tm-filter-count">{countFilter(f)}</span>
-          </button>
-        ))}
-        {dataSets.length>1&&<>
-          <span className="tm-filter-sep"/>
-          <select className="tm-filter-ds" value={filterDs} onChange={e=>setFilterDs(e.target.value)}>
-            <option value="all">All datasets</option>
-            {dataSets.map(ds=><option key={ds.id} value={ds.id}>{ds.name}</option>)}
-          </select>
-        </>}
-      </div>
-
-      {/* Test matrix */}
-      <div className="test-view__body">
-        {accuracy===0&&validatedDocs.length>0&&!runningIds.size&&(
-          <div className="tv-fail-banner">
-            <span>All {validatedDocs.length} document{validatedDocs.length!==1?'s':''} failed — the prompt isn't classifying correctly.</span>
-            <button className="tv-fail-banner__btn" onClick={startEditPrompt}>✎ Edit prompt</button>
-          </div>
-        )}
-        {docs.length===0
-          ?<div className="test-view__empty">No documents in library.<br/>Upload documents using the right panel, then come back to test.</div>
-          :(()=>{
-            const groups=dataSets.map(ds=>({ds,docs:applyFilters(docs.filter(d=>d.dataSetId===ds.id))})).filter(g=>g.docs.length>0);
-            const ungrouped=applyFilters(docs.filter(d=>!dataSets.find(s=>s.id===d.dataSetId)));
-            if(ungrouped.length>0)groups.push({ds:{id:'__none__',name:'Ungrouped',color:'#aaa'},docs:ungrouped});
-            if(groups.length===0)return<div className="test-view__empty">No documents match the current filter.</div>;
-
-            const renderDoc=(doc)=>{
-              const running=runningIds.has(doc.id);
-              const match=doc.lastTest?.match;
-              const rowCls=running?'':match===true?'match':match===false?'mismatch':'';
-              const isEditing=editingId===doc.id;
-              const expLabel=doc.expectedLabels?.[0];
-              const suggestions=getSuggestions(editingVal);
-              const badge=running?null:!doc.lastTest?null:match===null
-                ?<span className="result-badge result-badge--no-exp" title="Tested — no expected label set">·</span>
-                :match
-                  ?<span className="result-badge result-badge--match">✓</span>
-                  :<span className="result-badge result-badge--mismatch">✗</span>;
-              return(
-                <tr key={doc.id} className={rowCls}>
-                  <td><input type="checkbox" checked={doc.selected} onChange={()=>toggleSel(doc.id)} style={{accentColor:'var(--a)',cursor:'pointer',width:'13px',height:'13px'}}/></td>
-                  <td><span className="test-matrix__doc-name" title={doc.name}>{doc.name}</span></td>
-                  <td className="tm-exp-cell" onClick={()=>!isEditing&&startEdit(doc)}>
-                    {isEditing
-                      ?<div className="tm-exp-wrap">
-                          <input autoFocus className="tm-exp-input" value={editingVal}
-                            onChange={e=>setEditingVal(e.target.value)}
-                            onKeyDown={e=>{if(e.key==='Enter')saveExpected(doc.id,editingVal);if(e.key==='Escape'){setEditingId(null);setEditingVal('');}}}
-                            onBlur={e=>{if(!e.relatedTarget?.closest('.tm-exp-dropdown'))saveExpected(doc.id,editingVal);}}
-                            onClick={e=>e.stopPropagation()}/>
-                          {suggestions.length>0&&<div className="tm-exp-dropdown">
-                            {suggestions.map(s=>(
-                              <div key={s} className="tm-exp-dropdown__item"
-                                onMouseDown={e=>{e.preventDefault();saveExpected(doc.id,s);}}>
-                                {s}
-                              </div>
-                            ))}
-                          </div>}
-                        </div>
-                      :expLabel
-                        ?<span className="tm-exp-chip">{expLabel}
-                            <span className="tm-exp-chip__rm" title="Remove" onClick={e=>{e.stopPropagation();saveExpected(doc.id,'');}}>×</span>
-                          </span>
-                        :<span className="tm-exp-empty">— set expected</span>
-                    }
-                  </td>
-                  <td style={{fontWeight:500,color:'var(--tx1)'}}>
-                    {running?<span className="tp-doc__running"><span className="tr-row__spinner"/>classifying…</span>
-                      :doc.lastTest?.pred||<span style={{color:'var(--tx3)'}}>—</span>}
-                  </td>
-                  <td style={{fontWeight:700,color:!doc.lastTest||running?'var(--tx3)':doc.lastTest.conf>=80?'#006b00':doc.lastTest.conf>=60?'#92400e':'#b91c1c'}}>
-                    {running?'…':doc.lastTest?`${doc.lastTest.conf}%`:'—'}
-                  </td>
-                  <td>{badge}</td>
-                </tr>
-              );
-            };
-
-            return(
-              <table className="test-matrix">
-                <thead>
-                  <tr>
-                    <th style={{width:'28px'}}></th>
-                    <th>Document</th>
-                    <th>Expected <span style={{fontWeight:400,opacity:.6,textTransform:'none',letterSpacing:0}}>(click to edit)</span></th>
-                    <th>Predicted</th>
-                    <th>Confidence</th>
-                    <th style={{width:'40px'}}></th>
-                  </tr>
-                </thead>
-                {groups.map(({ds,docs:gDocs})=>{
-                  const allGDocs=docs.filter(d=>d.dataSetId===ds.id);
-                  const gTested=allGDocs.filter(d=>d.lastTest).length;
-                  const gMatch=allGDocs.filter(d=>d.lastTest?.match===true).length;
-                  const gMiss=allGDocs.filter(d=>d.lastTest?.match===false).length;
-                  return(
-                    <tbody key={ds.id}>
-                      <tr className="tm-section">
-                        <td colSpan={6}>
-                          <div className="tm-sec__inner">
-                            <span className="tm-sec__dot" style={{background:ds.color}}/>
-                            <span className="tm-sec__name">{ds.name}</span>
-                            <span className="tm-sec__count">{allGDocs.length}</span>
-                            <div className="tm-sec__stats">
-                              {gMatch>0&&<span className="tm-sec__match">✓ {gMatch}</span>}
-                              {gMiss>0&&<span className="tm-sec__miss">✗ {gMiss}</span>}
-                              {gTested<allGDocs.length&&<span className="tm-sec__pending">{gTested}/{allGDocs.length} tested</span>}
-                            </div>
-                            {/* Bulk set expected */}
-                            {bulkDsId===ds.id
-                              ?<div className="tm-bulk-wrap" onClick={e=>e.stopPropagation()}>
-                                  <input autoFocus className="tm-bulk-input" value={bulkVal} placeholder="Expected label for all…"
-                                    onChange={e=>setBulkVal(e.target.value)}
-                                    onKeyDown={e=>{if(e.key==='Enter')applyBulk(ds.id,allGDocs);if(e.key==='Escape'){setBulkDsId(null);setBulkVal('');}}}/>
-                                  <button className="tm-bulk-btn" onMouseDown={e=>{e.preventDefault();applyBulk(ds.id,allGDocs);}}>Apply all</button>
-                                  <button className="tm-bulk-btn" style={{color:'var(--tx3)'}} onClick={()=>{setBulkDsId(null);setBulkVal('');}}>×</button>
-                                </div>
-                              :<button className="tm-sec__set-all" onClick={e=>{e.stopPropagation();setBulkDsId(ds.id);setBulkVal('');}}>
-                                  + Set expected for all
-                                </button>
-                            }
-                          </div>
-                        </td>
-                      </tr>
-                      {gDocs.map(renderDoc)}
-                    </tbody>
-                  );
-                })}
-              </table>
-            );
-          })()
-        }
-      </div>
-
-      {/* Summary bar — always visible */}
-      {(()=>{
-        const isActive=publishedSnap&&publishedSnap.text===promptText;
-        const isApproved=approvedSnap&&approvedSnap.text===promptText&&!isActive;
-        const hasChanges=approvedSnap&&approvedSnap.text!==promptText&&!isActive;
-        const pubDate=isActive?new Date(publishedSnap.publishedAt).toLocaleDateString('en-GB',{day:'numeric',month:'short'}):null;
-        return(
-          <div className="test-view__summary">
-            <span><strong>{testedDocs.length}</strong> / {docs.length} tested</span>
-            {matchCount>0&&<span style={{color:'#006b00',fontWeight:600}}>✓ {matchCount} matched</span>}
-            {validatedDocs.length-matchCount>0&&<span style={{color:'#b91c1c',fontWeight:600}}>✗ {validatedDocs.length-matchCount} missed</span>}
-            {accuracy!==null&&<span>accuracy <strong>{accuracy}%</strong></span>}
-            {avgConf!==null&&<span>avg conf <strong>{avgConf}%</strong></span>}
-            {runningIds.size>0&&<span style={{color:'var(--a)',fontWeight:600}}>⟳ {runningIds.size} running</span>}
-            {/* Workflow action */}
-            {isActive
-              ?<span className="tp-pub-badge tp-pub-badge--ok">✓ Active · {publishedSnap.accuracy}% · {pubDate}</span>
-              :isApproved&&!runningIds.size
-                ?<button className="tp-deploy-btn" onClick={()=>onDeploy(promptKey)}>Deploy to Production</button>
-                :accuracy===0
-                  ?<button className="tp-fix-prompt-btn" onClick={startEditPrompt}>✎ Edit prompt — all tests failed</button>
-                  :accuracy!==null&&!runningIds.size&&<button
-                      className={`tp-approve-btn${hasChanges?' tp-approve-btn--re':''}`}
-                      onClick={()=>onApprove(promptKey,{text:promptText,accuracy,avgConf,testedCount:testedDocs.length,validatedCount:validatedDocs.length,publishedAt:new Date().toISOString()})}>
-                      {hasChanges?'↑ Re-approve':'Approve for Production'}
-                    </button>
-            }
-          </div>
-        );
-      })()}
-    </div>
-  );
-}
 
 /* ── Document Panel (Doc Library — upload & organize only) ── */
 function UploadModal({rawFiles,dataSets,addDataSet,onConfirm,onClose}){
@@ -4113,7 +3572,6 @@ function App({devOverrides={}}){
   /* Detail page state — initialized from selected LOB */
   const [selectedLobId,setSelectedLobId]=useState(devOverrides.selectedLobId||null);
   const [promptLevel,setPromptLevel]=useState(devOverrides.promptLevel||'l1');
-  const [testMode,setTestMode]=useState(devOverrides.testMode||false);
   const [sidebarW,setSidebarW]=useState(220);
   const [docPanelW,setDocPanelW]=useState(260);
   const [l1Items,setL1Items]=useState(devOverrides.l1Items||[]);
@@ -4125,7 +3583,6 @@ function App({devOverrides={}}){
   const [saveStates,setSaveStates]=useState(devOverrides.saveStates||{});
   const [publishedPrompts,setPublishedPrompts]=useState({});
   const [approvedPrompts,setApprovedPrompts]=useState({});
-  const [lastTestCtx,setLastTestCtx]=useState(null);
   const saveTimers=useRef({});
   const [showMenu,setShowMenu]=useState(null);
   const [modal,setModal]=useState(null);
@@ -4257,29 +3714,6 @@ function App({devOverrides={}}){
       addToast('Prompt deployed & active ✓','success');
     },1500);
   };
-  const exitTestMode=useCallback(()=>{
-    /* capture last test state before switching back to editor */
-    const tested=docs.filter(d=>d.lastTest);
-    const validated=tested.filter(d=>d.lastTest.match!==null);
-    const matched=validated.filter(d=>d.lastTest.match).length;
-    const accuracy=validated.length>0?Math.round(matched/validated.length*100):null;
-    const failedDocs=docs.filter(d=>d.lastTest?.match===false).map(d=>({
-      id:d.id,name:d.name,
-      expected:d.expectedLabels?.[0]||null,
-      predicted:d.lastTest.pred,
-      conf:d.lastTest.conf,
-    }));
-    const passedDocs=docs.filter(d=>d.lastTest?.match===true).map(d=>({
-      id:d.id,name:d.name,
-      expected:d.expectedLabels?.[0]||null,
-      predicted:d.lastTest.pred,
-      conf:d.lastTest.conf,
-    }));
-    if(tested.length>0){
-      setLastTestCtx({accuracy,matched,testedCount:tested.length,failedDocs,passedDocs,ranAt:new Date().toISOString()});
-    }
-    setTestMode(false);
-  },[docs]);
   const updateDocExpected=(id,label)=>setDocs(prev=>prev.map(d=>{
     if(d.id!==id)return d;
     const newLabels=label?[label]:[];
@@ -4344,16 +3778,14 @@ function App({devOverrides={}}){
                 <div className="cl-setup__row">
                   {[{id:'global',label:'Global'},{id:'l1',label:'L1 - Document categories'},{id:'l2',label:'L2 - Document types'}].map(opt=>(
                     <label key={opt.id} className={`cl-setup__radio${promptLevel===opt.id?' cl-setup__radio--active':''}`} onClick={e=>e.stopPropagation()}>
-                      <input type="radio" name="promptLevel" value={opt.id} checked={promptLevel===opt.id} onChange={()=>{setPromptLevel(opt.id);setTestMode(false);}}/>
+                      <input type="radio" name="promptLevel" value={opt.id} checked={promptLevel===opt.id} onChange={()=>setPromptLevel(opt.id)}/>
                       <span className="cl-setup__radio-label">{opt.label}</span>
                     </label>
                   ))}
-                  {!testMode&&docs.length>0&&<button className="cl-setup__test-btn" style={{marginLeft:'auto'}} onClick={()=>{setDocs(prev=>prev.map(d=>({...d,selected:true})));setTestMode(true);}}>▶ Test Prompt</button>}
-                  {testMode&&<button className="cl-setup__test-btn cl-setup__test-btn--back" style={{marginLeft:'auto'}} onClick={exitTestMode}>← Edit Prompt</button>}
                 </div>
               </div>
             </div>
-            {/* Center content — swaps based on promptLevel / testMode */}
+            {/* Center content — swaps based on promptLevel */}
             {(()=>{
               const activePromptLabel=(()=>{
                 if(promptLevel==='global')return`${l0Name} · Global Class`;
@@ -4378,15 +3810,7 @@ function App({devOverrides={}}){
                   markTested(doc.id,{ctx:activePromptLabel,pred,conf,match,testedAt:new Date().toISOString()});
                 },900+i*500+Math.random()*300);});
               };
-              return testMode
-                ?<TestView promptText={currentPromptText} promptLabel={activePromptLabel}
-                    docs={docs} dataSets={dataSets}
-                    toggleSel={toggleSel} onMarkTested={markTested} onUpdateExpected={updateDocExpected}
-                    labelSuggestions={labelSuggestions} promptKey={promptKey}
-                    publishedSnap={publishedSnap} approvedSnap={approvedSnap}
-                    onApprove={approvePrompt} onDeploy={deployPrompt}
-                    onEditPrompt={val=>handleEdit(promptKey,val)} onBack={exitTestMode}/>
-                :promptLevel==='l2'
+              return promptLevel==='l2'
                 ?<Workspace activeL1Tab={activeL1Tab} setActiveL1Tab={setActiveL1Tab} activeTab={activeTab} setActiveTab={setActiveTab} l1Items={l1Items}
                     prompts={prompts} defaultPrompts={defaultPrompts} tabMeta={tabMeta} saveStates={saveStates}
                     onEdit={handleEdit} onSave={handleSave} onVersion={()=>setModal('version')}
@@ -4402,7 +3826,6 @@ function App({devOverrides={}}){
                         onVersion={()=>setModal('version')}
                         hierarchyContext={buildHierarchy(promptLevel==='global'?'global':'l1',l1Items)}
                         promptMode={promptLevel} publishedSnap={publishedSnap}
-                        lastTestCtx={lastTestCtx}
                         docs={docs} dataSets={dataSets}
                         onSelectFiles={ids=>setDocs(prev=>prev.map(d=>({...d,selected:ids.includes(d.id)})))}
                         onRunTest={onRunInline}
@@ -4457,7 +3880,7 @@ function Root(){
       const firstCatId=l1Items[0]?.id||'l1';
       return{page:'detail',selectedLobId:lob.id,l0Name:lob.name,l1Items,prompts,defaultPrompts:prompts,
         tabMeta,activeTab:firstCatId,activeL1Tab:firstCatId,
-        promptLevel:opts.promptLevel||'l1',testMode:opts.testMode||false,
+        promptLevel:opts.promptLevel||'l1',
         ...(opts.docs!==undefined?{docs:opts.docs}:{}),
         ...(opts.lobs!==undefined?{lobs:opts.lobs}:{}),
         ...(opts.saveStates!==undefined?{saveStates:opts.saveStates}:{})};
@@ -4486,12 +3909,10 @@ function Root(){
       {id:'det-nocat',   group:'Prompt Detail', label:'No Categories',       state:build({...lob,categories:[]},{})},
       {id:'det-noph',    group:'Prompt Detail', label:'Missing Placeholder', state:build(lob,{l1Prompt:'Classify this document into the correct category.',promptLevel:'l1'})},
       {id:'det-unsaved', group:'Prompt Detail', label:'Unsaved Changes',     state:build(lob,{promptLevel:'l1',saveStates:{'l1':'unsaved'}})},
-      {id:'tv-prerun',   group:'Test View', label:'Pre-run (all selected)',  state:build(lob,{promptLevel:'l1',testMode:true,docs:selected})},
-      {id:'tv-match',    group:'Test View', label:'All Matched',             state:build(lob,{promptLevel:'l1',testMode:true,docs:matched})},
-      {id:'tv-mismatch', group:'Test View', label:'All Mismatched (error)',  state:build(lob,{promptLevel:'l1',testMode:true,docs:mismatch})},
-      {id:'tv-mixed',    group:'Test View', label:'Mixed Results',           state:build(lob,{promptLevel:'l1',testMode:true,docs:mixed})},
-      {id:'tv-lowconf',  group:'Test View', label:'Low Confidence',          state:build(lob,{promptLevel:'l1',testMode:true,docs:lowConf})},
-      {id:'tv-empty',    group:'Test View', label:'No Documents',            state:build(lob,{promptLevel:'l1',testMode:true,docs:[]})},
+      {id:'det-docs-matched', group:'Prompt Detail', label:'Docs — All Matched',  state:build(lob,{promptLevel:'l1',docs:matched})},
+      {id:'det-docs-miss',    group:'Prompt Detail', label:'Docs — All Mismatch', state:build(lob,{promptLevel:'l1',docs:mismatch})},
+      {id:'det-docs-mixed',   group:'Prompt Detail', label:'Docs — Mixed',        state:build(lob,{promptLevel:'l1',docs:mixed})},
+      {id:'det-docs-lowconf', group:'Prompt Detail', label:'Docs — Low Conf',     state:build(lob,{promptLevel:'l1',docs:lowConf})},
       {id:'doc-empty',   group:'Documents', label:'Empty Library',  state:build(lob,{promptLevel:'l1',docs:[]})},
       {id:'doc-pending', group:'Documents', label:'All Pending',    state:build(lob,{promptLevel:'l1',docs:pending})},
       {id:'doc-tested',  group:'Documents', label:'All Tested',     state:build(lob,{promptLevel:'l1',docs:matched})},
