@@ -1426,12 +1426,17 @@ body.dev-on .ov-page{padding-top:84px}
 .dtree__page-row:hover .dtree__page-cb,.dtree__page-row--selected .dtree__page-cb{opacity:1}
 .dtree__page-row--selected .dtree__page-cb{background:#003781;border-color:#003781}
 .dtree__page-row--selected{background:#ddeaff;color:#003781}
-.dtree__bulk-bar{display:flex;align-items:center;gap:4px;padding:5px 8px;background:#1a1a2e;margin:2px 8px 2px;border-radius:6px;flex-wrap:nowrap}
-.dtree__bulk-count{font-size:11px;font-weight:600;color:#fff;flex:1;white-space:nowrap}
-.dtree__bulk-btn{background:none;border:none;cursor:pointer;color:rgba(255,255,255,.8);font-size:11px;padding:3px 7px;border-radius:4px;font-family:inherit;white-space:nowrap;transition:background .1s;flex-shrink:0}
-.dtree__bulk-btn:hover{background:rgba(255,255,255,.18);color:#fff}
-.dtree__bulk-btn--danger:hover{background:rgba(220,38,38,.35);color:#fca5a5}
-.dtree__bulk-sep{width:1px;height:12px;background:rgba(255,255,255,.2);flex-shrink:0}
+.dtree__bulk-bar{display:flex;flex-direction:column;gap:4px;padding:6px 8px;background:#1a1a2e;margin:2px 8px 2px;border-radius:6px}
+.dtree__bulk-row1{display:flex;align-items:center}
+.dtree__bulk-count{font-size:11px;font-weight:600;color:#fff;flex:1}
+.dtree__bulk-clear{background:none;border:none;cursor:pointer;color:rgba(255,255,255,.6);font-size:13px;padding:0 2px;line-height:1;font-family:inherit}
+.dtree__bulk-clear:hover{color:#fff}
+.dtree__bulk-row2{display:flex;align-items:center;gap:4px}
+.dtree__bulk-btn{background:rgba(255,255,255,.1);border:none;cursor:pointer;color:rgba(255,255,255,.9);font-size:11px;padding:3px 7px;border-radius:4px;font-family:inherit;white-space:nowrap;transition:background .1s;flex:1;text-align:center}
+.dtree__bulk-btn:hover{background:rgba(255,255,255,.22);color:#fff}
+.dtree__bulk-btn--danger{background:rgba(220,38,38,.25)}
+.dtree__bulk-btn--danger:hover{background:rgba(220,38,38,.45);color:#fca5a5}
+.dtree__bulk-sep{display:none}
 .dtree__collapse{padding:8px;border-top:1px solid #ebebeb;display:flex;justify-content:flex-end}
 .dtree__collapse-btn{background:none;border:none;cursor:pointer;color:#767676;font-size:12px;padding:4px 8px;border-radius:4px;font-family:inherit}
 .dtree__collapse-btn:hover{background:#f5f5f5}
@@ -4198,14 +4203,15 @@ function DocTree({expanded,setExpanded,active,setActive}){
           <div>
             {selPages?.docId===d.id&&selPages.indices.size>0&&(
               <div className="dtree__bulk-bar">
-                <span className="dtree__bulk-count">{selPages.indices.size} page{selPages.indices.size>1?'s':''}</span>
-                <button className="dtree__bulk-btn" onClick={()=>setBulkMoveOpen(true)}>Move to doc</button>
-                <div className="dtree__bulk-sep"/>
-                <button className="dtree__bulk-btn" onClick={handleBulkNewDoc}>New doc</button>
-                <div className="dtree__bulk-sep"/>
-                <button className="dtree__bulk-btn dtree__bulk-btn--danger" onClick={handleBulkDelete}>Delete</button>
-                <div className="dtree__bulk-sep"/>
-                <button className="dtree__bulk-btn" onClick={()=>setSelPages(null)}>×</button>
+                <div className="dtree__bulk-row1">
+                  <span className="dtree__bulk-count">{selPages.indices.size} page{selPages.indices.size>1?'s':''} selected</span>
+                  <button className="dtree__bulk-clear" onClick={()=>setSelPages(null)}>×</button>
+                </div>
+                <div className="dtree__bulk-row2">
+                  <button className="dtree__bulk-btn" onClick={()=>setBulkMoveOpen(true)}>Move</button>
+                  <button className="dtree__bulk-btn" onClick={handleBulkNewDoc}>Split</button>
+                  <button className="dtree__bulk-btn dtree__bulk-btn--danger" onClick={handleBulkDelete}>Delete</button>
+                </div>
               </div>
             )}
             {renderPages(d,depth)}
