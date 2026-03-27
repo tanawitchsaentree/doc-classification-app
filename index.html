@@ -3803,12 +3803,12 @@ function CompletionHome({onOpen}){
 
 /* ── Completion Detail ── */
 const CMP_TREE=[
-  {id:'unclassified',type:'category',label:'UnClassified',icon:'📄',docs:[
+  {id:'unclassified',type:'category',label:'UnClassified',docs:[
     {id:'uc-d1',type:'document',label:'Document 1',pages:['Page 1','Page 2']},
     {id:'uc-d2',type:'document',label:'Document 2',pages:['Page 1']},
     {id:'uc-d3',type:'document',label:'Document 3',pages:[]},
   ]},
-  {id:'claim',type:'category',label:'Claim',icon:'📋',docs:[
+  {id:'claim',type:'category',label:'Claim',docs:[
     {id:'claim-reports',type:'group',label:'Claim Reports',docs:[
       {id:'cr-d1',type:'document',label:'Document 1',pages:['Page 1','Page 2','Page 3']},
       {id:'cr-d2',type:'document',label:'Document 2',pages:['Page 1']},
@@ -3816,15 +3816,15 @@ const CMP_TREE=[
     ]},
     {id:'claim-d1',type:'document',label:'Claim Document A',pages:['Page 1']},
   ]},
-  {id:'invoices',type:'category',label:'Invoices',icon:'🧾',docs:[
+  {id:'invoices',type:'category',label:'Invoices',docs:[
     {id:'tax-inv',type:'group',label:'Tax Invoices',docs:[
       {id:'ti-d1',type:'document',label:'Invoice #001',pages:['Page 1']},
       {id:'ti-d2',type:'document',label:'Invoice #002',pages:['Page 1','Page 2']},
     ]},
   ]},
-  {id:'contracts',type:'category',label:'Contracts',icon:'📝',docs:[]},
-  {id:'financial',type:'category',label:'Financial Statements',icon:'📊',docs:[]},
-  {id:'quote',type:'category',label:'Quote Request',icon:'💬',docs:[]},
+  {id:'contracts',type:'category',label:'Contracts',docs:[]},
+  {id:'financial',type:'category',label:'Financial Statements',docs:[]},
+  {id:'quote',type:'category',label:'Quote Request',docs:[]},
 ];
 
 function BulkMoveModal({tree,excludeDocId,count,onMove,onClose}){
@@ -4205,7 +4205,7 @@ function DocTree({expanded,setExpanded,active,setActive}){
             }
           })}
           onClick={()=>{setActive(d.id);if(hasChildren)toggle(d.id);}}>
-          <span style={{fontSize:11,color:'#aaa'}}>{isGroup?'📂':'📄'}</span>
+          <span style={{color:'#aaa',display:'flex',alignItems:'center'}}>{isGroup?<IC.Folder s={13}/>:<IC.File/>}</span>
           <span style={{flex:1}}>{d.label}</span>
           {hasChildren&&<span className="dtree__chev" style={{transform:isOpen?'rotate(0)':'rotate(-90deg)'}}><IC.ChevDown s={10}/></span>}
           <button className="dtree__more-btn" onClick={e=>openCtx(e,d.id,catId,isGroup)}>⋮</button>
@@ -4231,7 +4231,7 @@ function DocTree({expanded,setExpanded,active,setActive}){
                 onDragLeave={onLeave}
                 onDrop={e=>onDrop(e,()=>moveNodeToCat(drag.current.nodeId,cat.id))}
                 onClick={()=>{setActive(cat.id);if(hasDocs)toggle(cat.id);}}>
-                <span className="dtree__cat-ico">{cat.icon||'📁'}</span>
+                <span className="dtree__cat-ico"><IC.Folder s={14}/></span>
                 <span>{cat.label}</span>
                 {hasDocs&&<span className="dtree__chev" style={{transform:isOpen?'rotate(0)':'rotate(-90deg)'}}><IC.ChevDown s={10}/></span>}
               </div>
