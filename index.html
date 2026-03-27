@@ -2146,7 +2146,7 @@ function LobPromptSection({lobName,prompt,defaultPrompt,meta,saveState,onEdit,on
                     ?null
                     :accuracy!==null&&!stale&&!runningIds.size&&onApprove&&(
                         <button className="run-test-publish" onClick={()=>setShowPublishModal(true)}>
-                          {approvedSnap?'↑ Re-approve':'Approve for Production'}
+                          Approve for Production
                         </button>
                       )}
               <button className="run-test-btn" disabled={runningIds.size>0||selectedFiles.length===0} onClick={runTest}>
@@ -2924,7 +2924,7 @@ function Workspace({activeL1Tab,setActiveL1Tab,activeTab,setActiveTab,l1Items,pr
                     ?null
                     :accuracy!==null&&!stale&&!runningIds.size&&onApprove&&(
                         <button className="run-test-publish" onClick={()=>setShowPublishModal(true)}>
-                          {approvedSnap?'↑ Re-approve':'Approve for Production'}
+                          Approve for Production
                         </button>
                       )}
               <button className="run-test-btn" disabled={runningIds.size>0||selectedFiles.length===0} onClick={runTest}>
