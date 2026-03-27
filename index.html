@@ -1422,6 +1422,16 @@ body.dev-on .ov-page{padding-top:84px}
 .dtree__page-row--active{background:#ddeaff;color:#003781}
 .dtree__del{margin-left:auto;background:none;border:none;cursor:pointer;color:#ccc;padding:2px 4px;border-radius:3px;font-size:11px;line-height:1;flex-shrink:0}
 .dtree__del:hover{color:#cc0000;background:#fce8e8}
+.dtree__page-cb{flex-shrink:0;width:14px;height:14px;border:1.5px solid #ccc;border-radius:3px;cursor:pointer;margin-right:4px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;background:#fff;transition:all .1s;opacity:0}
+.dtree__page-row:hover .dtree__page-cb,.dtree__page-row--selected .dtree__page-cb{opacity:1}
+.dtree__page-row--selected .dtree__page-cb{background:#003781;border-color:#003781}
+.dtree__page-row--selected{background:#ddeaff;color:#003781}
+.dtree__bulk-bar{display:flex;align-items:center;gap:4px;padding:5px 8px;background:#1a1a2e;margin:2px 8px 2px;border-radius:6px;flex-wrap:nowrap}
+.dtree__bulk-count{font-size:11px;font-weight:600;color:#fff;flex:1;white-space:nowrap}
+.dtree__bulk-btn{background:none;border:none;cursor:pointer;color:rgba(255,255,255,.8);font-size:11px;padding:3px 7px;border-radius:4px;font-family:inherit;white-space:nowrap;transition:background .1s;flex-shrink:0}
+.dtree__bulk-btn:hover{background:rgba(255,255,255,.18);color:#fff}
+.dtree__bulk-btn--danger:hover{background:rgba(220,38,38,.35);color:#fca5a5}
+.dtree__bulk-sep{width:1px;height:12px;background:rgba(255,255,255,.2);flex-shrink:0}
 .dtree__collapse{padding:8px;border-top:1px solid #ebebeb;display:flex;justify-content:flex-end}
 .dtree__collapse-btn{background:none;border:none;cursor:pointer;color:#767676;font-size:12px;padding:4px 8px;border-radius:4px;font-family:inherit}
 .dtree__collapse-btn:hover{background:#f5f5f5}
@@ -1485,6 +1495,20 @@ body.dev-on .ov-page{padding-top:84px}
 .dtree__doc-row--drop{background:#ddeaff!important;outline:1px dashed #003781;border-radius:3px}
 .dtree__insert-line{height:3px;background:#003781;border-radius:2px;margin:0 8px;transition:opacity .1s}
 .dtree__drag-ghost{opacity:.35;pointer-events:none}
+/* Context menu */
+.dtree-ctx{position:fixed;background:#fff;border:1px solid #d4d4d4;border-radius:6px;box-shadow:0 4px 16px rgba(0,0,0,.14);z-index:300;min-width:190px;padding:4px 0}
+.dtree-ctx__item{display:block;width:100%;padding:9px 16px;font-size:13px;color:#1a1a2e;background:none;border:none;cursor:pointer;text-align:left;font-family:inherit;transition:background .1s}
+.dtree-ctx__item:hover{background:#f5f5f5}
+.dtree-ctx__item--danger{color:#cc0000}
+.dtree-ctx__item--danger:hover{background:#fce8e8}
+.dtree-ctx__sep{height:1px;background:#ebebeb;margin:3px 0}
+.dtree__more-btn{background:none;border:none;cursor:pointer;color:#aaa;padding:2px 5px;border-radius:3px;font-size:13px;opacity:0;transition:opacity .1s;line-height:1;flex-shrink:0;font-family:inherit}
+.dtree__doc-row:hover .dtree__more-btn,.dtree__doc-row--active .dtree__more-btn{opacity:1}
+.dtree__more-btn:hover{color:#003781;background:#e0ecff}
+/* Split & assign modal rows */
+.sa-row{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid #f0f0f0}
+.sa-row:last-child{border-bottom:none}
+.sa-row__pg{font-size:13px;font-weight:500;color:#1a1a2e;min-width:64px}
 
 </style>
 </head>
@@ -3777,36 +3801,124 @@ function CompletionHome({onOpen}){
 
 /* ── Completion Detail ── */
 const CMP_TREE=[
-  {id:'unclassified',label:'UnClassified',count:2,icon:'📄',docs:[
-    {id:'uc-d1',label:'Document 1',pages:['Page 1']},
-    {id:'uc-d2',label:'Document 2',pages:[]},
+  {id:'unclassified',type:'category',label:'UnClassified',icon:'📄',docs:[
+    {id:'uc-d1',type:'document',label:'Document 1',pages:['Page 1','Page 2']},
+    {id:'uc-d2',type:'document',label:'Document 2',pages:['Page 1']},
+    {id:'uc-d3',type:'document',label:'Document 3',pages:[]},
   ]},
-  {id:'claim',label:'Claim',count:3,icon:'📋',docs:[
-    {id:'claim-reports',label:'Claim reports',count:3,docs:[
-      {id:'cr-d1',label:'Document 1',pages:['Page 1','Page 2','Page 3']},
-      {id:'cr-d2',label:'Document 2',pages:[]},
-      {id:'cr-d3',label:'Document 3',pages:[]},
+  {id:'claim',type:'category',label:'Claim',icon:'📋',docs:[
+    {id:'claim-reports',type:'group',label:'Claim Reports',docs:[
+      {id:'cr-d1',type:'document',label:'Document 1',pages:['Page 1','Page 2','Page 3']},
+      {id:'cr-d2',type:'document',label:'Document 2',pages:['Page 1']},
+      {id:'cr-d3',type:'document',label:'Document 3',pages:[]},
+    ]},
+    {id:'claim-d1',type:'document',label:'Claim Document A',pages:['Page 1']},
+  ]},
+  {id:'invoices',type:'category',label:'Invoices',icon:'🧾',docs:[
+    {id:'tax-inv',type:'group',label:'Tax Invoices',docs:[
+      {id:'ti-d1',type:'document',label:'Invoice #001',pages:['Page 1']},
+      {id:'ti-d2',type:'document',label:'Invoice #002',pages:['Page 1','Page 2']},
     ]},
   ]},
-  {id:'invoices',label:'Invoices',count:2,icon:'🧾',docs:[]},
-  {id:'contracts',label:'Contracts',count:3,icon:'📝',docs:[]},
-  {id:'financial',label:'FinancialStatements',icon:'📊',docs:[]},
-  {id:'quote',label:'Quote Request',count:2,icon:'💬',docs:[]},
+  {id:'contracts',type:'category',label:'Contracts',icon:'📝',docs:[]},
+  {id:'financial',type:'category',label:'Financial Statements',icon:'📊',docs:[]},
+  {id:'quote',type:'category',label:'Quote Request',icon:'💬',docs:[]},
 ];
+
+function BulkMoveModal({tree,excludeDocId,count,onMove,onClose}){
+  const docs=[];
+  const collect=nodes=>nodes.forEach(n=>{if(n.type==='document'&&n.id!==excludeDocId)docs.push(n);if(n.docs)collect(n.docs);});
+  tree.forEach(cat=>cat.docs&&collect(cat.docs));
+  return(
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal" style={{maxWidth:340}} onClick={e=>e.stopPropagation()}>
+        <div className="modal__header">
+          <span className="modal__title">Move {count} page{count>1?'s':''} to</span>
+          <button className="modal__close" onClick={onClose}>✕</button>
+        </div>
+        <div className="modal__body" style={{padding:'6px 0',maxHeight:280,overflowY:'auto'}}>
+          {docs.length===0&&<p style={{padding:'8px 16px',fontSize:13,color:'#767676'}}>No other documents available.</p>}
+          {docs.map(d=>(
+            <button key={d.id} className="dtree-ctx__item" style={{display:'flex',alignItems:'center',gap:10}} onClick={()=>onMove(d.id)}>
+              <span style={{fontSize:11,color:'#aaa'}}>📄</span>
+              <span style={{flex:1}}>{d.label}</span>
+            </button>
+          ))}
+        </div>
+        <div className="modal__footer"><button className="btn btn-outline btn-sm" onClick={onClose}>Cancel</button></div>
+      </div>
+    </div>
+  );
+}
+
+function AssignCatModal({tree,nodeId,currentCatId,onAssign,onClose}){
+  return(
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal" style={{maxWidth:360}} onClick={e=>e.stopPropagation()}>
+        <div className="modal__header"><span className="modal__title">Move to category</span><button className="modal__close" onClick={onClose}>✕</button></div>
+        <div className="modal__body" style={{padding:'6px 0'}}>
+          {tree.map(c=>(
+            <button key={c.id} className="dtree-ctx__item" style={{display:'flex',alignItems:'center',gap:10,background:currentCatId===c.id?'#e8effa':undefined}}
+              onClick={()=>onAssign(nodeId,c.id)}>
+              <span>{c.icon||'📁'}</span>
+              <span style={{flex:1}}>{c.label}</span>
+              {currentCatId===c.id&&<span style={{fontSize:11,color:'#003781',fontWeight:600}}>Current</span>}
+            </button>
+          ))}
+        </div>
+        <div className="modal__footer"><button className="btn btn-outline btn-sm" onClick={onClose}>Cancel</button></div>
+      </div>
+    </div>
+  );
+}
+
+function SplitAssignModal({tree,doc,currentCatId,onConfirm,onClose}){
+  const [asgn,setAsgn]=useState((doc.pages||[]).map(pg=>({page:pg,catId:currentCatId||tree[0]?.id||''})));
+  const set=(i,catId)=>setAsgn(a=>a.map((x,j)=>j===i?{...x,catId}:x));
+  return(
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal" style={{maxWidth:480}} onClick={e=>e.stopPropagation()}>
+        <div className="modal__header"><span className="modal__title">Split and assign — {doc.label}</span><button className="modal__close" onClick={onClose}>✕</button></div>
+        <div className="modal__body">
+          <p style={{fontSize:12,color:'#767676',marginBottom:12}}>Each page becomes a separate document. Assign a category to each.</p>
+          {asgn.length===0&&<p style={{fontSize:13,color:'#767676'}}>This document has no pages to split.</p>}
+          {asgn.map((a,i)=>(
+            <div key={i} className="sa-row">
+              <span className="sa-row__pg">{a.page}</span>
+              <select className="ov-select" style={{flex:1}} value={a.catId} onChange={e=>set(i,e.target.value)}>
+                {tree.map(c=><option key={c.id} value={c.id}>{c.label}</option>)}
+              </select>
+            </div>
+          ))}
+        </div>
+        <div className="modal__footer">
+          <button className="btn btn-outline btn-sm" onClick={onClose}>Cancel</button>
+          <button className="btn btn-primary btn-sm" disabled={asgn.length===0} onClick={()=>onConfirm(asgn)}>Split & assign →</button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function DocTree({expanded,setExpanded,active,setActive}){
   const [tree,setTree]=useState(()=>JSON.parse(JSON.stringify(CMP_TREE)));
-  const [drop,setDrop]=useState(null); // {id:string, pos:'before'|'after'|'into'}
-  const drag=useRef(null); // {type:'document'|'page', docId, pageIdx?}
+  const [drop,setDrop]=useState(null); // {id, pos:'before'|'after'|'into'}
+  const drag=useRef(null);
+  const [ctx,setCtx]=useState(null); // {nodeId,catId,isGroup,x,y}
+  const [assignModal,setAssignModal]=useState(null); // {nodeId,catId}
+  const [splitModal,setSplitModal]=useState(null); // {doc,catId}
+  const [selPages,setSelPages]=useState(null); // {docId, indices: Set<number>}
+  const [bulkMoveOpen,setBulkMoveOpen]=useState(false);
+  const selLastIdx=useRef(null);
   const toggle=id=>setExpanded(p=>({...p,[id]:!p[id]}));
   const clone=t=>JSON.parse(JSON.stringify(t));
 
-  /* ── helpers ── */
-  const findDoc=(tr,docId)=>{
+  /* ── find any node (group or document) recursively ── */
+  const findNode=(tr,nodeId)=>{
     for(let ci=0;ci<tr.length;ci++){
       const search=docs=>{
         for(let di=0;di<docs.length;di++){
-          if(docs[di].id===docId)return{catIdx:ci,catId:tr[ci].id,parentDocs:docs,docIdx:di,doc:docs[di]};
+          if(docs[di].id===nodeId)return{catIdx:ci,catId:tr[ci].id,parentDocs:docs,nodeIdx:di,node:docs[di]};
           if(docs[di].docs?.length){const r=search(docs[di].docs);if(r)return r;}
         }return null;
       };
@@ -3814,50 +3926,179 @@ function DocTree({expanded,setExpanded,active,setActive}){
     }return null;
   };
 
-  const moveDocToCat=(docId,catId)=>setTree(prev=>{
-    const t=clone(prev);const loc=findDoc(t,docId);
+  /* ── move node to root of a category ── */
+  const moveNodeToCat=(nodeId,catId)=>setTree(prev=>{
+    const t=clone(prev);const loc=findNode(t,nodeId);
     if(!loc||loc.catId===catId)return prev;
-    const[doc]=loc.parentDocs.splice(loc.docIdx,1);
+    const[node]=loc.parentDocs.splice(loc.nodeIdx,1);
     const cat=t.find(c=>c.id===catId);if(!cat)return prev;
-    cat.docs.push(doc);return t;
+    cat.docs.push(node);return t;
   });
 
-  const moveDocRelative=(docId,refId,pos)=>{
-    if(docId===refId)return;
+  /* ── move node before/after a sibling ── */
+  const moveNodeRelative=(nodeId,refId,pos)=>{
+    if(nodeId===refId)return;
     setTree(prev=>{
       const t=clone(prev);
-      const src=findDoc(t,docId);const ref=findDoc(t,refId);
+      const src=findNode(t,nodeId);const ref=findNode(t,refId);
       if(!src||!ref)return prev;
-      const[doc]=src.parentDocs.splice(src.docIdx,1);
+      const[node]=src.parentDocs.splice(src.nodeIdx,1);
       const ri=ref.parentDocs.findIndex(d=>d.id===refId);
-      ref.parentDocs.splice(pos==='before'?ri:ri+1,0,doc);
+      if(ri===-1)return prev;
+      ref.parentDocs.splice(pos==='before'?ri:ri+1,0,node);
       return t;
     });
   };
 
+  /* ── move node into a group ── */
+  const moveNodeIntoGroup=(nodeId,groupId)=>{
+    if(nodeId===groupId)return;
+    setTree(prev=>{
+      const t=clone(prev);
+      const src=findNode(t,nodeId);const grp=findNode(t,groupId);
+      if(!src||!grp||!grp.node.docs)return prev;
+      const[node]=src.parentDocs.splice(src.nodeIdx,1);
+      grp.node.docs.push(node);return t;
+    });
+  };
+
+  /* ── move page between/within documents ── */
   const movePage=(fromDocId,fromPi,toDocId,toPi)=>setTree(prev=>{
     const t=clone(prev);
-    const from=findDoc(t,fromDocId);const to=findDoc(t,toDocId);
+    const from=findNode(t,fromDocId);const to=findNode(t,toDocId);
     if(!from||!to)return prev;
-    const[pg]=from.doc.pages.splice(fromPi,1);
-    let ins=toPi!==undefined?toPi:to.doc.pages.length;
+    const[pg]=from.node.pages.splice(fromPi,1);
+    let ins=toPi!==undefined?toPi:to.node.pages.length;
     if(fromDocId===toDocId&&fromPi<ins)ins--;
-    to.doc.pages.splice(Math.max(0,ins),0,pg);
+    to.node.pages.splice(Math.max(0,ins),0,pg);
     return t;
   });
+
+  /* ── context menu actions ── */
+  const handleAssign=(nodeId,catId)=>{moveNodeToCat(nodeId,catId);setAssignModal(null);};
+  const handleSplit=(nodeId)=>{
+    setTree(prev=>{
+      const t=clone(prev);const loc=findNode(t,nodeId);
+      if(!loc||!loc.node.pages?.length)return prev;
+      const newDocs=loc.node.pages.map((pg,i)=>({
+        id:`${nodeId}-sp${i}-${Date.now()+i}`,type:'document',
+        label:`${loc.node.label} (${pg})`,pages:[pg]
+      }));
+      loc.parentDocs.splice(loc.nodeIdx,1,...newDocs);
+      return t;
+    });
+    setCtx(null);
+  };
+  const handleSplitAssign=(asgn)=>{
+    const{doc}=splitModal;
+    setTree(prev=>{
+      const t=clone(prev);const loc=findNode(t,doc.id);
+      if(!loc)return prev;
+      loc.parentDocs.splice(loc.nodeIdx,1);
+      asgn.forEach(({page,catId:cid},i)=>{
+        const newDoc={id:`${doc.id}-sa${i}-${Date.now()+i}`,type:'document',label:`${doc.label} (${page})`,pages:[page]};
+        const cat=t.find(c=>c.id===cid);if(cat)cat.docs.push(newDoc);
+      });
+      return t;
+    });
+    setSplitModal(null);setCtx(null);
+  };
+  const handleDelete=(nodeId)=>{
+    setTree(prev=>{
+      const t=clone(prev);const loc=findNode(t,nodeId);
+      if(!loc)return prev;
+      loc.parentDocs.splice(loc.nodeIdx,1);return t;
+    });
+    setCtx(null);
+  };
+  const openCtx=(e,nodeId,catId,isGroup)=>{
+    e.stopPropagation();e.preventDefault();
+    setCtx({nodeId,catId,isGroup,x:e.clientX,y:e.clientY});
+  };
+
+  /* ── page multi-selection ── */
+  const togglePage=(e,docId,pi)=>{
+    e.stopPropagation();
+    if(e.shiftKey&&selPages?.docId===docId&&selLastIdx.current!==null){
+      const lo=Math.min(selLastIdx.current,pi);
+      const hi=Math.max(selLastIdx.current,pi);
+      const newIdx=new Set(selPages.indices);
+      for(let i=lo;i<=hi;i++)newIdx.add(i);
+      setSelPages({docId,indices:newIdx});
+    }else{
+      if(selPages?.docId!==docId){
+        setSelPages({docId,indices:new Set([pi])});
+      }else{
+        const newIdx=new Set(selPages.indices);
+        if(newIdx.has(pi))newIdx.delete(pi);else newIdx.add(pi);
+        setSelPages(newIdx.size>0?{docId,indices:newIdx}:null);
+      }
+      selLastIdx.current=pi;
+    }
+  };
+
+  /* ── move multiple pages ── */
+  const movePagesMulti=(fromDocId,indices,toDocId,toPi)=>setTree(prev=>{
+    const t=clone(prev);
+    const from=findNode(t,fromDocId);const to=findNode(t,toDocId);
+    if(!from||!to)return prev;
+    const sorted=[...indices].sort((a,b)=>b-a);
+    const pages=sorted.map(i=>from.node.pages[i]);
+    sorted.forEach(i=>from.node.pages.splice(i,1));
+    pages.reverse();
+    let ins=toPi!==undefined?toPi:to.node.pages.length;
+    if(fromDocId===toDocId){const removedBefore=sorted.filter(i=>i<ins).length;ins=Math.max(0,ins-removedBefore);}
+    to.node.pages.splice(ins,0,...pages);
+    return t;
+  });
+
+  /* ── bulk action handlers ── */
+  const handleBulkMove=(toDocId)=>{
+    if(!selPages)return;
+    movePagesMulti(selPages.docId,[...selPages.indices],toDocId,undefined);
+    setSelPages(null);setBulkMoveOpen(false);
+  };
+  const handleBulkNewDoc=()=>{
+    if(!selPages)return;
+    setTree(prev=>{
+      const t=clone(prev);const loc=findNode(t,selPages.docId);
+      if(!loc)return prev;
+      const sorted=[...selPages.indices].sort((a,b)=>a-b);
+      const pages=sorted.map(i=>loc.node.pages[i]);
+      [...sorted].reverse().forEach(i=>loc.node.pages.splice(i,1));
+      const newDoc={id:`nd-${Date.now()}`,type:'document',label:`${loc.node.label} (split)`,pages};
+      loc.parentDocs.splice(loc.nodeIdx+1,0,newDoc);
+      return t;
+    });
+    setSelPages(null);
+  };
+  const handleBulkDelete=()=>{
+    if(!selPages)return;
+    setTree(prev=>{
+      const t=clone(prev);const loc=findNode(t,selPages.docId);
+      if(!loc)return prev;
+      [...selPages.indices].sort((a,b)=>b-a).forEach(i=>loc.node.pages.splice(i,1));
+      return t;
+    });
+    setSelPages(null);
+  };
 
   /* ── drag handlers ── */
   const onStart=(e,info)=>{drag.current=info;e.dataTransfer.effectAllowed='move';e.stopPropagation();};
   const onEnd=()=>{setDrop(null);drag.current=null;};
   const onLeave=e=>{if(!e.currentTarget.contains(e.relatedTarget))setDrop(null);};
-  const getPos=e=>{const r=e.currentTarget.getBoundingClientRect();return e.clientY<r.top+r.height/2?'before':'after';};
-
+  // 3-zone for groups (top 25% before, mid into, bottom 25% after), 2-zone for docs
+  const getZone=(e,isGroupTarget)=>{
+    const r=e.currentTarget.getBoundingClientRect();
+    const pct=(e.clientY-r.top)/r.height;
+    if(!isGroupTarget)return pct<0.5?'before':'after';
+    if(pct<0.25)return'before';if(pct>0.75)return'after';return'into';
+  };
   const onOver=(e,id,pos,valid)=>{
     e.preventDefault();e.stopPropagation();
     if(valid){e.dataTransfer.dropEffect='move';setDrop({id,pos});}
     else e.dataTransfer.dropEffect='none';
   };
-
   const onDrop=(e,handler)=>{
     e.preventDefault();e.stopPropagation();
     if(drag.current)handler();
@@ -3870,62 +4111,112 @@ function DocTree({expanded,setExpanded,active,setActive}){
   );
 
   /* ── render pages ── */
-  const renderPages=(doc,depth)=>doc.pages?.map((pg,pi)=>(
-    <div key={pi}
-      draggable
-      onDragStart={e=>onStart(e,{type:'page',docId:doc.id,pageIdx:pi})}
-      onDragEnd={onEnd}
-      onDragOver={e=>{if(drag.current?.type!=='page')return;const pos=getPos(e);onOver(e,`p-${doc.id}-${pi}`,pos,true);}}
-      onDragLeave={onLeave}
-      onDrop={e=>onDrop(e,()=>{const pos=drop?.pos||'after';movePage(drag.current.docId,drag.current.pageIdx,doc.id,pos==='before'?pi:pi+1);})}>
-      {drop?.id===`p-${doc.id}-${pi}`&&drop.pos==='before'&&<InsLine id={`p-${doc.id}-${pi}`}/>}
-      <div className={`dtree__page-row${active===doc.id+pg?' dtree__page-row--active':''}${drag.current?.type==='page'&&drag.current.docId===doc.id&&drag.current.pageIdx===pi?' dtree__drag-ghost':''}`}
-        style={{paddingLeft:28+depth*12}} onClick={()=>setActive(doc.id+pg)}>
-        <span style={{flex:1}}>{pg}</span>
-        <button className="dtree__del" onClick={e=>e.stopPropagation()}>🗑</button>
+  const renderPages=(doc,depth)=>doc.pages?.map((pg,pi)=>{
+    const isSel=selPages?.docId===doc.id&&selPages.indices.has(pi);
+    const isDraggingSingle=drag.current?.type==='page'&&drag.current.docId===doc.id&&drag.current.pageIdx===pi;
+    const isDraggingMulti=drag.current?.type==='pages'&&drag.current.docId===doc.id&&drag.current.indices?.has(pi);
+    const isDragging=isDraggingSingle||isDraggingMulti;
+    const dropId=`p-${doc.id}-${pi}`;
+    return(
+      <div key={`${doc.id}-pg-${pi}`}
+        draggable
+        onDragStart={e=>{
+          if(isSel&&selPages.indices.size>1){
+            onStart(e,{type:'pages',docId:doc.id,indices:new Set(selPages.indices)});
+          }else{
+            onStart(e,{type:'page',docId:doc.id,pageIdx:pi});
+          }
+        }}
+        onDragEnd={onEnd}
+        onDragOver={e=>{
+          const dt=drag.current?.type;
+          if(dt==='page'||dt==='pages'){const pos=getZone(e,false);onOver(e,dropId,pos,true);}
+        }}
+        onDragLeave={onLeave}
+        onDrop={e=>onDrop(e,()=>{
+          const ins=drop?.pos==='before'?pi:pi+1;
+          if(drag.current.type==='page')movePage(drag.current.docId,drag.current.pageIdx,doc.id,ins);
+          else if(drag.current.type==='pages')movePagesMulti(drag.current.docId,[...drag.current.indices],doc.id,ins);
+        })}>
+        {drop?.id===dropId&&drop.pos==='before'&&<InsLine id={dropId}/>}
+        <div className={`dtree__page-row${active===doc.id+pg?' dtree__page-row--active':''}${isDragging?' dtree__drag-ghost':''}${isSel?' dtree__page-row--selected':''}`}
+          style={{paddingLeft:10+depth*12}} onClick={()=>setActive(doc.id+pg)}>
+          <div className="dtree__page-cb" onClick={e=>togglePage(e,doc.id,pi)}>{isSel&&'✓'}</div>
+          <span style={{flex:1}}>{pg}</span>
+          <button className="dtree__del" onClick={e=>e.stopPropagation()}>🗑</button>
+        </div>
+        {drop?.id===dropId&&drop.pos==='after'&&<InsLine id={dropId}/>}
       </div>
-      {drop?.id===`p-${doc.id}-${pi}`&&drop.pos==='after'&&<InsLine id={`p-${doc.id}-${pi}`}/>}
-    </div>
-  ));
+    );
+  });
 
-  /* ── render docs ── */
-  const renderDocs=(docs,catId,depth=0)=>docs.map((d,di)=>{
-    const isGroup=!!d.docs;const isOpen=expanded[d.id];
-    const isDragging=drag.current?.type==='document'&&drag.current.docId===d.id;
-    const isDropTarget=drop?.id===d.id;
+  /* ── render nodes (groups + documents, any depth) ── */
+  const renderDocs=(docs,catId,depth=0)=>docs.map(d=>{
+    const isGroup=d.type==='group';
+    const isOpen=expanded[d.id];
+    const isDragging=drag.current?.type==='node'&&drag.current.nodeId===d.id;
+    const isDropInto=drop?.id===d.id&&drop.pos==='into';
+    const hasChildren=isGroup?(d.docs?.length>0):(d.pages?.length>0);
     return(
       <div key={d.id}>
         {drop?.id===`bd-${d.id}`&&<InsLine id={`bd-${d.id}`}/>}
-        <div className={`dtree__doc-row${active===d.id?' dtree__doc-row--active':''}${isDragging?' dtree__drag-ghost':''}${isDropTarget?' dtree__doc-row--drop':''}`}
+        <div className={`dtree__doc-row${active===d.id?' dtree__doc-row--active':''}${isDragging?' dtree__drag-ghost':''}${isDropInto?' dtree__doc-row--drop':''}`}
           style={{paddingLeft:16+depth*12}}
-          draggable={!isGroup}
-          onDragStart={e=>!isGroup&&onStart(e,{type:'document',docId:d.id})}
+          draggable
+          onDragStart={e=>onStart(e,{type:'node',nodeId:d.id})}
           onDragEnd={onEnd}
           onDragOver={e=>{
             const dt=drag.current?.type;
-            if(dt==='document'&&!isGroup){const pos=getPos(e);onOver(e,pos==='before'?`bd-${d.id}`:`ad-${d.id}`,pos,true);}
-            else if(dt==='page'){onOver(e,d.id,'into',true);}
+            if(dt==='node'){
+              const zone=getZone(e,isGroup);
+              if(zone==='before')onOver(e,`bd-${d.id}`,'before',true);
+              else if(zone==='after')onOver(e,`ad-${d.id}`,'after',true);
+              else onOver(e,d.id,'into',true);
+            }else if(dt==='page'&&!isGroup){onOver(e,d.id,'into',true);}
             else e.preventDefault();
           }}
           onDragLeave={onLeave}
           onDrop={e=>onDrop(e,()=>{
-            if(drag.current.type==='document'){const pos=drop?.pos||'after';moveDocRelative(drag.current.docId,d.id,pos);}
-            else if(drag.current.type==='page'){movePage(drag.current.docId,drag.current.pageIdx,d.id,undefined);}
+            if(drag.current.type==='node'){
+              const pos=drop?.pos;
+              if(pos==='before')moveNodeRelative(drag.current.nodeId,d.id,'before');
+              else if(pos==='after')moveNodeRelative(drag.current.nodeId,d.id,'after');
+              else if(pos==='into'&&isGroup)moveNodeIntoGroup(drag.current.nodeId,d.id);
+            }else if(drag.current.type==='page'){
+              movePage(drag.current.docId,drag.current.pageIdx,d.id,undefined);
+            }
           })}
-          onClick={()=>{setActive(d.id);if(isGroup||d.pages?.length)toggle(d.id);}}>
-          <span style={{fontSize:11,color:'#aaa'}}>📄</span>
-          <span style={{flex:1}}>{d.label}{d.count?` (${d.count})`:''}</span>
-          {(isGroup||d.pages?.length>0)&&<span className="dtree__chev" style={{transform:isOpen?'rotate(0)':'rotate(-90deg)'}}><IC.ChevDown s={10}/></span>}
+          onClick={()=>{setActive(d.id);if(hasChildren)toggle(d.id);}}>
+          <span style={{fontSize:11,color:'#aaa'}}>{isGroup?'📂':'📄'}</span>
+          <span style={{flex:1}}>{d.label}</span>
+          {hasChildren&&<span className="dtree__chev" style={{transform:isOpen?'rotate(0)':'rotate(-90deg)'}}><IC.ChevDown s={10}/></span>}
+          <button className="dtree__more-btn" onClick={e=>openCtx(e,d.id,catId,isGroup)}>⋮</button>
         </div>
         {drop?.id===`ad-${d.id}`&&<InsLine id={`ad-${d.id}`}/>}
         {isOpen&&isGroup&&<div>{renderDocs(d.docs,catId,depth+1)}</div>}
-        {isOpen&&!isGroup&&d.pages?.length>0&&renderPages(d,depth)}
+        {isOpen&&!isGroup&&hasChildren&&(
+          <div>
+            {selPages?.docId===d.id&&selPages.indices.size>0&&(
+              <div className="dtree__bulk-bar">
+                <span className="dtree__bulk-count">{selPages.indices.size} page{selPages.indices.size>1?'s':''}</span>
+                <button className="dtree__bulk-btn" onClick={()=>setBulkMoveOpen(true)}>Move to doc</button>
+                <div className="dtree__bulk-sep"/>
+                <button className="dtree__bulk-btn" onClick={handleBulkNewDoc}>New doc</button>
+                <div className="dtree__bulk-sep"/>
+                <button className="dtree__bulk-btn dtree__bulk-btn--danger" onClick={handleBulkDelete}>Delete</button>
+                <div className="dtree__bulk-sep"/>
+                <button className="dtree__bulk-btn" onClick={()=>setSelPages(null)}>×</button>
+              </div>
+            )}
+            {renderPages(d,depth)}
+          </div>
+        )}
       </div>
     );
   });
 
   return(
-    <div className="dtree">
+    <div className="dtree" onClick={()=>{setCtx(null);setSelPages(null);}}>
       <button className="dtree__create">+ Create Document</button>
       <div className="dtree__tree">
         {tree.map(cat=>{
@@ -3934,12 +4225,12 @@ function DocTree({expanded,setExpanded,active,setActive}){
           return(
             <div key={cat.id} className="dtree__cat">
               <div className={`dtree__cat-row${active===cat.id?' dtree__cat-row--active':''}${isCatDrop?' dtree__cat-row--drop':''}`}
-                onDragOver={e=>drag.current?.type==='document'&&onOver(e,`cat-${cat.id}`,'into',true)}
+                onDragOver={e=>drag.current?.type==='node'&&onOver(e,`cat-${cat.id}`,'into',true)}
                 onDragLeave={onLeave}
-                onDrop={e=>onDrop(e,()=>moveDocToCat(drag.current.docId,cat.id))}
+                onDrop={e=>onDrop(e,()=>moveNodeToCat(drag.current.nodeId,cat.id))}
                 onClick={()=>{setActive(cat.id);if(hasDocs)toggle(cat.id);}}>
                 <span className="dtree__cat-ico">{cat.icon||'📁'}</span>
-                <span>{cat.label}{cat.count?<span className="dtree__cat-count"> ({cat.count})</span>:null}</span>
+                <span>{cat.label}</span>
                 {hasDocs&&<span className="dtree__chev" style={{transform:isOpen?'rotate(0)':'rotate(-90deg)'}}><IC.ChevDown s={10}/></span>}
               </div>
               {isOpen&&hasDocs&&<div className="dtree__sub">{renderDocs(cat.docs,cat.id)}</div>}
@@ -3948,6 +4239,20 @@ function DocTree({expanded,setExpanded,active,setActive}){
         })}
       </div>
       <div className="dtree__collapse"><button className="dtree__collapse-btn">«</button></div>
+      {ctx&&(
+        <div className="dtree-ctx" style={{top:ctx.y,left:ctx.x}} onClick={e=>e.stopPropagation()}>
+          <button className="dtree-ctx__item" onClick={()=>{setAssignModal({nodeId:ctx.nodeId,catId:ctx.catId});setCtx(null);}}>Move to category</button>
+          {!ctx.isGroup&&<>
+            <button className="dtree-ctx__item" onClick={()=>handleSplit(ctx.nodeId)}>Split document</button>
+            <button className="dtree-ctx__item" onClick={()=>{const loc=findNode(tree,ctx.nodeId);setSplitModal({doc:loc?.node,catId:ctx.catId});setCtx(null);}}>Split and assign</button>
+          </>}
+          <div className="dtree-ctx__sep"/>
+          <button className="dtree-ctx__item dtree-ctx__item--danger" onClick={()=>handleDelete(ctx.nodeId)}>Delete</button>
+        </div>
+      )}
+      {assignModal&&<AssignCatModal tree={tree} nodeId={assignModal.nodeId} currentCatId={assignModal.catId} onAssign={handleAssign} onClose={()=>setAssignModal(null)}/>}
+      {splitModal&&<SplitAssignModal tree={tree} doc={splitModal.doc} currentCatId={splitModal.catId} onConfirm={handleSplitAssign} onClose={()=>setSplitModal(null)}/>}
+      {bulkMoveOpen&&selPages&&<BulkMoveModal tree={tree} excludeDocId={selPages.docId} count={selPages.indices.size} onMove={handleBulkMove} onClose={()=>setBulkMoveOpen(false)}/>}
     </div>
   );
 }
