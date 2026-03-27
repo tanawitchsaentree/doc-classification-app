@@ -1422,6 +1422,8 @@ body.dev-on .ov-page{padding-top:84px}
 .dtree__doc-row{display:flex;align-items:center;gap:5px;padding:6px 10px 6px 16px;cursor:pointer;font-size:12px;color:#444;user-select:none}
 .dtree__doc-row:hover{background:#f5f5f5}
 .dtree__doc-row--active{background:#ddeaff;color:#003781}
+.dtree__doc-row--new{animation:node-flash 2s ease forwards}
+@keyframes node-flash{0%{background:#d1fae5;outline:1.5px solid #34d399}40%{background:#d1fae5;outline:1.5px solid #34d399}100%{background:transparent;outline:1.5px solid transparent}}
 .dtree__page-row{display:flex;align-items:center;padding:4px 8px 4px 28px;font-size:12px;color:#767676;cursor:pointer;user-select:none}
 .dtree__page-row:hover{background:#f5f5f5}
 .dtree__page-row--active{background:#ddeaff;color:#003781}
@@ -3960,7 +3962,9 @@ function DocTree({expanded,setExpanded,active,setActive}){
   const [selPages,setSelPages]=useState(null); // {docId, indices: Set<number>}
   const [bulkMoveOpen,setBulkMoveOpen]=useState(false);
   const [toast,setToast]=useState(null);
+  const [newNodeIds,setNewNodeIds]=useState(new Set());
   const showToast=msg=>{setToast(msg);setTimeout(()=>setToast(null),2500);};
+  const flashNodes=ids=>{setNewNodeIds(new Set(ids));setTimeout(()=>setNewNodeIds(new Set()),2000);};
   const selLastIdx=useRef(null);
   const toggle=id=>setExpanded(p=>({...p,[id]:!p[id]}));
   const clone=t=>JSON.parse(JSON.stringify(t));
@@ -4029,31 +4033,42 @@ function DocTree({expanded,setExpanded,active,setActive}){
   /* ── context menu actions ── */
   const handleAssign=(nodeId,catId)=>{moveNodeToCat(nodeId,catId);setAssignModal(null);};
   const handleSplit=(nodeId)=>{
+    const loc=findNode(tree,nodeId);
+    if(!loc||!loc.node.pages?.length){setCtx(null);return;}
+    const ts=Date.now();
+    const newIds=loc.node.pages.map((_,i)=>`${nodeId}-sp${i}-${ts+i}`);
+    const count=loc.node.pages.length;
     setTree(prev=>{
-      const t=clone(prev);const loc=findNode(t,nodeId);
-      if(!loc||!loc.node.pages?.length)return prev;
-      const newDocs=loc.node.pages.map((pg,i)=>({
-        id:`${nodeId}-sp${i}-${Date.now()+i}`,type:'document',
-        label:`${loc.node.label} (${pg})`,pages:[pg]
-      }));
-      loc.parentDocs.splice(loc.nodeIdx,1,...newDocs);
+      const t=clone(prev);const locT=findNode(t,nodeId);
+      if(!locT)return prev;
+      const newDocs=locT.node.pages.map((pg,i)=>({id:newIds[i],type:'document',label:`${locT.node.label} (${pg})`,pages:[pg]}));
+      locT.parentDocs.splice(locT.nodeIdx,1,...newDocs);
       return t;
     });
     setCtx(null);
+    flashNodes(newIds);
+    showToast(`Split into ${count} document${count>1?'s':''}`);
   };
   const handleSplitAssign=(asgn)=>{
     const{doc}=splitModal;
+    const ts=Date.now();
+    const newIds=asgn.map((_,i)=>`${doc.id}-sa${i}-${ts+i}`);
+    const catIds=[...new Set(asgn.map(a=>a.catId))];
     setTree(prev=>{
       const t=clone(prev);const loc=findNode(t,doc.id);
       if(!loc)return prev;
       loc.parentDocs.splice(loc.nodeIdx,1);
       asgn.forEach(({page,catId:cid},i)=>{
-        const newDoc={id:`${doc.id}-sa${i}-${Date.now()+i}`,type:'document',label:`${doc.label} (${page})`,pages:[page]};
+        const newDoc={id:newIds[i],type:'document',label:`${doc.label} (${page})`,pages:[page]};
         const cat=t.find(c=>c.id===cid);if(cat)cat.docs.push(newDoc);
       });
       return t;
     });
+    // expand target categories so user can see the new nodes
+    setExpanded(prev=>{const next={...prev};catIds.forEach(id=>{next[id]=true;});return next;});
     setSplitModal(null);setCtx(null);
+    flashNodes(newIds);
+    showToast(`Split into ${asgn.length} doc${asgn.length>1?'s':''} across ${catIds.length} categor${catIds.length>1?'ies':'y'}`);
   };
   const handleDelete=(nodeId)=>{
     setTree(prev=>{
@@ -4115,17 +4130,23 @@ function DocTree({expanded,setExpanded,active,setActive}){
   };
   const handleBulkNewDoc=()=>{
     if(!selPages)return;
+    const newId=`nd-${Date.now()}`;
+    const n=selPages.indices.size;
+    const srcLoc=findNode(tree,selPages.docId);
+    const srcLabel=srcLoc?.node?.label||'Document';
     setTree(prev=>{
       const t=clone(prev);const loc=findNode(t,selPages.docId);
       if(!loc)return prev;
       const sorted=[...selPages.indices].sort((a,b)=>a-b);
       const pages=sorted.map(i=>loc.node.pages[i]);
       [...sorted].reverse().forEach(i=>loc.node.pages.splice(i,1));
-      const newDoc={id:`nd-${Date.now()}`,type:'document',label:`${loc.node.label} (split)`,pages};
+      const newDoc={id:newId,type:'document',label:`${srcLabel} (split)`,pages};
       loc.parentDocs.splice(loc.nodeIdx+1,0,newDoc);
       return t;
     });
     setSelPages(null);
+    flashNodes([newId]);
+    showToast(`${n} page${n>1?'s':''} split into new document`);
   };
   const handleBulkDelete=()=>{
     if(!selPages)return;
@@ -4231,7 +4252,7 @@ function DocTree({expanded,setExpanded,active,setActive}){
     return(
       <div key={d.id}>
         {drop?.id===`bd-${d.id}`&&<InsLine id={`bd-${d.id}`}/>}
-        <div className={`dtree__doc-row${active===d.id?' dtree__doc-row--active':''}${isDragging?' dtree__drag-ghost':''}${isDropInto?' dtree__doc-row--drop':''}`}
+        <div className={`dtree__doc-row${active===d.id?' dtree__doc-row--active':''}${isDragging?' dtree__drag-ghost':''}${isDropInto?' dtree__doc-row--drop':''}${newNodeIds.has(d.id)?' dtree__doc-row--new':''}`}
           style={{paddingLeft:16+depth*12}}
           draggable
           onDragStart={e=>onStart(e,{type:'node',nodeId:d.id})}
