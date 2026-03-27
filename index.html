@@ -1401,7 +1401,8 @@ body.dev-on .ov-page{padding-top:84px}
 
 /* ── Completion Detail ── */
 /* doc tree — reuses .sidebar shell */
-.dtree{width:200px;min-width:160px;flex-shrink:0;background:#fff;border-right:1px solid #d4d4d4;display:flex;flex-direction:column;overflow:hidden}
+.dtree{width:200px;min-width:160px;flex-shrink:0;background:#fff;border-right:1px solid #d4d4d4;display:flex;flex-direction:column;overflow:hidden;position:relative}
+.dtree__toast{position:absolute;bottom:52px;left:8px;right:8px;background:#1a1a2e;color:#fff;padding:7px 10px;border-radius:6px;font-size:11px;text-align:center;z-index:20;pointer-events:none;animation:bulk-in .15s ease}
 .dtree__create{margin:10px 10px 6px;border:1.5px dashed #003781;background:transparent;color:#003781;border-radius:6px;padding:8px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;font-family:inherit;transition:background .15s;width:calc(100% - 20px)}
 .dtree__create:hover{background:#eff6ff}
 .dtree__tree{flex:1;overflow-y:auto;padding-bottom:8px}
@@ -3954,6 +3955,8 @@ function DocTree({expanded,setExpanded,active,setActive}){
   const [splitModal,setSplitModal]=useState(null); // {doc,catId}
   const [selPages,setSelPages]=useState(null); // {docId, indices: Set<number>}
   const [bulkMoveOpen,setBulkMoveOpen]=useState(false);
+  const [toast,setToast]=useState(null);
+  const showToast=msg=>{setToast(msg);setTimeout(()=>setToast(null),2500);};
   const selLastIdx=useRef(null);
   const toggle=id=>setExpanded(p=>({...p,[id]:!p[id]}));
   const clone=t=>JSON.parse(JSON.stringify(t));
@@ -4100,8 +4103,11 @@ function DocTree({expanded,setExpanded,active,setActive}){
   /* ── bulk action handlers ── */
   const handleBulkMove=(toDocId)=>{
     if(!selPages)return;
+    const n=selPages.indices.size;
+    const dest=findNode(tree,toDocId)?.node?.label||'document';
     movePagesMulti(selPages.docId,[...selPages.indices],toDocId,undefined);
     setSelPages(null);setBulkMoveOpen(false);
+    showToast(`${n} page${n>1?'s':''} moved to "${dest}"`);
   };
   const handleBulkNewDoc=()=>{
     if(!selPages)return;
@@ -4261,7 +4267,7 @@ function DocTree({expanded,setExpanded,active,setActive}){
   });
 
   return(
-    <div className="dtree" onClick={()=>{setCtx(null);setSelPages(null);}}>
+    <div className="dtree" onClick={()=>setCtx(null)}>
       <button className="dtree__create">+ Create Document</button>
       <div className="dtree__tree">
         {tree.map(cat=>{
@@ -4305,6 +4311,7 @@ function DocTree({expanded,setExpanded,active,setActive}){
       )}
       {assignModal&&<AssignCatModal tree={tree} nodeId={assignModal.nodeId} currentCatId={assignModal.catId} onAssign={handleAssign} onClose={()=>setAssignModal(null)}/>}
       {splitModal&&<SplitAssignModal tree={tree} doc={splitModal.doc} currentCatId={splitModal.catId} onConfirm={handleSplitAssign} onClose={()=>setSplitModal(null)}/>}
+      {toast&&<div className="dtree__toast">{toast}</div>}
       {bulkMoveOpen&&selPages&&<BulkMoveModal tree={tree} excludeDocId={selPages.docId} count={selPages.indices.size} onMove={handleBulkMove} onClose={()=>setBulkMoveOpen(false)}/>}
     </div>
   );
