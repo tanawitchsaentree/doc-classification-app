@@ -3835,67 +3835,92 @@ const CMP_TREE=[
   {id:'quote',type:'category',label:'Quote Request',docs:[]},
 ];
 
-function BulkMoveModal({tree,excludeDocId,count,onMove,onClose}){
-  const [openCats,setOpenCats]=React.useState(()=>{
-    const init={};tree.forEach(c=>{if(c.docs?.length)init[c.id]=true;});return init;
-  });
+/* shared move preview card */
+function MovePreview({fromIcon,fromLabel,fromSub,toIcon,toLabel,toSub}){
+  const row=(icon,label,sub,badge)=>(
+    <div style={{display:'flex',alignItems:'center',gap:8,padding:'9px 12px',background:'#f8f9fb',border:'1px solid #e4eaf2',borderRadius:7}}>
+      <span style={{display:'flex',flexShrink:0}}>{icon}</span>
+      <div style={{flex:1,minWidth:0}}>
+        <div style={{fontSize:13,fontWeight:600,color:'#1a1a2e',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{label}</div>
+        {sub&&<div style={{fontSize:11,color:'#888',marginTop:1}}>{sub}</div>}
+      </div>
+      {badge&&<span style={{fontSize:10,color:'#888',background:'#eee',borderRadius:4,padding:'1px 5px',flexShrink:0}}>{badge}</span>}
+    </div>
+  );
+  return(
+    <div style={{display:'flex',flexDirection:'column',gap:4}}>
+      {row(fromIcon,fromLabel,fromSub,'from')}
+      <div style={{textAlign:'center',color:'#aaa',fontSize:16,lineHeight:1.2}}>↓</div>
+      {row(toIcon,toLabel,toSub,'to')}
+    </div>
+  );
+}
+
+function BulkMoveModal({tree,excludeDocId,sourceLabel,count,onMove,onClose}){
+  const [openCats,setOpenCats]=React.useState(()=>{const init={};tree.forEach(c=>{if(c.docs?.length)init[c.id]=true;});return init;});
+  const [dest,setDest]=React.useState(null); // {id,label,path}
   const toggleCat=id=>setOpenCats(p=>({...p,[id]:!p[id]}));
 
-  const renderNodes=(nodes,depth=0)=>nodes.map(n=>{
-    if(n.type==='group'){
-      const hasDocs=n.docs?.length>0;
-      return(
-        <div key={n.id}>
-          <div style={{display:'flex',alignItems:'center',gap:6,padding:'5px 14px',paddingLeft:14+depth*14,color:'#555',fontSize:12,fontWeight:500,cursor:hasDocs?'pointer':'default',userSelect:'none'}}
-            onClick={()=>hasDocs&&setOpenCats(p=>({...p,[n.id]:!p[n.id]}))}>
-            <span style={{color:'#aaa',display:'flex'}}><IC.Folder s={13}/></span>
-            <span style={{flex:1}}>{n.label}</span>
-            {hasDocs&&<span style={{color:'#bbb',fontSize:10,lineHeight:1,transform:openCats[n.id]?'rotate(0)':'rotate(-90deg)',display:'inline-block',transition:'transform .15s'}}><IC.ChevDown s={10}/></span>}
-          </div>
-          {openCats[n.id]&&hasDocs&&renderNodes(n.docs,depth+1)}
+  if(dest){return(
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal" style={{maxWidth:340}} onClick={e=>e.stopPropagation()}>
+        <div className="modal__header"><span className="modal__title">Confirm move</span><button className="modal__close" onClick={onClose}>✕</button></div>
+        <div className="modal__body" style={{padding:'18px 20px'}}>
+          <p style={{fontSize:12,color:'#767676',marginBottom:14}}>Moving <strong>{count} page{count>1?'s':''}</strong></p>
+          <MovePreview
+            fromIcon={<IC.File/>} fromLabel={sourceLabel}
+            toIcon={<IC.File/>} toLabel={dest.label} toSub={dest.path}/>
         </div>
-      );
-    }
-    if(n.type==='document'&&n.id!==excludeDocId){
-      return(
-        <button key={n.id} onClick={()=>onMove(n.id)}
-          style={{display:'flex',alignItems:'center',gap:6,width:'100%',padding:'5px 14px',paddingLeft:14+depth*14,background:'none',border:'none',cursor:'pointer',textAlign:'left',fontSize:12,color:'#1a1a2e',fontFamily:'inherit',transition:'background .1s'}}
-          onMouseEnter={e=>e.currentTarget.style.background='#f0f5ff'}
-          onMouseLeave={e=>e.currentTarget.style.background='none'}>
-          <span style={{color:'#aaa',display:'flex'}}><IC.File/></span>
+        <div className="modal__footer">
+          <button className="btn btn-outline btn-sm" onClick={()=>setDest(null)}>← Back</button>
+          <button className="btn btn-primary btn-sm" onClick={()=>onMove(dest.id)}>Confirm move →</button>
+        </div>
+      </div>
+    </div>
+  );}
+
+  const renderNodes=(nodes,path,depth=0)=>nodes.map(n=>{
+    if(n.type==='group'){
+      const hasDocs=n.docs?.length>0;const isOpen=openCats[n.id];
+      return(<div key={n.id}>
+        <div style={{display:'flex',alignItems:'center',gap:6,padding:'5px 14px',paddingLeft:14+depth*14,color:'#555',fontSize:12,fontWeight:500,cursor:hasDocs?'pointer':'default',userSelect:'none'}}
+          onClick={()=>hasDocs&&setOpenCats(p=>({...p,[n.id]:!p[n.id]}))}>
+          <span style={{color:'#4a7ec8',display:'flex'}}><IC.Folder s={13}/></span>
           <span style={{flex:1}}>{n.label}</span>
-          <span style={{fontSize:10,color:'#aaa'}}>{n.pages?.length||0}p</span>
-        </button>
-      );
-    }
+          {hasDocs&&<span style={{color:'#bbb',display:'inline-flex',transform:isOpen?'rotate(0)':'rotate(-90deg)',transition:'transform .15s'}}><IC.ChevDown s={10}/></span>}
+        </div>
+        {isOpen&&hasDocs&&renderNodes(n.docs,path?`${path} › ${n.label}`:n.label,depth+1)}
+      </div>);}
+    if(n.type==='document'&&n.id!==excludeDocId){return(
+      <button key={n.id} onClick={()=>setDest({id:n.id,label:n.label,path})}
+        style={{display:'flex',alignItems:'center',gap:6,width:'100%',padding:'5px 14px',paddingLeft:14+depth*14,background:'none',border:'none',cursor:'pointer',textAlign:'left',fontSize:12,color:'#1a1a2e',fontFamily:'inherit',transition:'background .1s'}}
+        onMouseEnter={e=>e.currentTarget.style.background='#f0f5ff'}
+        onMouseLeave={e=>e.currentTarget.style.background='none'}>
+        <span style={{color:'#5a7ea8',display:'flex'}}><IC.File/></span>
+        <span style={{flex:1}}>{n.label}</span>
+        <span style={{fontSize:10,color:'#aaa'}}>{n.pages?.length||0}p</span>
+      </button>);}
     return null;
   });
 
   const hasAny=tree.some(cat=>cat.docs?.some(function check(n){return(n.type==='document'&&n.id!==excludeDocId)||(n.docs?.some(check));}));
-
   return(
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal" style={{maxWidth:320}} onClick={e=>e.stopPropagation()}>
-        <div className="modal__header">
-          <span className="modal__title">Move {count} page{count>1?'s':''} to</span>
-          <button className="modal__close" onClick={onClose}>✕</button>
-        </div>
+        <div className="modal__header"><span className="modal__title">Move {count} page{count>1?'s':''} to</span><button className="modal__close" onClick={onClose}>✕</button></div>
         <div className="modal__body" style={{padding:'4px 0',maxHeight:360,overflowY:'auto'}}>
           {!hasAny&&<p style={{padding:'10px 16px',fontSize:13,color:'#767676'}}>No other documents available.</p>}
           {tree.map(cat=>{
-            const hasDocs=cat.docs?.length>0;
-            const isOpen=openCats[cat.id];
-            return(
-              <div key={cat.id}>
-                <div style={{display:'flex',alignItems:'center',gap:6,padding:'6px 14px',background:'#f7f8fa',borderBottom:'1px solid #ebebeb',cursor:hasDocs?'pointer':'default',userSelect:'none'}}
-                  onClick={()=>hasDocs&&toggleCat(cat.id)}>
-                  <span style={{color:'#5a7db5',display:'flex'}}><IC.Folder s={13}/></span>
-                  <span style={{flex:1,fontSize:12,fontWeight:600,color:'#1a1a2e'}}>{cat.label}</span>
-                  {hasDocs&&<span style={{color:'#bbb',transform:isOpen?'rotate(0)':'rotate(-90deg)',display:'inline-flex',transition:'transform .15s'}}><IC.ChevDown s={10}/></span>}
-                </div>
-                {isOpen&&hasDocs&&<div>{renderNodes(cat.docs,1)}</div>}
+            const hasDocs=cat.docs?.length>0;const isOpen=openCats[cat.id];
+            return(<div key={cat.id}>
+              <div style={{display:'flex',alignItems:'center',gap:6,padding:'6px 14px',background:'#f7f8fa',borderBottom:'1px solid #ebebeb',cursor:hasDocs?'pointer':'default',userSelect:'none'}}
+                onClick={()=>hasDocs&&toggleCat(cat.id)}>
+                <span style={{color:'#003781',display:'flex'}}><IC.Folder s={13}/></span>
+                <span style={{flex:1,fontSize:12,fontWeight:600,color:'#1a1a2e'}}>{cat.label}</span>
+                {hasDocs&&<span style={{color:'#bbb',display:'inline-flex',transform:isOpen?'rotate(0)':'rotate(-90deg)',transition:'transform .15s'}}><IC.ChevDown s={10}/></span>}
               </div>
-            );
+              {isOpen&&hasDocs&&<div>{renderNodes(cat.docs,cat.label,1)}</div>}
+            </div>);
           })}
         </div>
         <div className="modal__footer"><button className="btn btn-outline btn-sm" onClick={onClose}>Cancel</button></div>
@@ -3904,16 +3929,76 @@ function BulkMoveModal({tree,excludeDocId,count,onMove,onClose}){
   );
 }
 
-function AssignCatModal({tree,nodeId,currentCatId,onAssign,onClose}){
+function BulkDocMoveModal({tree,count,docLabels,onMove,onClose}){
+  const [dest,setDest]=React.useState(null);
+  if(dest){return(
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal" style={{maxWidth:340}} onClick={e=>e.stopPropagation()}>
+        <div className="modal__header"><span className="modal__title">Confirm move</span><button className="modal__close" onClick={onClose}>✕</button></div>
+        <div className="modal__body" style={{padding:'18px 20px'}}>
+          <p style={{fontSize:12,color:'#767676',marginBottom:14}}>Moving <strong>{count} document{count>1?'s':''}</strong> to:</p>
+          <div style={{display:'flex',alignItems:'center',gap:8,padding:'10px 12px',background:'#f0f5ff',border:'1px solid #c7d8f5',borderRadius:7,marginBottom:12}}>
+            <span style={{color:'#003781',display:'flex'}}><IC.Folder s={14}/></span>
+            <span style={{fontSize:13,fontWeight:600,color:'#003781'}}>{dest.label}</span>
+          </div>
+          <div style={{fontSize:12,color:'#555',display:'flex',flexDirection:'column',gap:2,maxHeight:120,overflowY:'auto'}}>
+            {docLabels.map((l,i)=><div key={i} style={{display:'flex',alignItems:'center',gap:6,padding:'2px 0'}}>
+              <span style={{color:'#8aaac4',display:'flex'}}><IC.File/></span><span>{l}</span>
+            </div>)}
+          </div>
+        </div>
+        <div className="modal__footer">
+          <button className="btn btn-outline btn-sm" onClick={()=>setDest(null)}>← Back</button>
+          <button className="btn btn-primary btn-sm" onClick={()=>onMove(dest.id)}>Confirm move →</button>
+        </div>
+      </div>
+    </div>
+  );}
   return(
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal" style={{maxWidth:360}} onClick={e=>e.stopPropagation()}>
+      <div className="modal" style={{maxWidth:300}} onClick={e=>e.stopPropagation()}>
+        <div className="modal__header"><span className="modal__title">Move {count} doc{count>1?'s':''} to</span><button className="modal__close" onClick={onClose}>✕</button></div>
+        <div className="modal__body" style={{padding:'6px 0'}}>
+          {tree.map(cat=>(
+            <button key={cat.id} className="dtree-ctx__item" style={{display:'flex',alignItems:'center',gap:10}} onClick={()=>setDest({id:cat.id,label:cat.label})}>
+              <span style={{color:'#003781',display:'flex'}}><IC.Folder s={13}/></span>
+              <span style={{flex:1}}>{cat.label}</span>
+            </button>
+          ))}
+        </div>
+        <div className="modal__footer"><button className="btn btn-outline btn-sm" onClick={onClose}>Cancel</button></div>
+      </div>
+    </div>
+  );
+}
+
+function AssignCatModal({tree,nodeId,nodeLabel,currentCatId,onAssign,onClose}){
+  const [dest,setDest]=React.useState(null);
+  if(dest){return(
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal" style={{maxWidth:340}} onClick={e=>e.stopPropagation()}>
+        <div className="modal__header"><span className="modal__title">Confirm move</span><button className="modal__close" onClick={onClose}>✕</button></div>
+        <div className="modal__body" style={{padding:'18px 20px'}}>
+          <MovePreview
+            fromIcon={<IC.File/>} fromLabel={nodeLabel||nodeId}
+            toIcon={<IC.Folder s={13}/>} toLabel={dest.label}/>
+        </div>
+        <div className="modal__footer">
+          <button className="btn btn-outline btn-sm" onClick={()=>setDest(null)}>← Back</button>
+          <button className="btn btn-primary btn-sm" onClick={()=>onAssign(nodeId,dest.id)}>Confirm →</button>
+        </div>
+      </div>
+    </div>
+  );}
+  return(
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal" style={{maxWidth:340}} onClick={e=>e.stopPropagation()}>
         <div className="modal__header"><span className="modal__title">Move to category</span><button className="modal__close" onClick={onClose}>✕</button></div>
         <div className="modal__body" style={{padding:'6px 0'}}>
           {tree.map(c=>(
             <button key={c.id} className="dtree-ctx__item" style={{display:'flex',alignItems:'center',gap:10,background:currentCatId===c.id?'#e8effa':undefined}}
-              onClick={()=>onAssign(nodeId,c.id)}>
-              <span>{c.icon||'📁'}</span>
+              onClick={()=>setDest({id:c.id,label:c.label})}>
+              <span style={{color:'#003781',display:'flex'}}><IC.Folder s={13}/></span>
               <span style={{flex:1}}>{c.label}</span>
               {currentCatId===c.id&&<span style={{fontSize:11,color:'#003781',fontWeight:600}}>Current</span>}
             </button>
@@ -4323,12 +4408,14 @@ function DocTree({expanded,setExpanded,active,setActive}){
           onDragLeave={onLeave}
           onDrop={e=>onDrop(e,()=>{
             if(drag.current.type==='node'){
-              const pos=drop?.pos;
-              if(pos==='before')moveNodeRelative(drag.current.nodeId,d.id,'before');
-              else if(pos==='after')moveNodeRelative(drag.current.nodeId,d.id,'after');
-              else if(pos==='into'&&isGroup)moveNodeIntoGroup(drag.current.nodeId,d.id);
+              const pos=drop?.pos;const sl=findNode(tree,drag.current.nodeId)?.node?.label;
+              if(pos==='before'||pos==='after')moveNodeRelative(drag.current.nodeId,d.id,pos);
+              else if(pos==='into'&&isGroup){moveNodeIntoGroup(drag.current.nodeId,d.id);showToast(`"${sl}" moved into "${d.label}"`);}
             }else if(drag.current.type==='page'){
+              const isCross=drag.current.docId!==d.id;
+              const pgLabel=findNode(tree,drag.current.docId)?.node?.pages?.[drag.current.pageIdx];
               movePage(drag.current.docId,drag.current.pageIdx,d.id,undefined);
+              if(isCross)showToast(`"${pgLabel}" moved to "${d.label}"`);
             }
           })}
           onClick={()=>{setActive(d.id);if(hasChildren)toggle(d.id);}}>
@@ -4357,7 +4444,7 @@ function DocTree({expanded,setExpanded,active,setActive}){
               <div className={`dtree__cat-row${active===cat.id?' dtree__cat-row--active':''}${isCatDrop?' dtree__cat-row--drop':''}`}
                 onDragOver={e=>drag.current?.type==='node'&&onOver(e,`cat-${cat.id}`,'into',true)}
                 onDragLeave={onLeave}
-                onDrop={e=>onDrop(e,()=>moveNodeToCat(drag.current.nodeId,cat.id))}
+                onDrop={e=>onDrop(e,()=>{const sl=findNode(tree,drag.current.nodeId)?.node?.label;moveNodeToCat(drag.current.nodeId,cat.id);showToast(`"${sl}" moved to ${cat.label}`);})}
                 onClick={()=>{setActive(cat.id);if(hasDocs)toggle(cat.id);}}>
                 <span className="dtree__cat-ico"><IC.Folder s={14}/></span>
                 <span>{cat.label}</span>
@@ -4398,24 +4485,11 @@ function DocTree({expanded,setExpanded,active,setActive}){
           <button className="dtree-ctx__item dtree-ctx__item--danger" onClick={()=>handleDelete(ctx.nodeId)}>Delete</button>
         </div>
       )}
-      {assignModal&&<AssignCatModal tree={tree} nodeId={assignModal.nodeId} currentCatId={assignModal.catId} onAssign={handleAssign} onClose={()=>setAssignModal(null)}/>}
+      {assignModal&&<AssignCatModal tree={tree} nodeId={assignModal.nodeId} nodeLabel={findNode(tree,assignModal.nodeId)?.node?.label||''} currentCatId={assignModal.catId} onAssign={handleAssign} onClose={()=>setAssignModal(null)}/>}
       {splitModal&&<SplitAssignModal tree={tree} doc={splitModal.doc} currentCatId={splitModal.catId} onConfirm={handleSplitAssign} onClose={()=>setSplitModal(null)}/>}
       {toast&&<div className="dtree__toast">{toast}</div>}
-      {bulkMoveOpen&&selPages&&<BulkMoveModal tree={tree} excludeDocId={selPages.docId} count={selPages.indices.size} onMove={handleBulkMove} onClose={()=>setBulkMoveOpen(false)}/>}
-      {bulkDocMoveOpen&&<div className="modal-overlay" onClick={()=>setBulkDocMoveOpen(false)}>
-        <div className="modal" style={{maxWidth:300}} onClick={e=>e.stopPropagation()}>
-          <div className="modal__header"><span className="modal__title">Move {selDocs.size} doc{selDocs.size>1?'s':''} to</span><button className="modal__close" onClick={()=>setBulkDocMoveOpen(false)}>✕</button></div>
-          <div className="modal__body" style={{padding:'6px 0'}}>
-            {tree.map(cat=>(
-              <button key={cat.id} className="dtree-ctx__item" style={{display:'flex',alignItems:'center',gap:10}} onClick={()=>handleBulkDocMove(cat.id)}>
-                <span style={{color:'#003781',display:'flex'}}><IC.Folder s={13}/></span>
-                <span style={{flex:1}}>{cat.label}</span>
-              </button>
-            ))}
-          </div>
-          <div className="modal__footer"><button className="btn btn-outline btn-sm" onClick={()=>setBulkDocMoveOpen(false)}>Cancel</button></div>
-        </div>
-      </div>}
+      {bulkMoveOpen&&selPages&&<BulkMoveModal tree={tree} excludeDocId={selPages.docId} sourceLabel={findNode(tree,selPages.docId)?.node?.label||''} count={selPages.indices.size} onMove={handleBulkMove} onClose={()=>setBulkMoveOpen(false)}/>}
+      {bulkDocMoveOpen&&<BulkDocMoveModal tree={tree} count={selDocs.size} docLabels={[...selDocs].map(id=>findNode(tree,id)?.node?.label||id)} onMove={handleBulkDocMove} onClose={()=>setBulkDocMoveOpen(false)}/>}
     </div>
   );
 }
