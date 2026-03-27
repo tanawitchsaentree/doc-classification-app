@@ -1427,6 +1427,9 @@ body.dev-on .ov-page{padding-top:84px}
 .dtree__page-row--active{background:#ddeaff;color:#003781}
 .dtree__del{margin-left:auto;background:none;border:none;cursor:pointer;color:#ccc;padding:2px 4px;border-radius:3px;font-size:11px;line-height:1;flex-shrink:0}
 .dtree__del:hover{color:#cc0000;background:#fce8e8}
+.dtree__page-more{background:none;border:none;cursor:pointer;color:#aaa;padding:2px 4px;border-radius:3px;font-size:13px;line-height:1;opacity:0;transition:opacity .1s;flex-shrink:0;font-family:inherit}
+.dtree__page-row:hover .dtree__page-more{opacity:1}
+.dtree__page-more:hover{color:#003781;background:#e0ecff}
 .dtree__page-cb{flex-shrink:0;width:14px;height:14px;border:1.5px solid #ccc;border-radius:3px;cursor:pointer;margin-right:4px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;background:#fff;transition:all .1s;opacity:0}
 .dtree__page-row:hover .dtree__page-cb,.dtree__page-row--selected .dtree__page-cb,
 .dtree__doc-row:hover .dtree__page-cb,.dtree__doc-row--sel .dtree__page-cb{opacity:1}
@@ -4055,6 +4058,10 @@ function DocTree({expanded,setExpanded,active,setActive}){
   const showToast=msg=>{setToast(msg);setTimeout(()=>setToast(null),2500);};
   const flashNodes=ids=>{setNewNodeIds(new Set(ids));setTimeout(()=>setNewNodeIds(new Set()),2000);};
   const selLastIdx=useRef(null);
+  const [pageCtx,setPageCtx]=useState(null);
+  const openPageCtx=(e,docId,pi,totalPages)=>{e.stopPropagation();e.preventDefault();setPageCtx({docId,pi,x:e.clientX,y:e.clientY,totalPages});};
+  const selectToEnd=()=>{if(!pageCtx)return;const{docId,pi,totalPages}=pageCtx;const idx=new Set();for(let i=pi;i<totalPages;i++)idx.add(i);setSelPages({docId,indices:idx});if(selDocs.size>0)setSelDocs(new Set());selLastIdx.current=pi;setPageCtx(null);};
+  const selectFromStart=()=>{if(!pageCtx)return;const{docId,pi}=pageCtx;const idx=new Set();for(let i=0;i<=pi;i++)idx.add(i);setSelPages({docId,indices:idx});if(selDocs.size>0)setSelDocs(new Set());selLastIdx.current=pi;setPageCtx(null);};
   const toggle=id=>setExpanded(p=>({...p,[id]:!p[id]}));
   const clone=t=>JSON.parse(JSON.stringify(t));
 
@@ -4373,6 +4380,7 @@ function DocTree({expanded,setExpanded,active,setActive}){
           style={{paddingLeft:10+depth*12}} onClick={()=>setActive(doc.id+pg)}>
           <div className="dtree__page-cb" onClick={e=>togglePage(e,doc.id,pi)}>{isSel&&'✓'}</div>
           <span style={{flex:1}}>{pg}</span>
+          <button className="dtree__page-more" onClick={e=>openPageCtx(e,doc.id,pi,doc.pages.length)}>⋮</button>
           <button className="dtree__del" onClick={e=>{e.stopPropagation();deletePage(doc.id,pi);}}>🗑</button>
         </div>
         {drop?.id===dropId&&drop.pos==='after'&&<InsLine id={dropId}/>}
@@ -4433,7 +4441,7 @@ function DocTree({expanded,setExpanded,active,setActive}){
   });
 
   return(
-    <div className="dtree" onClick={()=>setCtx(null)}>
+    <div className="dtree" onClick={()=>{setCtx(null);setPageCtx(null);}}>
       <button className="dtree__create">+ Create Document</button>
       <div className="dtree__tree">
         {tree.map(cat=>{
@@ -4483,6 +4491,12 @@ function DocTree({expanded,setExpanded,active,setActive}){
           </>}
           <div className="dtree-ctx__sep"/>
           <button className="dtree-ctx__item dtree-ctx__item--danger" onClick={()=>handleDelete(ctx.nodeId)}>Delete</button>
+        </div>
+      )}
+      {pageCtx&&(
+        <div className="dtree-ctx" style={{top:pageCtx.y,left:pageCtx.x}} onClick={e=>e.stopPropagation()}>
+          <button className="dtree-ctx__item" onClick={selectToEnd}>Select page {pageCtx.pi+1} to end</button>
+          <button className="dtree-ctx__item" onClick={selectFromStart}>Select start to page {pageCtx.pi+1}</button>
         </div>
       )}
       {assignModal&&<AssignCatModal tree={tree} nodeId={assignModal.nodeId} nodeLabel={findNode(tree,assignModal.nodeId)?.node?.label||''} currentCatId={assignModal.catId} onAssign={handleAssign} onClose={()=>setAssignModal(null)}/>}
