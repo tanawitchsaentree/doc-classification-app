@@ -1414,7 +1414,8 @@ body.dev-on .ov-page{padding-top:84px}
 .dtree__cat-ico{font-size:12px;color:#aaa;flex-shrink:0}
 .dtree__cat-count{font-size:11px;color:#767676;font-weight:400;margin-left:2px}
 .dtree__chev{font-size:10px;color:#aaa;margin-left:auto;transition:transform .15s}
-.dtree__sub{padding-left:8px}
+.dtree__sub{margin-left:14px;padding-left:0;border-left:2px solid #bfdbfe}
+.dtree__group-sub{margin-left:6px;padding-left:0;border-left:2px solid #dbeafe}
 .dtree__doc-row{display:flex;align-items:center;gap:5px;padding:6px 10px 6px 16px;cursor:pointer;font-size:12px;color:#444;user-select:none}
 .dtree__doc-row:hover{background:#f5f5f5}
 .dtree__doc-row--active{background:#ddeaff;color:#003781}
@@ -4260,7 +4261,7 @@ function DocTree({expanded,setExpanded,active,setActive}){
           <button className="dtree__more-btn" onClick={e=>openCtx(e,d.id,catId,isGroup)}>⋮</button>
         </div>
         {drop?.id===`ad-${d.id}`&&<InsLine id={`ad-${d.id}`}/>}
-        {isOpen&&isGroup&&<div>{renderDocs(d.docs,catId,depth+1)}</div>}
+        {isOpen&&isGroup&&<div className="dtree__group-sub">{renderDocs(d.docs,catId,depth+1)}</div>}
         {isOpen&&!isGroup&&hasChildren&&renderPages(d,depth)}
       </div>
     );
