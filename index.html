@@ -1426,7 +1426,8 @@ body.dev-on .ov-page{padding-top:84px}
 .dtree__page-row:hover .dtree__page-cb,.dtree__page-row--selected .dtree__page-cb{opacity:1}
 .dtree__page-row--selected .dtree__page-cb{background:#003781;border-color:#003781}
 .dtree__page-row--selected{background:#ddeaff;color:#003781}
-.dtree__bulk-bar{display:flex;flex-direction:column;gap:4px;padding:6px 8px;background:#1a1a2e;margin:2px 8px 2px;border-radius:6px}
+.dtree__bulk-bar{display:flex;flex-direction:column;gap:4px;padding:6px 8px;background:#1a1a2e;margin:2px 8px 2px;border-radius:6px;animation:bulk-in .12s ease}
+@keyframes bulk-in{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
 .dtree__bulk-row1{display:flex;align-items:center}
 .dtree__bulk-count{font-size:11px;font-weight:600;color:#fff;flex:1}
 .dtree__bulk-clear{background:none;border:none;cursor:pointer;color:rgba(255,255,255,.6);font-size:13px;padding:0 2px;line-height:1;font-family:inherit}
@@ -4087,6 +4088,22 @@ function DocTree({expanded,setExpanded,active,setActive}){
     });
     setSelPages(null);
   };
+  const deletePage=(docId,pi)=>{
+    setTree(prev=>{
+      const t=clone(prev);const loc=findNode(t,docId);
+      if(!loc)return prev;
+      loc.node.pages.splice(pi,1);
+      return t;
+    });
+    // clear selection if the deleted page was selected
+    setSelPages(prev=>{
+      if(!prev||prev.docId!==docId)return prev;
+      const newIdx=new Set(prev.indices);newIdx.delete(pi);
+      // shift indices > pi down by 1
+      const shifted=new Set([...newIdx].map(i=>i>pi?i-1:i));
+      return shifted.size>0?{docId,indices:shifted}:null;
+    });
+  };
 
   /* ── drag handlers ── */
   const onStart=(e,info)=>{drag.current=info;e.dataTransfer.effectAllowed='move';e.stopPropagation();};
@@ -4148,7 +4165,7 @@ function DocTree({expanded,setExpanded,active,setActive}){
           style={{paddingLeft:10+depth*12}} onClick={()=>setActive(doc.id+pg)}>
           <div className="dtree__page-cb" onClick={e=>togglePage(e,doc.id,pi)}>{isSel&&'✓'}</div>
           <span style={{flex:1}}>{pg}</span>
-          <button className="dtree__del" onClick={e=>e.stopPropagation()}>🗑</button>
+          <button className="dtree__del" onClick={e=>{e.stopPropagation();deletePage(doc.id,pi);}}>🗑</button>
         </div>
         {drop?.id===dropId&&drop.pos==='after'&&<InsLine id={dropId}/>}
       </div>
@@ -4202,7 +4219,7 @@ function DocTree({expanded,setExpanded,active,setActive}){
         {isOpen&&!isGroup&&hasChildren&&(
           <div>
             {selPages?.docId===d.id&&selPages.indices.size>0&&(
-              <div className="dtree__bulk-bar">
+              <div className="dtree__bulk-bar" onClick={e=>e.stopPropagation()}>
                 <div className="dtree__bulk-row1">
                   <span className="dtree__bulk-count">{selPages.indices.size} page{selPages.indices.size>1?'s':''} selected</span>
                   <button className="dtree__bulk-clear" onClick={()=>setSelPages(null)}>×</button>
