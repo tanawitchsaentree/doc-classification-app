@@ -332,7 +332,7 @@ input,textarea,select{font-family:inherit}
 .workspace__ver-val{font-size:13px;font-weight:600;color:#333333}
 .workspace__ver-div{width:1px;background:#d4d4d4;height:32px;flex-shrink:0;margin:0 16px}
 .workspace__status{font-size:12px;font-weight:600;padding:2px 8px;border-radius:4px;display:inline-flex;align-items:center}
-.workspace__status.active{background:#e6f4e6;color:#008a00}.workspace__status.deployed{background:#e6f4e6;color:#008a00}.workspace__status.draft{background:#f5f5f5;color:#767676}.workspace__status.failed{background:#fce8e8;color:#cc0000}.workspace__status.approved{background:#fff3e0;color:#b45309}.workspace__status.deploying{background:#f0f4ff;color:#3b5bdb;animation:status-pulse 1s ease-in-out infinite}
+.workspace__status.active{background:#e6f4e6;color:#008a00}.workspace__status.draft{background:#f5f5f5;color:#767676}.workspace__status.failed{background:#fce8e8;color:#cc0000}.workspace__status.approved{background:#fff3e0;color:#b45309}.workspace__status.deploying{background:#f0f4ff;color:#3b5bdb;animation:status-pulse 1s ease-in-out infinite}
 @keyframes status-pulse{0%,100%{opacity:1}50%{opacity:.45}}
 .workspace__warn{display:flex;align-items:center;gap:8px;padding:9px 12px;background:#fffbeb;border:1px solid #ffd580;border-radius:4px;font-size:12px;color:#6b3000}
 .workspace__warn code{background:#fff3e0;border-radius:3px;padding:1px 5px;font-family:monospace;font-size:11px}
@@ -3588,14 +3588,15 @@ function App({devOverrides={}}){
         return acc;
       },{})
     };
-    // Build tab meta from live lob data
+    // Build tab meta from live lob data — normalize 'Deployed' → 'Active'
+    const normStatus=s=>s==='Deployed'?'Active':s;
     const meta={
       global:{version:'1.0',score:'N/A',status:'Active'},
-      l1:{version:lob.classL1Version||'V.1',score:`${lob.confidence}%`,status:lob.status},
+      l1:{version:lob.classL1Version||'V.1',score:`${lob.confidence}%`,status:normStatus(lob.status)},
     };
     lob.categories.forEach(c=>{
-      meta[c.id]={version:c.activeVersion||'V.1',score:`${c.confidence}%`,status:c.status};
-      c.types.forEach(t=>{meta[t.id]={version:c.activeVersion||'V.1',score:`${c.confidence}%`,status:c.status};});
+      meta[c.id]={version:c.activeVersion||'V.1',score:`${c.confidence}%`,status:normStatus(c.status)};
+      c.types.forEach(t=>{meta[t.id]={version:c.activeVersion||'V.1',score:`${c.confidence}%`,status:normStatus(c.status)};});
     });
     // Seed publishedPrompts for keys already Deployed/Active in source data
     const isLive=s=>s==='Deployed'||s==='Active';
@@ -3854,8 +3855,9 @@ function Root(){
       const l1Items=lob.categories.map(c=>({id:c.id,name:c.name,expanded:false,l2:c.types.map(t=>({id:t.id,name:t.name}))}));
       const prompts={global:GLOBAL_PROMPT,l1:opts.l1Prompt!==undefined?opts.l1Prompt:(lob.lobPrompt||''),
         ...lob.categories.reduce((acc,c)=>{acc[c.id]=opts.catPrompt!==undefined?opts.catPrompt:(c.prompt||'');c.types.forEach(t=>{acc[t.id]=t.prompt||'';});return acc;},{})};
-      const tabMeta={global:{version:'1.0',score:'N/A',status:'Active'},l1:{version:lob.classL1Version||'V.1',score:`${lob.confidence}%`,status:lob.status}};
-      lob.categories.forEach(c=>{tabMeta[c.id]={version:c.activeVersion||'V.1',score:`${c.confidence}%`,status:c.status};c.types.forEach(t=>{tabMeta[t.id]={version:c.activeVersion||'V.1',score:`${c.confidence}%`,status:c.status};});});
+      const normS=s=>s==='Deployed'?'Active':s;
+      const tabMeta={global:{version:'1.0',score:'N/A',status:'Active'},l1:{version:lob.classL1Version||'V.1',score:`${lob.confidence}%`,status:normS(lob.status)}};
+      lob.categories.forEach(c=>{tabMeta[c.id]={version:c.activeVersion||'V.1',score:`${c.confidence}%`,status:normS(c.status)};c.types.forEach(t=>{tabMeta[t.id]={version:c.activeVersion||'V.1',score:`${c.confidence}%`,status:normS(c.status)};});});
       const isLive=s=>s==='Deployed'||s==='Active';
       const seedPub={};
       if(isLive(lob.status)){
