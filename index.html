@@ -1428,7 +1428,10 @@ body.dev-on .ov-page{padding-top:84px}
 .dtree__del{margin-left:auto;background:none;border:none;cursor:pointer;color:#ccc;padding:2px 4px;border-radius:3px;font-size:11px;line-height:1;flex-shrink:0}
 .dtree__del:hover{color:#cc0000;background:#fce8e8}
 .dtree__page-cb{flex-shrink:0;width:14px;height:14px;border:1.5px solid #ccc;border-radius:3px;cursor:pointer;margin-right:4px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;background:#fff;transition:all .1s;opacity:0}
-.dtree__page-row:hover .dtree__page-cb,.dtree__page-row--selected .dtree__page-cb{opacity:1}
+.dtree__page-row:hover .dtree__page-cb,.dtree__page-row--selected .dtree__page-cb,
+.dtree__doc-row:hover .dtree__page-cb,.dtree__doc-row--sel .dtree__page-cb{opacity:1}
+.dtree__doc-row--sel .dtree__page-cb{background:#003781;border-color:#003781}
+.dtree__doc-row--sel{background:#eef4ff}
 .dtree__page-row--selected .dtree__page-cb{background:#003781;border-color:#003781}
 .dtree__page-row--selected{background:#ddeaff;color:#003781}
 .dtree__bulk-bar{display:flex;align-items:center;gap:6px;padding:8px 10px;background:#003781;border-top:2px solid #002060;flex-shrink:0;animation:bulk-in .15s ease}
@@ -3959,6 +3962,9 @@ function DocTree({expanded,setExpanded,active,setActive}){
   const [splitModal,setSplitModal]=useState(null); // {doc,catId}
   const [selPages,setSelPages]=useState(null); // {docId, indices: Set<number>}
   const [bulkMoveOpen,setBulkMoveOpen]=useState(false);
+  const [selDocs,setSelDocs]=useState(new Set());
+  const [bulkDocMoveOpen,setBulkDocMoveOpen]=useState(false);
+  const selDocLastId=useRef(null);
   const [toast,setToast]=useState(null);
   const [newNodeIds,setNewNodeIds]=useState(new Set());
   const showToast=msg=>{setToast(msg);setTimeout(()=>setToast(null),2500);};
@@ -4081,9 +4087,58 @@ function DocTree({expanded,setExpanded,active,setActive}){
     setCtx({nodeId,catId,isGroup,x:e.clientX,y:e.clientY});
   };
 
+  /* ── document multi-selection ── */
+  const toggleDoc=(e,docId,siblings)=>{
+    e.stopPropagation();
+    if(selPages)setSelPages(null); // clear page selection
+    if(e.shiftKey&&selDocLastId.current!==null){
+      const ids=siblings.map(s=>s.id);
+      const li=ids.indexOf(selDocLastId.current);const ci=ids.indexOf(docId);
+      if(li!==-1&&ci!==-1){
+        const newSet=new Set(selDocs);
+        const lo=Math.min(li,ci);const hi=Math.max(li,ci);
+        for(let i=lo;i<=hi;i++)newSet.add(ids[i]);
+        setSelDocs(newSet);return;
+      }
+    }
+    const newSet=new Set(selDocs);
+    if(newSet.has(docId))newSet.delete(docId);else newSet.add(docId);
+    setSelDocs(newSet.size>0?newSet:new Set());
+    selDocLastId.current=docId;
+  };
+  const handleBulkDocMove=(catId)=>{
+    const n=selDocs.size;
+    const catLabel=tree.find(c=>c.id===catId)?.label||'category';
+    setTree(prev=>{
+      const t=clone(prev);
+      [...selDocs].forEach(docId=>{
+        const loc=findNode(t,docId);
+        if(!loc||loc.catId===catId)return;
+        const[node]=loc.parentDocs.splice(loc.nodeIdx,1);
+        const cat=t.find(c=>c.id===catId);if(cat)cat.docs.push(node);
+      });
+      return t;
+    });
+    setSelDocs(new Set());setBulkDocMoveOpen(false);
+    showToast(`${n} document${n>1?'s':''} moved to ${catLabel}`);
+  };
+  const handleBulkDocDelete=()=>{
+    const n=selDocs.size;
+    setTree(prev=>{
+      const t=clone(prev);
+      const locs=[...selDocs].map(id=>findNode(t,id)).filter(Boolean);
+      locs.sort((a,b)=>b.nodeIdx-a.nodeIdx);
+      locs.forEach(loc=>loc.parentDocs.splice(loc.nodeIdx,1));
+      return t;
+    });
+    setSelDocs(new Set());
+    showToast(`${n} document${n>1?'s':''} deleted`);
+  };
+
   /* ── page multi-selection ── */
   const togglePage=(e,docId,pi)=>{
     e.stopPropagation();
+    if(selDocs.size>0)setSelDocs(new Set()); // clear doc selection
     if(e.shiftKey&&selPages?.docId===docId&&selLastIdx.current!==null){
       const lo=Math.min(selLastIdx.current,pi);
       const hi=Math.max(selLastIdx.current,pi);
@@ -4250,7 +4305,7 @@ function DocTree({expanded,setExpanded,active,setActive}){
     return(
       <div key={d.id}>
         {drop?.id===`bd-${d.id}`&&<InsLine id={`bd-${d.id}`}/>}
-        <div className={`dtree__doc-row${active===d.id?' dtree__doc-row--active':''}${isDragging?' dtree__drag-ghost':''}${isDropInto?' dtree__doc-row--drop':''}${newNodeIds.has(d.id)?' dtree__doc-row--new':''}`}
+        <div className={`dtree__doc-row${active===d.id?' dtree__doc-row--active':''}${isDragging?' dtree__drag-ghost':''}${isDropInto?' dtree__doc-row--drop':''}${newNodeIds.has(d.id)?' dtree__doc-row--new':''}${selDocs.has(d.id)?' dtree__doc-row--sel':''}`}
           style={{paddingLeft:16+depth*12}}
           draggable
           onDragStart={e=>onStart(e,{type:'node',nodeId:d.id})}
@@ -4277,6 +4332,7 @@ function DocTree({expanded,setExpanded,active,setActive}){
             }
           })}
           onClick={()=>{setActive(d.id);if(hasChildren)toggle(d.id);}}>
+          <div className="dtree__page-cb" onClick={e=>toggleDoc(e,d.id,docs)}>{selDocs.has(d.id)&&'✓'}</div>
           <span style={{display:'flex',alignItems:'center',color:isGroup?(depth===0?'#3a6bc4':'#6b9fd4'):(depth===0?'#5a7ea8':'#8aaac4')}}>{isGroup?<IC.Folder s={13}/>:<IC.File/>}</span>
           <span style={{flex:1}}>{d.label}</span>
           {hasChildren&&<span className="dtree__chev" style={{transform:isOpen?'rotate(0)':'rotate(-90deg)'}}><IC.ChevDown s={10}/></span>}
@@ -4312,12 +4368,22 @@ function DocTree({expanded,setExpanded,active,setActive}){
           );
         })}
       </div>
-      {selPages&&selPages.indices.size>0&&(
+      {(selDocs.size>0||(selPages&&selPages.indices.size>0))&&(
         <div className="dtree__bulk-bar" onClick={e=>e.stopPropagation()}>
-          <span className="dtree__bulk-count">{selPages.indices.size} page{selPages.indices.size>1?'s':''}</span>
-          <button className="dtree__bulk-btn" onClick={()=>setBulkMoveOpen(true)}>Move</button>
-          <button className="dtree__bulk-btn" onClick={handleBulkNewDoc}>Split</button>
-          <button className="dtree__bulk-btn dtree__bulk-btn--danger" onClick={handleBulkDelete}>Delete</button>
+          {selDocs.size>0?(
+            <>
+              <span className="dtree__bulk-count">{selDocs.size} doc{selDocs.size>1?'s':''}</span>
+              <button className="dtree__bulk-btn" onClick={()=>setBulkDocMoveOpen(true)}>Move</button>
+              <button className="dtree__bulk-btn dtree__bulk-btn--danger" onClick={handleBulkDocDelete}>Delete</button>
+            </>
+          ):(
+            <>
+              <span className="dtree__bulk-count">{selPages.indices.size} page{selPages.indices.size>1?'s':''}</span>
+              <button className="dtree__bulk-btn" onClick={()=>setBulkMoveOpen(true)}>Move</button>
+              <button className="dtree__bulk-btn" onClick={handleBulkNewDoc}>Split</button>
+              <button className="dtree__bulk-btn dtree__bulk-btn--danger" onClick={handleBulkDelete}>Delete</button>
+            </>
+          )}
         </div>
       )}
       <div className="dtree__collapse"><button className="dtree__collapse-btn">«</button></div>
@@ -4336,6 +4402,20 @@ function DocTree({expanded,setExpanded,active,setActive}){
       {splitModal&&<SplitAssignModal tree={tree} doc={splitModal.doc} currentCatId={splitModal.catId} onConfirm={handleSplitAssign} onClose={()=>setSplitModal(null)}/>}
       {toast&&<div className="dtree__toast">{toast}</div>}
       {bulkMoveOpen&&selPages&&<BulkMoveModal tree={tree} excludeDocId={selPages.docId} count={selPages.indices.size} onMove={handleBulkMove} onClose={()=>setBulkMoveOpen(false)}/>}
+      {bulkDocMoveOpen&&<div className="modal-overlay" onClick={()=>setBulkDocMoveOpen(false)}>
+        <div className="modal" style={{maxWidth:300}} onClick={e=>e.stopPropagation()}>
+          <div className="modal__header"><span className="modal__title">Move {selDocs.size} doc{selDocs.size>1?'s':''} to</span><button className="modal__close" onClick={()=>setBulkDocMoveOpen(false)}>✕</button></div>
+          <div className="modal__body" style={{padding:'6px 0'}}>
+            {tree.map(cat=>(
+              <button key={cat.id} className="dtree-ctx__item" style={{display:'flex',alignItems:'center',gap:10}} onClick={()=>handleBulkDocMove(cat.id)}>
+                <span style={{color:'#003781',display:'flex'}}><IC.Folder s={13}/></span>
+                <span style={{flex:1}}>{cat.label}</span>
+              </button>
+            ))}
+          </div>
+          <div className="modal__footer"><button className="btn btn-outline btn-sm" onClick={()=>setBulkDocMoveOpen(false)}>Cancel</button></div>
+        </div>
+      </div>}
     </div>
   );
 }
