@@ -1480,6 +1480,11 @@ body.dev-on .ov-page{padding-top:84px}
 .cdp-col-menu__item:hover{background:#fce8e8}
 .cdp-add-row{background:none;border:none;color:#003781;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:4px;padding:6px 0;font-family:inherit}
 .cdp-add-row:hover{text-decoration:underline}
+/* DnD states */
+.dtree__cat-row--drop{background:#ddeaff!important;border-left:3px solid #003781}
+.dtree__doc-row--drop{background:#ddeaff!important;outline:1px dashed #003781;border-radius:3px}
+.dtree__insert-line{height:3px;background:#003781;border-radius:2px;margin:0 8px;transition:opacity .1s}
+.dtree__drag-ghost{opacity:.35;pointer-events:none}
 
 </style>
 </head>
@@ -3790,46 +3795,154 @@ const CMP_TREE=[
 ];
 
 function DocTree({expanded,setExpanded,active,setActive}){
+  const [tree,setTree]=useState(()=>JSON.parse(JSON.stringify(CMP_TREE)));
+  const [drop,setDrop]=useState(null); // {id:string, pos:'before'|'after'|'into'}
+  const drag=useRef(null); // {type:'document'|'page', docId, pageIdx?}
   const toggle=id=>setExpanded(p=>({...p,[id]:!p[id]}));
-  const renderDocs=(docs,depth=0)=>docs.map(d=>{
-    const hasSub=d.docs&&d.docs.length>0;
-    const hasPages=d.pages&&d.pages.length>0;
-    const isOpen=expanded[d.id];
+  const clone=t=>JSON.parse(JSON.stringify(t));
+
+  /* ── helpers ── */
+  const findDoc=(tr,docId)=>{
+    for(let ci=0;ci<tr.length;ci++){
+      const search=docs=>{
+        for(let di=0;di<docs.length;di++){
+          if(docs[di].id===docId)return{catIdx:ci,catId:tr[ci].id,parentDocs:docs,docIdx:di,doc:docs[di]};
+          if(docs[di].docs?.length){const r=search(docs[di].docs);if(r)return r;}
+        }return null;
+      };
+      const r=search(tr[ci].docs);if(r)return r;
+    }return null;
+  };
+
+  const moveDocToCat=(docId,catId)=>setTree(prev=>{
+    const t=clone(prev);const loc=findDoc(t,docId);
+    if(!loc||loc.catId===catId)return prev;
+    const[doc]=loc.parentDocs.splice(loc.docIdx,1);
+    const cat=t.find(c=>c.id===catId);if(!cat)return prev;
+    cat.docs.push(doc);return t;
+  });
+
+  const moveDocRelative=(docId,refId,pos)=>{
+    if(docId===refId)return;
+    setTree(prev=>{
+      const t=clone(prev);
+      const src=findDoc(t,docId);const ref=findDoc(t,refId);
+      if(!src||!ref)return prev;
+      const[doc]=src.parentDocs.splice(src.docIdx,1);
+      const ri=ref.parentDocs.findIndex(d=>d.id===refId);
+      ref.parentDocs.splice(pos==='before'?ri:ri+1,0,doc);
+      return t;
+    });
+  };
+
+  const movePage=(fromDocId,fromPi,toDocId,toPi)=>setTree(prev=>{
+    const t=clone(prev);
+    const from=findDoc(t,fromDocId);const to=findDoc(t,toDocId);
+    if(!from||!to)return prev;
+    const[pg]=from.doc.pages.splice(fromPi,1);
+    let ins=toPi!==undefined?toPi:to.doc.pages.length;
+    if(fromDocId===toDocId&&fromPi<ins)ins--;
+    to.doc.pages.splice(Math.max(0,ins),0,pg);
+    return t;
+  });
+
+  /* ── drag handlers ── */
+  const onStart=(e,info)=>{drag.current=info;e.dataTransfer.effectAllowed='move';e.stopPropagation();};
+  const onEnd=()=>{setDrop(null);drag.current=null;};
+  const onLeave=e=>{if(!e.currentTarget.contains(e.relatedTarget))setDrop(null);};
+  const getPos=e=>{const r=e.currentTarget.getBoundingClientRect();return e.clientY<r.top+r.height/2?'before':'after';};
+
+  const onOver=(e,id,pos,valid)=>{
+    e.preventDefault();e.stopPropagation();
+    if(valid){e.dataTransfer.dropEffect='move';setDrop({id,pos});}
+    else e.dataTransfer.dropEffect='none';
+  };
+
+  const onDrop=(e,handler)=>{
+    e.preventDefault();e.stopPropagation();
+    if(drag.current)handler();
+    setDrop(null);drag.current=null;
+  };
+
+  /* ── insert line ── */
+  const InsLine=({id})=>(
+    <div style={{height:drop?.id===id?3:0,background:'#003781',borderRadius:2,margin:'1px 8px',transition:'height .1s'}}/>
+  );
+
+  /* ── render pages ── */
+  const renderPages=(doc,depth)=>doc.pages?.map((pg,pi)=>(
+    <div key={pi}
+      draggable
+      onDragStart={e=>onStart(e,{type:'page',docId:doc.id,pageIdx:pi})}
+      onDragEnd={onEnd}
+      onDragOver={e=>{if(drag.current?.type!=='page')return;const pos=getPos(e);onOver(e,`p-${doc.id}-${pi}`,pos,true);}}
+      onDragLeave={onLeave}
+      onDrop={e=>onDrop(e,()=>{const pos=drop?.pos||'after';movePage(drag.current.docId,drag.current.pageIdx,doc.id,pos==='before'?pi:pi+1);})}>
+      {drop?.id===`p-${doc.id}-${pi}`&&drop.pos==='before'&&<InsLine id={`p-${doc.id}-${pi}`}/>}
+      <div className={`dtree__page-row${active===doc.id+pg?' dtree__page-row--active':''}${drag.current?.type==='page'&&drag.current.docId===doc.id&&drag.current.pageIdx===pi?' dtree__drag-ghost':''}`}
+        style={{paddingLeft:28+depth*12}} onClick={()=>setActive(doc.id+pg)}>
+        <span style={{flex:1}}>{pg}</span>
+        <button className="dtree__del" onClick={e=>e.stopPropagation()}>🗑</button>
+      </div>
+      {drop?.id===`p-${doc.id}-${pi}`&&drop.pos==='after'&&<InsLine id={`p-${doc.id}-${pi}`}/>}
+    </div>
+  ));
+
+  /* ── render docs ── */
+  const renderDocs=(docs,catId,depth=0)=>docs.map((d,di)=>{
+    const isGroup=!!d.docs;const isOpen=expanded[d.id];
+    const isDragging=drag.current?.type==='document'&&drag.current.docId===d.id;
+    const isDropTarget=drop?.id===d.id;
     return(
       <div key={d.id}>
-        <div className={`dtree__doc-row${active===d.id?' dtree__doc-row--active':''}`} style={{paddingLeft:16+depth*12}}
-          onClick={()=>{setActive(d.id);if(hasSub||hasPages)toggle(d.id);}}>
+        {drop?.id===`bd-${d.id}`&&<InsLine id={`bd-${d.id}`}/>}
+        <div className={`dtree__doc-row${active===d.id?' dtree__doc-row--active':''}${isDragging?' dtree__drag-ghost':''}${isDropTarget?' dtree__doc-row--drop':''}`}
+          style={{paddingLeft:16+depth*12}}
+          draggable={!isGroup}
+          onDragStart={e=>!isGroup&&onStart(e,{type:'document',docId:d.id})}
+          onDragEnd={onEnd}
+          onDragOver={e=>{
+            const dt=drag.current?.type;
+            if(dt==='document'&&!isGroup){const pos=getPos(e);onOver(e,pos==='before'?`bd-${d.id}`:`ad-${d.id}`,pos,true);}
+            else if(dt==='page'){onOver(e,d.id,'into',true);}
+            else e.preventDefault();
+          }}
+          onDragLeave={onLeave}
+          onDrop={e=>onDrop(e,()=>{
+            if(drag.current.type==='document'){const pos=drop?.pos||'after';moveDocRelative(drag.current.docId,d.id,pos);}
+            else if(drag.current.type==='page'){movePage(drag.current.docId,drag.current.pageIdx,d.id,undefined);}
+          })}
+          onClick={()=>{setActive(d.id);if(isGroup||d.pages?.length)toggle(d.id);}}>
           <span style={{fontSize:11,color:'#aaa'}}>📄</span>
           <span style={{flex:1}}>{d.label}{d.count?` (${d.count})`:''}</span>
-          {(hasSub||hasPages)&&<span className="dtree__chev" style={{transform:isOpen?'rotate(0)':'rotate(-90deg)'}}><IC.ChevDown s={10}/></span>}
+          {(isGroup||d.pages?.length>0)&&<span className="dtree__chev" style={{transform:isOpen?'rotate(0)':'rotate(-90deg)'}}><IC.ChevDown s={10}/></span>}
         </div>
-        {isOpen&&hasSub&&<div>{renderDocs(d.docs,depth+1)}</div>}
-        {isOpen&&hasPages&&d.pages.map(pg=>(
-          <div key={pg} className={`dtree__page-row${active===d.id+pg?' dtree__page-row--active':''}`}
-            style={{paddingLeft:28+depth*12}} onClick={()=>setActive(d.id+pg)}>
-            <span style={{flex:1}}>{pg}</span>
-            <button className="dtree__del" onClick={e=>{e.stopPropagation();}}>🗑</button>
-          </div>
-        ))}
+        {drop?.id===`ad-${d.id}`&&<InsLine id={`ad-${d.id}`}/>}
+        {isOpen&&isGroup&&<div>{renderDocs(d.docs,catId,depth+1)}</div>}
+        {isOpen&&!isGroup&&d.pages?.length>0&&renderPages(d,depth)}
       </div>
     );
   });
+
   return(
     <div className="dtree">
       <button className="dtree__create">+ Create Document</button>
       <div className="dtree__tree">
-        {CMP_TREE.map(cat=>{
-          const isOpen=expanded[cat.id];
-          const hasDocs=cat.docs&&cat.docs.length>0;
+        {tree.map(cat=>{
+          const isOpen=expanded[cat.id];const hasDocs=cat.docs?.length>0;
+          const isCatDrop=drop?.id===`cat-${cat.id}`;
           return(
             <div key={cat.id} className="dtree__cat">
-              <div className={`dtree__cat-row${active===cat.id?' dtree__cat-row--active':''}`}
+              <div className={`dtree__cat-row${active===cat.id?' dtree__cat-row--active':''}${isCatDrop?' dtree__cat-row--drop':''}`}
+                onDragOver={e=>drag.current?.type==='document'&&onOver(e,`cat-${cat.id}`,'into',true)}
+                onDragLeave={onLeave}
+                onDrop={e=>onDrop(e,()=>moveDocToCat(drag.current.docId,cat.id))}
                 onClick={()=>{setActive(cat.id);if(hasDocs)toggle(cat.id);}}>
                 <span className="dtree__cat-ico">{cat.icon||'📁'}</span>
                 <span>{cat.label}{cat.count?<span className="dtree__cat-count"> ({cat.count})</span>:null}</span>
                 {hasDocs&&<span className="dtree__chev" style={{transform:isOpen?'rotate(0)':'rotate(-90deg)'}}><IC.ChevDown s={10}/></span>}
               </div>
-              {isOpen&&hasDocs&&<div className="dtree__sub">{renderDocs(cat.docs)}</div>}
+              {isOpen&&hasDocs&&<div className="dtree__sub">{renderDocs(cat.docs,cat.id)}</div>}
             </div>
           );
         })}
