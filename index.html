@@ -3828,24 +3828,67 @@ const CMP_TREE=[
 ];
 
 function BulkMoveModal({tree,excludeDocId,count,onMove,onClose}){
-  const docs=[];
-  const collect=nodes=>nodes.forEach(n=>{if(n.type==='document'&&n.id!==excludeDocId)docs.push(n);if(n.docs)collect(n.docs);});
-  tree.forEach(cat=>cat.docs&&collect(cat.docs));
+  const [openCats,setOpenCats]=React.useState(()=>{
+    const init={};tree.forEach(c=>{if(c.docs?.length)init[c.id]=true;});return init;
+  });
+  const toggleCat=id=>setOpenCats(p=>({...p,[id]:!p[id]}));
+
+  const renderNodes=(nodes,depth=0)=>nodes.map(n=>{
+    if(n.type==='group'){
+      const hasDocs=n.docs?.length>0;
+      return(
+        <div key={n.id}>
+          <div style={{display:'flex',alignItems:'center',gap:6,padding:'5px 14px',paddingLeft:14+depth*14,color:'#555',fontSize:12,fontWeight:500,cursor:hasDocs?'pointer':'default',userSelect:'none'}}
+            onClick={()=>hasDocs&&setOpenCats(p=>({...p,[n.id]:!p[n.id]}))}>
+            <span style={{color:'#aaa',display:'flex'}}><IC.Folder s={13}/></span>
+            <span style={{flex:1}}>{n.label}</span>
+            {hasDocs&&<span style={{color:'#bbb',fontSize:10,lineHeight:1,transform:openCats[n.id]?'rotate(0)':'rotate(-90deg)',display:'inline-block',transition:'transform .15s'}}><IC.ChevDown s={10}/></span>}
+          </div>
+          {openCats[n.id]&&hasDocs&&renderNodes(n.docs,depth+1)}
+        </div>
+      );
+    }
+    if(n.type==='document'&&n.id!==excludeDocId){
+      return(
+        <button key={n.id} onClick={()=>onMove(n.id)}
+          style={{display:'flex',alignItems:'center',gap:6,width:'100%',padding:'5px 14px',paddingLeft:14+depth*14,background:'none',border:'none',cursor:'pointer',textAlign:'left',fontSize:12,color:'#1a1a2e',fontFamily:'inherit',transition:'background .1s'}}
+          onMouseEnter={e=>e.currentTarget.style.background='#f0f5ff'}
+          onMouseLeave={e=>e.currentTarget.style.background='none'}>
+          <span style={{color:'#aaa',display:'flex'}}><IC.File/></span>
+          <span style={{flex:1}}>{n.label}</span>
+          <span style={{fontSize:10,color:'#aaa'}}>{n.pages?.length||0}p</span>
+        </button>
+      );
+    }
+    return null;
+  });
+
+  const hasAny=tree.some(cat=>cat.docs?.some(function check(n){return(n.type==='document'&&n.id!==excludeDocId)||(n.docs?.some(check));}));
+
   return(
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal" style={{maxWidth:340}} onClick={e=>e.stopPropagation()}>
+      <div className="modal" style={{maxWidth:320}} onClick={e=>e.stopPropagation()}>
         <div className="modal__header">
           <span className="modal__title">Move {count} page{count>1?'s':''} to</span>
           <button className="modal__close" onClick={onClose}>✕</button>
         </div>
-        <div className="modal__body" style={{padding:'6px 0',maxHeight:280,overflowY:'auto'}}>
-          {docs.length===0&&<p style={{padding:'8px 16px',fontSize:13,color:'#767676'}}>No other documents available.</p>}
-          {docs.map(d=>(
-            <button key={d.id} className="dtree-ctx__item" style={{display:'flex',alignItems:'center',gap:10}} onClick={()=>onMove(d.id)}>
-              <span style={{fontSize:11,color:'#aaa'}}>📄</span>
-              <span style={{flex:1}}>{d.label}</span>
-            </button>
-          ))}
+        <div className="modal__body" style={{padding:'4px 0',maxHeight:360,overflowY:'auto'}}>
+          {!hasAny&&<p style={{padding:'10px 16px',fontSize:13,color:'#767676'}}>No other documents available.</p>}
+          {tree.map(cat=>{
+            const hasDocs=cat.docs?.length>0;
+            const isOpen=openCats[cat.id];
+            return(
+              <div key={cat.id}>
+                <div style={{display:'flex',alignItems:'center',gap:6,padding:'6px 14px',background:'#f7f8fa',borderBottom:'1px solid #ebebeb',cursor:hasDocs?'pointer':'default',userSelect:'none'}}
+                  onClick={()=>hasDocs&&toggleCat(cat.id)}>
+                  <span style={{color:'#5a7db5',display:'flex'}}><IC.Folder s={13}/></span>
+                  <span style={{flex:1,fontSize:12,fontWeight:600,color:'#1a1a2e'}}>{cat.label}</span>
+                  {hasDocs&&<span style={{color:'#bbb',transform:isOpen?'rotate(0)':'rotate(-90deg)',display:'inline-flex',transition:'transform .15s'}}><IC.ChevDown s={10}/></span>}
+                </div>
+                {isOpen&&hasDocs&&<div>{renderNodes(cat.docs,1)}</div>}
+              </div>
+            );
+          })}
         </div>
         <div className="modal__footer"><button className="btn btn-outline btn-sm" onClick={onClose}>Cancel</button></div>
       </div>
