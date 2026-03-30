@@ -3101,7 +3101,12 @@ function UploadModal({rawFiles,dataSets,addDataSet,onConfirm,onClose}){
   const remove=i=>setItems(it=>{const n=it.filter((_,j)=>j!==i);if(!n.length)onClose();return n;});
   const addExp=(i,label)=>{if(!label.trim())return;setItems(it=>it.map((x,j)=>j===i&&x.expectedLabels.length<2&&!x.expectedLabels.includes(label.trim())?{...x,expectedLabels:[...x.expectedLabels,label.trim()],addLabelInput:''}:x));};
   const rmExp=(i,label)=>setItems(it=>it.map((x,j)=>j===i?{...x,expectedLabels:x.expectedLabels.filter(l=>l!==label)}:x));
-  const addBulkLabel=label=>{if(!label.trim()||bulkLabels.length>=2||bulkLabels.includes(label.trim()))return;setBulkLabels(l=>[...l,label.trim()]);setBulkLabelInput('');};
+  const addBulkLabel=label=>{
+    const l=label.trim();if(!l||bulkLabels.length>=2||bulkLabels.includes(l))return;
+    setBulkLabels(ls=>[...ls,l]);setBulkLabelInput('');
+    setItems(it=>it.map(x=>x.expectedLabels.includes(l)||x.expectedLabels.length>=2?x:{...x,expectedLabels:[...x.expectedLabels,l]}));
+  };
+  const removeBulkLabel=l=>{setBulkLabels(ls=>ls.filter(x=>x!==l));setItems(it=>it.map(x=>({...x,expectedLabels:x.expectedLabels.filter(e=>e!==l)})));};
   const applyToAll=()=>setItems(it=>it.map(x=>({...x,dataSetId:bulkDs,expectedLabels:[...bulkLabels]})));
 
   const handleCreateDs=()=>{
@@ -3159,13 +3164,14 @@ function UploadModal({rawFiles,dataSets,addDataSet,onConfirm,onClose}){
             </div>
           )}
           <div className="upload-pending__row">
-            <span className="upload-pending__label">Expect</span>
+            <span className="upload-pending__label">Label</span>
             <div className="upload-pending__chips">
-              {bulkLabels.map(l=><span key={l} className="upload-pending__chip">{l}<span className="upload-pending__chip-rm" onClick={()=>setBulkLabels(ls=>ls.filter(x=>x!==l))}>×</span></span>)}
+              {bulkLabels.map(l=><span key={l} className="upload-pending__chip">{l}<span className="upload-pending__chip-rm" onClick={()=>removeBulkLabel(l)}>×</span></span>)}
               {bulkLabels.length<2&&<input className="upload-pending__input" style={{width:'90px'}} placeholder="Add label…" value={bulkLabelInput}
                 onChange={e=>setBulkLabelInput(e.target.value)}
-                onKeyDown={e=>{if(e.key==='Enter'||e.key===',')addBulkLabel(bulkLabelInput);}}/>}
+                onKeyDown={e=>{if(e.key==='Enter'||e.key===','){addBulkLabel(bulkLabelInput);}}}/>}
             </div>
+            {bulkLabels.length>0&&<span style={{fontSize:10,color:'#888',marginLeft:4}}>applied to all</span>}
           </div>
         </div>
         <div className="upm__body">
