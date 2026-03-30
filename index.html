@@ -1515,6 +1515,15 @@ body.dev-on .ov-page{padding-top:84px}
 .dtree-ctx__item--danger{color:#cc0000}
 .dtree-ctx__item--danger:hover{background:#fce8e8}
 .dtree-ctx__sep{height:1px;background:#ebebeb;margin:3px 0}
+.dtree-range{position:fixed;background:#fff;border:1px solid #d4d4d4;border-radius:8px;box-shadow:0 6px 24px rgba(0,0,0,.16);z-index:300;padding:14px 16px;width:210px}
+.dtree-range__title{font-size:11px;font-weight:600;color:#666;text-transform:uppercase;letter-spacing:.04em;margin-bottom:10px}
+.dtree-range__row{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.dtree-range__input{width:56px;border:1.5px solid #d4d4d4;border-radius:5px;padding:5px 8px;font-size:13px;font-family:inherit;text-align:center;color:#1a1a2e}
+.dtree-range__input:focus{outline:none;border-color:#003781}
+.dtree-range__hint{font-size:10px;color:#aaa;margin-bottom:10px}
+.dtree-range__apply{width:100%;background:#003781;color:#fff;border:none;border-radius:5px;padding:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:background .1s}
+.dtree-range__apply:hover{background:#002060}
+.dtree-range__apply:disabled{background:#ccc;cursor:not-allowed}
 .dtree__more-btn{background:none;border:none;cursor:pointer;color:#aaa;padding:2px 5px;border-radius:3px;font-size:13px;opacity:0;transition:opacity .1s;line-height:1;flex-shrink:0;font-family:inherit}
 .dtree__doc-row:hover .dtree__more-btn,.dtree__doc-row--active .dtree__more-btn{opacity:1}
 .dtree__more-btn:hover{color:#003781;background:#e0ecff}
@@ -4079,9 +4088,14 @@ function DocTree({expanded,setExpanded,active,setActive}){
   };
   const selLastIdx=useRef(null);
   const [pageCtx,setPageCtx]=useState(null);
+  const [rangeModal,setRangeModal]=useState(null);
+  const [rangeFrom,setRangeFrom]=useState('');
+  const [rangeTo,setRangeTo]=useState('');
   const openPageCtx=(e,docId,pi,totalPages)=>{e.stopPropagation();e.preventDefault();setPageCtx({docId,pi,x:e.clientX,y:e.clientY,totalPages});};
   const selectToEnd=()=>{if(!pageCtx)return;const{docId,pi,totalPages}=pageCtx;const idx=new Set();for(let i=pi;i<totalPages;i++)idx.add(i);setSelPages({docId,indices:idx});if(selDocs.size>0)setSelDocs(new Set());selLastIdx.current=pi;setPageCtx(null);};
   const selectFromStart=()=>{if(!pageCtx)return;const{docId,pi}=pageCtx;const idx=new Set();for(let i=0;i<=pi;i++)idx.add(i);setSelPages({docId,indices:idx});if(selDocs.size>0)setSelDocs(new Set());selLastIdx.current=pi;setPageCtx(null);};
+  const openRangeModal=()=>{if(!pageCtx)return;setRangeFrom(String(pageCtx.pi+1));setRangeTo(String(pageCtx.totalPages));setRangeModal({docId:pageCtx.docId,totalPages:pageCtx.totalPages,x:pageCtx.x,y:pageCtx.y});setPageCtx(null);};
+  const applyRange=()=>{if(!rangeModal)return;const f=parseInt(rangeFrom,10),t=parseInt(rangeTo,10);if(!f||!t||f<1||t>rangeModal.totalPages||f>t)return;const idx=new Set();for(let i=f-1;i<=t-1;i++)idx.add(i);setSelPages({docId:rangeModal.docId,indices:idx});if(selDocs.size>0)setSelDocs(new Set());selLastIdx.current=f-1;setRangeModal(null);};
   const toggle=id=>setExpanded(p=>({...p,[id]:!p[id]}));
   const clone=t=>JSON.parse(JSON.stringify(t));
 
@@ -4461,7 +4475,7 @@ function DocTree({expanded,setExpanded,active,setActive}){
   });
 
   return(
-    <div className="dtree" onClick={()=>{setCtx(null);setPageCtx(null);}}>
+    <div className="dtree" onClick={()=>{setCtx(null);setPageCtx(null);setRangeModal(null);}}>
       <input ref={fileUploadRef} type="file" accept=".jpg,.jpeg,.png,.pdf" multiple style={{display:'none'}} onChange={e=>{handleUploadFiles(e.target.files);e.target.value='';}}/>
       <button className="dtree__create" onClick={()=>fileUploadRef.current?.click()}>+ Upload Document</button>
       <div className="dtree__tree">
@@ -4518,10 +4532,27 @@ function DocTree({expanded,setExpanded,active,setActive}){
         <div className="dtree-ctx" style={{top:pageCtx.y,left:pageCtx.x}} onClick={e=>e.stopPropagation()}>
           <button className="dtree-ctx__item" onClick={selectToEnd}>Select page {pageCtx.pi+1} to end</button>
           <button className="dtree-ctx__item" onClick={selectFromStart}>Select start to page {pageCtx.pi+1}</button>
+          <div className="dtree-ctx__sep"/>
+          <button className="dtree-ctx__item" onClick={openRangeModal}>Select range…</button>
         </div>
       )}
       {assignModal&&<AssignCatModal tree={tree} nodeId={assignModal.nodeId} nodeLabel={findNode(tree,assignModal.nodeId)?.node?.label||''} currentCatId={assignModal.catId} onAssign={handleAssign} onClose={()=>setAssignModal(null)}/>}
       {splitModal&&<SplitAssignModal tree={tree} doc={splitModal.doc} currentCatId={splitModal.catId} onConfirm={handleSplitAssign} onClose={()=>setSplitModal(null)}/>}
+      {rangeModal&&(
+        <div className="dtree-range" style={{top:rangeModal.y,left:rangeModal.x}} onClick={e=>e.stopPropagation()}>
+          <div className="dtree-range__title">Select page range</div>
+          <div className="dtree-range__row">
+            <input className="dtree-range__input" type="number" min={1} max={rangeModal.totalPages} value={rangeFrom} onChange={e=>setRangeFrom(e.target.value)} onKeyDown={e=>e.key==='Enter'&&applyRange()} autoFocus/>
+            <span style={{color:'#aaa',fontSize:13}}>–</span>
+            <input className="dtree-range__input" type="number" min={1} max={rangeModal.totalPages} value={rangeTo} onChange={e=>setRangeTo(e.target.value)} onKeyDown={e=>e.key==='Enter'&&applyRange()}/>
+          </div>
+          <div className="dtree-range__hint">1 – {rangeModal.totalPages} pages</div>
+          <button className="dtree-range__apply" onClick={applyRange}
+            disabled={!rangeFrom||!rangeTo||parseInt(rangeFrom)<1||parseInt(rangeTo)>rangeModal.totalPages||parseInt(rangeFrom)>parseInt(rangeTo)}>
+            Apply
+          </button>
+        </div>
+      )}
       {toast&&<div className="dtree__toast">{toast}</div>}
       {bulkMoveOpen&&selPages&&<BulkMoveModal tree={tree} excludeDocId={selPages.docId} sourceLabel={findNode(tree,selPages.docId)?.node?.label||''} count={selPages.indices.size} onMove={handleBulkMove} onClose={()=>setBulkMoveOpen(false)}/>}
       {bulkDocMoveOpen&&<BulkDocMoveModal tree={tree} count={selDocs.size} docLabels={[...selDocs].map(id=>findNode(tree,id)?.node?.label||id)} onMove={handleBulkDocMove} onClose={()=>setBulkDocMoveOpen(false)}/>}
