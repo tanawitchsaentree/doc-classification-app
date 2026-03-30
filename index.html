@@ -4539,6 +4539,8 @@ function DocTree({expanded,setExpanded,active,setActive}){
       {assignModal&&<AssignCatModal tree={tree} nodeId={assignModal.nodeId} nodeLabel={findNode(tree,assignModal.nodeId)?.node?.label||''} currentCatId={assignModal.catId} onAssign={handleAssign} onClose={()=>setAssignModal(null)}/>}
       {splitModal&&<SplitAssignModal tree={tree} doc={splitModal.doc} currentCatId={splitModal.catId} onConfirm={handleSplitAssign} onClose={()=>setSplitModal(null)}/>}
       {rangeModal&&(
+        <>
+        <div style={{position:'fixed',inset:0,zIndex:299}} onClick={()=>setRangeModal(null)}/>
         <div className="dtree-range" style={{top:rangeModal.y,left:rangeModal.x}} onClick={e=>e.stopPropagation()}>
           <div className="dtree-range__title">Select page range</div>
           <div className="dtree-range__row">
@@ -4552,6 +4554,7 @@ function DocTree({expanded,setExpanded,active,setActive}){
             Apply
           </button>
         </div>
+        </>
       )}
       {toast&&<div className="dtree__toast">{toast}</div>}
       {bulkMoveOpen&&selPages&&<BulkMoveModal tree={tree} excludeDocId={selPages.docId} sourceLabel={findNode(tree,selPages.docId)?.node?.label||''} count={selPages.indices.size} onMove={handleBulkMove} onClose={()=>setBulkMoveOpen(false)}/>}
