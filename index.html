@@ -4055,8 +4055,22 @@ function DocTree({expanded,setExpanded,active,setActive}){
   const selDocLastId=useRef(null);
   const [toast,setToast]=useState(null);
   const [newNodeIds,setNewNodeIds]=useState(new Set());
+  const fileUploadRef=useRef(null);
   const showToast=msg=>{setToast(msg);setTimeout(()=>setToast(null),2500);};
   const flashNodes=ids=>{setNewNodeIds(new Set(ids));setTimeout(()=>setNewNodeIds(new Set()),2000);};
+  const handleUploadFiles=files=>{
+    const arr=Array.from(files);if(!arr.length)return;
+    const newNodes=arr.map(f=>{
+      const isPdf=f.name.toLowerCase().endsWith('.pdf');
+      const pageCount=isPdf?Math.min(10,Math.max(1,Math.ceil(f.size/50000))):1;
+      const pages=Array.from({length:pageCount},(_,i)=>`Page ${i+1}`);
+      return{id:`upload-${Date.now()}-${Math.random().toString(36).slice(2,7)}`,type:'document',label:f.name.replace(/\.[^/.]+$/,''),pages};
+    });
+    setTree(t=>{const nt=clone(t);const uc=nt.find(c=>c.id==='unclassified');if(uc)uc.docs.push(...newNodes);return nt;});
+    setExpanded(p=>({...p,unclassified:true}));
+    flashNodes(newNodes.map(n=>n.id));
+    showToast(`${newNodes.length} document${newNodes.length>1?'s':''} added to UnClassified`);
+  };
   const selLastIdx=useRef(null);
   const [pageCtx,setPageCtx]=useState(null);
   const openPageCtx=(e,docId,pi,totalPages)=>{e.stopPropagation();e.preventDefault();setPageCtx({docId,pi,x:e.clientX,y:e.clientY,totalPages});};
@@ -4442,7 +4456,8 @@ function DocTree({expanded,setExpanded,active,setActive}){
 
   return(
     <div className="dtree" onClick={()=>{setCtx(null);setPageCtx(null);}}>
-      <button className="dtree__create">+ Create Document</button>
+      <input ref={fileUploadRef} type="file" accept=".jpg,.jpeg,.png,.pdf" multiple style={{display:'none'}} onChange={e=>{handleUploadFiles(e.target.files);e.target.value='';}}/>
+      <button className="dtree__create" onClick={()=>fileUploadRef.current?.click()}>+ Upload Document</button>
       <div className="dtree__tree">
         {tree.map(cat=>{
           const isOpen=expanded[cat.id];const hasDocs=cat.docs?.length>0;
