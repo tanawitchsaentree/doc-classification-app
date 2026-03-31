@@ -4757,8 +4757,8 @@ function CompletionDetail({doc,onBack}){
 function App({devOverrides={}}){
   const ds=useContext(DataCtx);
   const {toasts,addToast,removeToast}=useToast();
-  const [page,setPage]=useState(devOverrides.page||'lob-overview');
-  const [activeNav,setActiveNav]=useState('classification');
+  const [page,setPage]=useState(devOverrides.page||'dashboard');
+  const [activeNav,setActiveNav]=useState('home');
   const [completionDoc,setCompletionDoc]=useState(null);
   const [showOutputFormat,setShowOutputFormat]=useState(false);
   const [tabMeta,setTabMeta]=useState(devOverrides.tabMeta||{});
