@@ -2168,10 +2168,10 @@ function LobPromptSection({lobName,prompt,defaultPrompt,meta,saveState,onEdit,on
   const found=[...new Set(prompt.match(/\{\{[^}]+\}\}/g)||[])];
   return(
     <div className="l1-prompt-sec" id="cat-sec-l1">
-      <div className="l1-prompt-sec__hdr" onClick={()=>setOpen(o=>!o)} style={{cursor:'pointer'}}>
-        <span className="cat-sec__chevron" style={{transform:open?'rotate(0deg)':'rotate(-90deg)',transition:'transform .15s'}}><IC.ChevDown s={13}/></span>
-        <span className="l1-prompt-sec__badge">Stage 1</span>
-        <span className="l1-prompt-sec__title">{lobName}</span>
+      <div className="l1-prompt-sec__hdr" onClick={()=>promptMode!=='global'&&setOpen(o=>!o)} style={{cursor:promptMode!=='global'?'pointer':'default'}}>
+        {promptMode!=='global'&&<span className="cat-sec__chevron" style={{transform:open?'rotate(0deg)':'rotate(-90deg)',transition:'transform .15s'}}><IC.ChevDown s={13}/></span>}
+        {promptMode!=='global'&&<span className="l1-prompt-sec__badge">Stage 1</span>}
+        <span className="l1-prompt-sec__title">{promptMode==='global'?'Global prompt':lobName}</span>
         <div style={{display:'flex',alignItems:'center',gap:'6px',marginLeft:'auto'}}>
           <span className="lps-ver-pill">{m.version}</span>
           {m.score!=='N/A'&&<span className="lps-ver-pill">{m.score}</span>}
@@ -2180,7 +2180,7 @@ function LobPromptSection({lobName,prompt,defaultPrompt,meta,saveState,onEdit,on
           <button className="workspace__manage-btn" onClick={e=>{e.stopPropagation();onVersion();}}>Manage version</button>
         </div>
       </div>
-      {open&&<div className="l1-prompt-sec__body">
+      {(open||promptMode==='global')&&<div className="l1-prompt-sec__body">
         {/* Left: Prompt editor */}
         <div className="l1-prompt-sec__prompt">
           {missing&&<div style={{display:'flex',alignItems:'center',gap:'7px',padding:'7px 10px',background:'#fffbeb',border:'1px solid #fde68a',borderRadius:'6px',marginBottom:'10px',fontSize:'11px',color:'#92400e'}}><IC.Warn/> The <code style={{fontFamily:'monospace',background:'#fef3c7',padding:'1px 4px',borderRadius:'3px'}}>{'{{CLASSIFICATION_HIERARCHY}}'}</code> placeholder is required</div>}
