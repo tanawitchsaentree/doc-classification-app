@@ -4296,7 +4296,8 @@ function DocTree({expanded,setExpanded,active,setActive}){
       const pages=sorted.map(i=>loc.node.pages[i]);
       [...sorted].reverse().forEach(i=>loc.node.pages.splice(i,1));
       const newDoc={id:newId,type:'document',label:`${srcLabel} (split)`,pages};
-      loc.parentDocs.splice(loc.nodeIdx+1,0,newDoc);
+      if(loc.node.pages.length===0){loc.parentDocs.splice(loc.nodeIdx,1,newDoc);}
+      else{loc.parentDocs.splice(loc.nodeIdx+1,0,newDoc);}
       return t;
     });
     setSelPages(null);
