@@ -100,6 +100,14 @@ input,textarea,select{font-family:inherit}
 .quick-link__icon{width:36px;height:36px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
 .quick-link__label{font-size:13px;font-weight:600;color:#333333}
 .quick-link__sub{font-size:11px;color:#a0a0a0;margin-top:1px}
+.dash-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.dash-card{background:#fff;border:1px solid #e4e8f0;border-radius:10px;padding:28px 24px 22px;display:flex;flex-direction:column;gap:0;cursor:pointer;transition:box-shadow .15s,border-color .15s}
+.dash-card:hover{box-shadow:0 4px 20px rgba(0,0,0,.08);border-color:#c4cfdf}
+.dash-card__icon{width:56px;height:56px;background:#1a4fd6;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:18px;flex-shrink:0}
+.dash-card__title{font-size:16px;font-weight:600;color:#1a1a2e;margin-bottom:10px}
+.dash-card__desc{font-size:13px;color:#666;line-height:1.6;flex:1;margin-bottom:18px}
+.dash-card__open{background:none;border:none;color:#1a4fd6;font-size:13px;font-weight:500;cursor:pointer;padding:0;text-align:left;font-family:inherit}
+.dash-card__open:hover{text-decoration:underline}
 
 /* ── NDBX Button spinner (loading state) ── */
 .btn__spinner{width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
@@ -1910,86 +1918,54 @@ function NavBar({activeNav,onNav,menus,setMenu}){
 }
 
 /* ── Dashboard ── */
-function Dashboard({lobs,onNavigate}){
-  const totalCats=lobs.reduce((a,l)=>a+l.categories.length,0);
-  const totalTypes=lobs.reduce((a,l)=>a+l.categories.reduce((b,c)=>b+c.types.length,0),0);
-  const avgConf=Math.round(lobs.reduce((a,l)=>a+l.confidence,0)/lobs.length);
-  const deployed=lobs.filter(l=>l.status==='Deployed').length;
-  // Pipeline counts derived from deployed lob/type stats
-  const deployedTypes=lobs.reduce((a,l)=>a+l.categories.filter(c=>c.status==='Deployed').reduce((b,c)=>b+c.types.length,0),0);
-  const totalDocs=deployedTypes*18+47;
-  const classified=Math.round(totalDocs*0.938);
-  const review=totalDocs-classified;
-  const completed=Math.round(classified*0.941);
-  const PIPE=[
-    {icon:'📥',label:'Ingestion',       count:`${totalDocs.toLocaleString()} docs`,  color:'#eff6ff'},
-    {icon:'⚙️', label:'Pre-processing',  count:`${(totalDocs-3).toLocaleString()} docs`, color:'#f0fdf4'},
-    {icon:'🧠',label:'Auto Classify',   count:`${classified.toLocaleString()} docs`,  color:'#faf5ff'},
-    {icon:'👁️', label:'Manual Review',   count:`${review} pending`,                   color:'#fffbeb'},
-    {icon:'✅',label:'Completed',       count:`${completed.toLocaleString()} docs`,  color:'#f0fdf4'},
+function Dashboard({onNavigate}){
+  const MODULES=[
+    {
+      id:'classification',
+      label:'Classification',
+      desc:'Classify document using AI-powered prompt and manage document types across different lines of business.',
+      action:'config-list',
+      icon:<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><polyline points="9 15 11 17 15 13"/></svg>,
+    },
+    {
+      id:'identification',
+      label:'Identification',
+      desc:'Identify and extract key information from document with intelligent field recognition and validation.',
+      action:'identification',
+      icon:<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="8" y1="8" x2="16" y2="8"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="16" x2="12" y2="16"/></svg>,
+    },
+    {
+      id:'completion',
+      label:'Completion',
+      desc:'Auto-complete and validate document fields using contextual AI assistance and predefined rules.',
+      action:'completion',
+      icon:<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/><line x1="8" y1="9" x2="10" y2="9"/></svg>,
+    },
+    {
+      id:'flow',
+      label:'Flow',
+      desc:'Design and manage document processing workflows with automated routing and approval chains.',
+      action:'flow',
+      icon:<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="6" cy="6" r="2"/><circle cx="18" cy="12" r="2"/><circle cx="6" cy="18" r="2"/><path d="M8 6h4a2 2 0 012 2v2"/><path d="M16 14v2a2 2 0 01-2 2H8"/></svg>,
+    },
+    {
+      id:'export',
+      label:'Export',
+      desc:'Export processed documents in various formats, ensuring compliance and data security.',
+      action:'export',
+      icon:<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 8 16 12 12 16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>,
+    },
   ];
   return(
-    <div className="page-scroll">
-      <div className="page-hdr">
-        <div className="page-hdr__left"><h1>Dashboard</h1><p>System overview and quick actions</p></div>
-      </div>
-      <div className="stats-grid">
-        {[
-          {lbl:LABELS.l0.plural,          val:lobs.length, sub:`${deployed} deployed`},
-          {lbl:`Total ${LABELS.l1.plural}`,val:totalCats,sub:`across all ${LABELS.l0.plural}`},
-          {lbl:LABELS.l2.plural,          val:totalTypes,sub:`leaf-level config`},
-          {lbl:'Avg Confidence',   val:`${avgConf}%`,   sub:'classification score'},
-        ].map(s=>(
-          <div key={s.lbl} className="stat-card">
-            <div className="stat-card__label">{s.lbl}</div>
-            <div className="stat-card__value">{s.val}</div>
-            <div className="stat-card__sub">{s.sub}</div>
-            <div className="stat-card__bar"><div className="stat-card__bar-fill" style={{width:`${Math.min(100,avgConf)}%`}}/></div>
-          </div>
-        ))}
-      </div>
-      <div className="section-title">Processing Pipeline</div>
-      <div className="pipeline">
-        {PIPE.map((p,i)=><React.Fragment key={p.label}>
-          {i>0&&<div className="pipe-arrow">→</div>}
-          <div className="pipe-step">
-            <div className="pipe-step__icon" style={{background:p.color}}>{p.icon}</div>
-            <div className="pipe-step__label">{p.label}</div>
-            <div className="pipe-step__count">{p.count}</div>
-          </div>
-        </React.Fragment>)}
-      </div>
-      <div className="section-title">{LABELS.l0.short} Performance</div>
-      <div className="lob-perf">
-        <div className="lob-perf__hdr">
-          <span>{LABELS.l0.short}</span><span>{LABELS.l1.short}</span><span>{LABELS.l2.short}</span><span>Confidence</span><span>Status</span>
-        </div>
-        {lobs.map(l=>(
-          <div key={l.id} className="lob-perf__row" onClick={()=>onNavigate('lob-overview')}>
-            <div className="lob-perf__name">
-              <div className="lob-dot" style={{background:l.status==='Deployed'?'#008a00':'#cc0000'}}/>
-              <div><div className="lob-perf__name-text">{l.name}</div><div className="lob-perf__name-sub">{l.categories.length} {LABELS.l1.plural.toLowerCase()}</div></div>
-            </div>
-            <div className="lob-perf__cell">{l.categories.length}</div>
-            <div className="lob-perf__cell">{l.categories.reduce((a,c)=>a+c.types.length,0)}</div>
-            <div className="lob-perf__cell">
-              <div className="lob-perf__conf">{l.confidence}%</div>
-              <div className="conf-bar"><div className="conf-bar__fill" style={{width:`${l.confidence}%`,background:l.confidence>=90?'#008a00':l.confidence>=80?'#e07000':'#cc0000'}}/></div>
-            </div>
-            <div className="lob-perf__cell"><span className={`status-chip status-chip--${l.status.toLowerCase()}`}>{l.status}</span></div>
-          </div>
-        ))}
-      </div>
-      <div className="section-title">Quick Actions</div>
-      <div className="quick-links">
-        {[
-          {icon:'⚙️',color:'#eff6ff',label:'Configure Classification',sub:`Manage ${LABELS.l0.label}, ${LABELS.l1.label}, ${LABELS.l2.label} & prompts`,action:'lob-overview'},
-          {icon:'📋',color:'#f0fdf4',label:'Manual Review Queue',      sub:'72 documents pending review',           action:'queue'},
-          {icon:'📊',color:'#faf5ff',label:'Audit Log',               sub:'View classification history',            action:'audit'},
-        ].map(q=>(
-          <div key={q.label} className="quick-link" onClick={()=>onNavigate(q.action)}>
-            <div className="quick-link__icon" style={{background:q.color}}>{q.icon}</div>
-            <div><div className="quick-link__label">{q.label}</div><div className="quick-link__sub">{q.sub}</div></div>
+    <div style={{padding:'36px 40px'}}>
+      <h1 style={{fontSize:22,fontWeight:700,color:'#1a1a2e',marginBottom:32}}>Dashboard</h1>
+      <div className="dash-grid">
+        {MODULES.map(m=>(
+          <div key={m.id} className="dash-card" onClick={()=>onNavigate(m.action)}>
+            <div className="dash-card__icon">{m.icon}</div>
+            <div className="dash-card__title">{m.label}</div>
+            <div className="dash-card__desc">{m.desc}</div>
+            <button className="dash-card__open" onClick={e=>{e.stopPropagation();onNavigate(m.action);}}>Open</button>
           </div>
         ))}
       </div>
@@ -5017,7 +4993,11 @@ function App({devOverrides={}}){
     <div className="app" onClick={closeAll}>
       <NavBar activeNav={activeNav} onNav={handleNav} menus={menus} setMenu={setMenu}/>
 
-      {page==='dashboard'&&<Dashboard lobs={lobs} onNavigate={nav=>{if(nav==='config-list'){setPage('config-list');setActiveNav('classification');}else addToast(`${nav} coming soon`,'info');}}/>}
+      {page==='dashboard'&&<Dashboard onNavigate={nav=>{
+        if(nav==='config-list'){setPage('config-list');setActiveNav('classification');}
+        else if(nav==='completion'){setPage('completion');setActiveNav('completion');}
+        else addToast(`${nav} coming soon`,'info');
+      }}/>}
 
       {page==='lob-overview'&&<LobOverview lobs={lobs} onSelectLob={onSelectLob} addToast={addToast}
         onOpenOutputFormat={()=>{setOfActiveLobId(null);setShowOutputFormat(true);}}
