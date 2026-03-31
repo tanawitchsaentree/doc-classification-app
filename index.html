@@ -3662,6 +3662,7 @@ function CompletionHome({onOpen,addToast}){
     const n=selected.size;
     setLocalDocs(prev=>prev.filter(d=>!selected.has(d.id)));
     setSelected(new Set());
+    setPageNum(1);
     addToast?.(`${n} document${n>1?'s':''} deleted`,'warning');
   };
   const handleChangeQueue=()=>{addToast?.(`Change queue for ${selected.size} document${selected.size>1?'s':''}…`,'info');};
