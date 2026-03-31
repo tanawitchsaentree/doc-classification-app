@@ -2143,7 +2143,7 @@ function PublishModal({accuracy,testedCount,matchedCount,onConfirm,onClose}){
 /* ── LOB Prompt Section (Stage 1 — L1-only scroll mode) ── */
 /* targets = l1Items passed from App so classifier knows the category targets */
 function LobPromptSection({lobName,prompt,defaultPrompt,meta,saveState,onEdit,onSave,
-  onVersion,hierarchyContext,promptMode='l1',publishedSnap,approvedSnap,docs=[],dataSets=[],onSelectFiles,onRunTest,onApprove,onDeploy}){
+  onVersion,hierarchyContext,promptMode='class',publishedSnap,approvedSnap,docs=[],dataSets=[],onSelectFiles,onRunTest,onApprove,onDeploy}){
   const [open,setOpen]=useState(true);
   const [showResetConfirm,setShowResetConfirm]=useState(false);
   const [showPreview,setShowPreview]=useState(false);
@@ -4880,8 +4880,8 @@ function App({devOverrides={}}){
         c.types.forEach(t=>{seedPub[t.id]={text:t.prompt||'',accuracy,publishedAt,note:''};});
       }
     });
-    // L2 mode: land on first category; L1/Global: land on clicked category or first
-    const startTab=promptLevel==='l2'?(newL1Items[0]?.id||''):(cat?cat.id:(newL1Items[0]?.id||''));
+    // Class mode: land on clicked category or first; Global: same
+    const startTab=cat?cat.id:(newL1Items[0]?.id||'');
     const startL1Tab=startTab;
     setSelectedLobId(lob.id);
     setL1Items(newL1Items);
@@ -4921,7 +4921,7 @@ function App({devOverrides={}}){
     const snapshot=approvedPrompts[promptKey];
     if(!snapshot)return;
     const newScore=snapshot.accuracy!=null?`${snapshot.accuracy}%`:'N/A';
-    const isLobLevel=promptKey==='l1'||promptKey==='global';
+    const isLobLevel=promptKey==='global';
     setTabMeta(p=>({...p,[promptKey]:{...(p[promptKey]||{}),status:'Deploying'}}));
     setTimeout(()=>{
       setPublishedPrompts(pp=>({...pp,[promptKey]:snapshot}));
@@ -5148,7 +5148,7 @@ function Root(){
       const firstCatId=l1Items[0]?.id||'l1';
       return{page:'detail',selectedLobId:lob.id,l0Name:lob.name,l1Items,prompts,defaultPrompts:prompts,
         tabMeta,activeTab:firstCatId,activeL1Tab:firstCatId,
-        promptLevel:opts.promptLevel||'l1',
+        promptLevel:opts.promptLevel||'class',
         publishedPrompts:seedPub,
         ...(opts.docs!==undefined?{docs:opts.docs}:{}),
         ...(opts.lobs!==undefined?{lobs:opts.lobs}:{}),
