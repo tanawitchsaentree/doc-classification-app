@@ -3633,11 +3633,13 @@ const CMP_DOCS=[
   {id:'6859534dce455e9a54135999',date:'16-06-2025 | 09:30 AM',sender:'Mereuta, Cosmin (Allianz Technology, ex...)',user:'Cosmin Mereuta',status:'Locked',category:'Claim',queue:'FNOL'},
 ];
 
-function CompletionHome({onOpen}){
+function CompletionHome({onOpen,addToast}){
   const [dateFrom,setDateFrom]=useState('');
   const [dateTo,setDateTo]=useState('');
   const [ingestionId,setIngestionId]=useState('');
   const [docCategory,setDocCategory]=useState('');
+  const [statusFilter,setStatusFilter]=useState('');
+  const [queueFilter,setQueueFilter]=useState('');
   const [mode,setMode]=useState('Manual');
   const [sortCol,setSortCol]=useState('date');
   const [sortDir,setSortDir]=useState('desc');
@@ -3645,6 +3647,9 @@ function CompletionHome({onOpen}){
   const [pageSize,setPageSize]=useState(10);
   const [selected,setSelected]=useState(new Set());
   const [moreFilters,setMoreFilters]=useState(false);
+  const [localDocs,setLocalDocs]=useState(CMP_DOCS);
+
+  const parseDocDate=s=>{const[dp]=s.split(' | ');const[d,m,y]=dp.split('-');return new Date(`${y}-${m}-${d}`);};
 
   const sort=(col)=>{
     if(sortCol===col){setSortDir(d=>d==='asc'?'desc':'asc');}
@@ -3652,9 +3657,21 @@ function CompletionHome({onOpen}){
     setPageNum(1);
   };
 
-  const filtered=CMP_DOCS.filter(d=>{
+  const handleDelete=()=>{
+    const n=selected.size;
+    setLocalDocs(prev=>prev.filter(d=>!selected.has(d.id)));
+    setSelected(new Set());
+    addToast?.(`${n} document${n>1?'s':''} deleted`,'warning');
+  };
+  const handleChangeQueue=()=>{addToast?.(`Change queue for ${selected.size} document${selected.size>1?'s':''}…`,'info');};
+
+  const filtered=localDocs.filter(d=>{
+    if(dateFrom&&parseDocDate(d.date)<new Date(dateFrom))return false;
+    if(dateTo){const to=new Date(dateTo);to.setHours(23,59,59,999);if(parseDocDate(d.date)>to)return false;}
     if(ingestionId&&!d.id.includes(ingestionId))return false;
     if(docCategory&&!d.category.toLowerCase().includes(docCategory.toLowerCase()))return false;
+    if(statusFilter&&d.status!==statusFilter)return false;
+    if(queueFilter&&d.queue!==queueFilter)return false;
     return true;
   });
 
@@ -3696,7 +3713,7 @@ function CompletionHome({onOpen}){
     return pages;
   })();
 
-  const clearFilters=()=>{setDateFrom('');setDateTo('');setIngestionId('');setDocCategory('');setPageNum(1);};
+  const clearFilters=()=>{setDateFrom('');setDateTo('');setIngestionId('');setDocCategory('');setStatusFilter('');setQueueFilter('');setPageNum(1);};
 
   return(
     <div className="ov-page">
@@ -3730,6 +3747,24 @@ function CompletionHome({onOpen}){
           More filters <span style={{fontSize:'10px'}}>{moreFilters?'▲':'▼'}</span>
         </button>
       </div>
+      {moreFilters&&(
+        <div className="ov-filter-row" style={{paddingTop:8,borderTop:'1px solid #ebebeb',marginTop:8}}>
+          <div className="ov-filter-group">
+            <span className="ov-filter-label">Status</span>
+            <select className="ov-search" style={{width:140}} value={statusFilter} onChange={e=>{setStatusFilter(e.target.value);setPageNum(1);}}>
+              <option value="">All</option>
+              {[...new Set(CMP_DOCS.map(d=>d.status))].map(s=><option key={s} value={s}>{s}</option>)}
+            </select>
+          </div>
+          <div className="ov-filter-group">
+            <span className="ov-filter-label">Queue</span>
+            <select className="ov-search" style={{width:160}} value={queueFilter} onChange={e=>{setQueueFilter(e.target.value);setPageNum(1);}}>
+              <option value="">All</option>
+              {[...new Set(CMP_DOCS.map(d=>d.queue))].map(q=><option key={q} value={q}>{q}</option>)}
+            </select>
+          </div>
+        </div>
+      )}
 
       {/* Toolbar */}
       <div className="cmp-toolbar">
@@ -3739,10 +3774,10 @@ function CompletionHome({onOpen}){
           <button className={`cmp-toggle__btn ${mode==='Automatic'?'cmp-toggle__btn--on':'cmp-toggle__btn--off'}`} onClick={()=>setMode('Automatic')}>Automatic</button>
         </div>
         <div style={{flex:1}}/>
-        <button className="btn btn-outline btn-sm" disabled={selected.size===0}>Change queue</button>
-        <button className="btn btn-outline btn-sm" disabled={selected.size===0}>Delete</button>
-        <button className="btn btn-outline btn-sm">Export to excel</button>
-        <button className="btn btn-outline btn-sm">Refresh</button>
+        <button className="btn btn-outline btn-sm" disabled={selected.size===0} onClick={handleChangeQueue}>Change queue</button>
+        <button className="btn btn-outline btn-sm" disabled={selected.size===0} onClick={handleDelete}>Delete</button>
+        <button className="btn btn-outline btn-sm" disabled={filtered.length===0} onClick={()=>addToast?.(`Exporting ${filtered.length} row${filtered.length>1?'s':''}…`,'success')}>Export to excel</button>
+        <button className="btn btn-outline btn-sm" onClick={()=>{setLocalDocs(CMP_DOCS);setSelected(new Set());setPageNum(1);}}>Refresh</button>
       </div>
 
       {/* Table */}
@@ -5003,7 +5038,7 @@ function App({devOverrides={}}){
         onOpenOutputFormat={()=>{setOfActiveLobId(null);setShowOutputFormat(true);}}
         onConfirm={setConfirmState} onDeleteLob={deleteLob}/>}
 
-      {page==='completion'&&<CompletionHome onOpen={doc=>{setCompletionDoc(doc);setPage('completion-detail');}}/>}
+      {page==='completion'&&<CompletionHome onOpen={doc=>{setCompletionDoc(doc);setPage('completion-detail');}} addToast={addToast}/>}
       {page==='completion-detail'&&<CompletionDetail doc={completionDoc} onBack={()=>{setPage('completion');setActiveNav('completion');}}/>}
 
 
