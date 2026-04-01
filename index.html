@@ -1457,6 +1457,12 @@ body.dev-on .ov-page{padding-top:84px}
 .dtree__collapse{padding:8px;border-top:1px solid #ebebeb;display:flex;justify-content:flex-end}
 .dtree__collapse-btn{background:none;border:none;cursor:pointer;color:#767676;font-size:12px;padding:4px 8px;border-radius:4px;font-family:inherit}
 .dtree__collapse-btn:hover{background:#f5f5f5}
+.dtree-confirm{position:absolute;bottom:36px;left:0;right:0;background:#fff;border-top:2px solid #cc0000;padding:9px 12px;display:flex;align-items:center;gap:8px;z-index:25;box-shadow:0 -3px 10px rgba(0,0,0,.1)}
+.dtree-confirm__msg{flex:1;font-size:12px;font-weight:500;color:#333}
+.dtree-confirm__yes{background:#cc0000;color:#fff;border:none;border-radius:4px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit}
+.dtree-confirm__yes:hover{background:#a80000}
+.dtree-confirm__no{background:none;border:1.5px solid #ccc;border-radius:4px;padding:5px 12px;font-size:11px;cursor:pointer;font-family:inherit;color:#555}
+.dtree-confirm__no:hover{background:#f5f5f5}
 /* center doc viewer */
 .docview{flex:1;display:flex;flex-direction:column;background:#f5f5f5;min-width:0;border-right:1px solid #d4d4d4}
 .docview__toolbar{display:flex;align-items:center;gap:2px;padding:6px 10px;background:#fff;border-bottom:1px solid #d4d4d4;flex-shrink:0}
@@ -3970,7 +3976,9 @@ function BulkDocMoveModal({tree,count,docLabels,onMove,onClose}){
           <p style={{fontSize:12,color:'#767676',marginBottom:14}}>Moving <strong>{count} document{count>1?'s':''}</strong> to:</p>
           <div style={{display:'flex',alignItems:'center',gap:8,padding:'10px 12px',background:'#f0f5ff',border:'1px solid #c7d8f5',borderRadius:7,marginBottom:12}}>
             <span style={{color:'#003781',display:'flex'}}><IC.Folder s={14}/></span>
-            <span style={{fontSize:13,fontWeight:600,color:'#003781'}}>{dest.label}</span>
+            <div><div style={{fontSize:13,fontWeight:600,color:'#003781'}}>{dest.label}</div>
+              {dest.path&&<div style={{fontSize:11,color:'#888'}}>{dest.path}</div>}
+            </div>
           </div>
           <div style={{fontSize:12,color:'#555',display:'flex',flexDirection:'column',gap:2,maxHeight:120,overflowY:'auto'}}>
             {docLabels.map((l,i)=><div key={i} style={{display:'flex',alignItems:'center',gap:6,padding:'2px 0'}}>
@@ -3980,7 +3988,7 @@ function BulkDocMoveModal({tree,count,docLabels,onMove,onClose}){
         </div>
         <div className="modal__footer">
           <button className="btn btn-outline btn-sm" onClick={()=>setDest(null)}>← Back</button>
-          <button className="btn btn-primary btn-sm" onClick={()=>onMove(dest.id)}>Confirm move →</button>
+          <button className="btn btn-primary btn-sm" onClick={()=>onMove(dest.id,dest.type)}>Confirm move →</button>
         </div>
       </div>
     </div>
@@ -3989,12 +3997,21 @@ function BulkDocMoveModal({tree,count,docLabels,onMove,onClose}){
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal" style={{maxWidth:300}} onClick={e=>e.stopPropagation()}>
         <div className="modal__header"><span className="modal__title">Move {count} doc{count>1?'s':''} to</span><button className="modal__close" onClick={onClose}>✕</button></div>
-        <div className="modal__body" style={{padding:'6px 0'}}>
+        <div className="modal__body" style={{padding:'6px 0',maxHeight:360,overflowY:'auto'}}>
           {tree.map(cat=>(
-            <button key={cat.id} className="dtree-ctx__item" style={{display:'flex',alignItems:'center',gap:10}} onClick={()=>setDest({id:cat.id,label:cat.label})}>
-              <span style={{color:'#003781',display:'flex'}}><IC.Folder s={13}/></span>
-              <span style={{flex:1}}>{cat.label}</span>
-            </button>
+            <div key={cat.id}>
+              <button className="dtree-ctx__item" style={{display:'flex',alignItems:'center',gap:10}} onClick={()=>setDest({id:cat.id,type:'cat',label:cat.label,path:null})}>
+                <span style={{color:'#003781',display:'flex'}}><IC.Folder s={13}/></span>
+                <span style={{flex:1}}>{cat.label}</span>
+              </button>
+              {cat.docs?.filter(d=>d.type==='group').map(g=>(
+                <button key={g.id} className="dtree-ctx__item" style={{display:'flex',alignItems:'center',gap:10,paddingLeft:28}} onClick={()=>setDest({id:g.id,type:'group',label:g.label,path:cat.label})}>
+                  <span style={{color:'#4a7ec8',display:'flex'}}><IC.Folder s={12}/></span>
+                  <span style={{flex:1}}>{g.label}</span>
+                  <span style={{fontSize:10,color:'#aaa',background:'#f0f0f0',borderRadius:3,padding:'1px 5px'}}>group</span>
+                </button>
+              ))}
+            </div>
           ))}
         </div>
         <div className="modal__footer"><button className="btn btn-outline btn-sm" onClick={onClose}>Cancel</button></div>
@@ -4012,11 +4029,11 @@ function AssignCatModal({tree,nodeId,nodeLabel,currentCatId,onAssign,onClose}){
         <div className="modal__body" style={{padding:'18px 20px'}}>
           <MovePreview
             fromIcon={<IC.File/>} fromLabel={nodeLabel||nodeId}
-            toIcon={<IC.Folder s={13}/>} toLabel={dest.label}/>
+            toIcon={<IC.Folder s={13}/>} toLabel={dest.label} toSub={dest.path||undefined}/>
         </div>
         <div className="modal__footer">
           <button className="btn btn-outline btn-sm" onClick={()=>setDest(null)}>← Back</button>
-          <button className="btn btn-primary btn-sm" onClick={()=>onAssign(nodeId,dest.id)}>Confirm →</button>
+          <button className="btn btn-primary btn-sm" onClick={()=>onAssign(nodeId,dest.id,dest.type)}>Confirm →</button>
         </div>
       </div>
     </div>
@@ -4024,15 +4041,25 @@ function AssignCatModal({tree,nodeId,nodeLabel,currentCatId,onAssign,onClose}){
   return(
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal" style={{maxWidth:340}} onClick={e=>e.stopPropagation()}>
-        <div className="modal__header"><span className="modal__title">Move to category</span><button className="modal__close" onClick={onClose}>✕</button></div>
-        <div className="modal__body" style={{padding:'6px 0'}}>
+        <div className="modal__header"><span className="modal__title">Move to</span><button className="modal__close" onClick={onClose}>✕</button></div>
+        <div className="modal__body" style={{padding:'6px 0',maxHeight:360,overflowY:'auto'}}>
           {tree.map(c=>(
-            <button key={c.id} className="dtree-ctx__item" style={{display:'flex',alignItems:'center',gap:10,background:currentCatId===c.id?'#e8effa':undefined}}
-              onClick={()=>setDest({id:c.id,label:c.label})}>
-              <span style={{color:'#003781',display:'flex'}}><IC.Folder s={13}/></span>
-              <span style={{flex:1}}>{c.label}</span>
-              {currentCatId===c.id&&<span style={{fontSize:11,color:'#003781',fontWeight:600}}>Current</span>}
-            </button>
+            <div key={c.id}>
+              <button className="dtree-ctx__item" style={{display:'flex',alignItems:'center',gap:10,background:currentCatId===c.id?'#e8effa':undefined}}
+                onClick={()=>setDest({id:c.id,type:'cat',label:c.label,path:null})}>
+                <span style={{color:'#003781',display:'flex'}}><IC.Folder s={13}/></span>
+                <span style={{flex:1}}>{c.label}</span>
+                {currentCatId===c.id&&<span style={{fontSize:11,color:'#003781',fontWeight:600}}>Current</span>}
+              </button>
+              {c.docs?.filter(d=>d.type==='group').map(g=>(
+                <button key={g.id} className="dtree-ctx__item" style={{display:'flex',alignItems:'center',gap:10,paddingLeft:28}}
+                  onClick={()=>setDest({id:g.id,type:'group',label:g.label,path:c.label})}>
+                  <span style={{color:'#4a7ec8',display:'flex'}}><IC.Folder s={12}/></span>
+                  <span style={{flex:1}}>{g.label}</span>
+                  <span style={{fontSize:10,color:'#aaa',background:'#f0f0f0',borderRadius:3,padding:'1px 5px'}}>group</span>
+                </button>
+              ))}
+            </div>
           ))}
         </div>
         <div className="modal__footer"><button className="btn btn-outline btn-sm" onClick={onClose}>Cancel</button></div>
@@ -4070,6 +4097,7 @@ function SplitAssignModal({tree,doc,currentCatId,onConfirm,onClose}){
 }
 
 function DocTree({expanded,setExpanded,active,setActive}){
+  const [collapsed,setCollapsed]=useState(false);
   const [tree,setTree]=useState(()=>JSON.parse(JSON.stringify(CMP_TREE)));
   const [drop,setDrop]=useState(null); // {id, pos:'before'|'after'|'into'}
   const drag=useRef(null);
@@ -4083,6 +4111,7 @@ function DocTree({expanded,setExpanded,active,setActive}){
   const selDocLastId=useRef(null);
   const [toast,setToast]=useState(null);
   const [newNodeIds,setNewNodeIds]=useState(new Set());
+  const [confirmDel,setConfirmDel]=useState(null); // {msg, onConfirm}
   const fileUploadRef=useRef(null);
   const showToast=msg=>{setToast(msg);setTimeout(()=>setToast(null),2500);};
   const flashNodes=ids=>{setNewNodeIds(new Set(ids));setTimeout(()=>setNewNodeIds(new Set()),2000);};
@@ -4128,9 +4157,9 @@ function DocTree({expanded,setExpanded,active,setActive}){
   /* ── move node to root of a category ── */
   const moveNodeToCat=(nodeId,catId)=>setTree(prev=>{
     const t=clone(prev);const loc=findNode(t,nodeId);
-    if(!loc||loc.catId===catId)return prev;
+    const cat=t.find(c=>c.id===catId);if(!loc||!cat)return prev;
+    if(cat.docs.some(d=>d.id===nodeId))return prev; // already at root of this cat
     const[node]=loc.parentDocs.splice(loc.nodeIdx,1);
-    const cat=t.find(c=>c.id===catId);if(!cat)return prev;
     cat.docs.push(node);return t;
   });
 
@@ -4174,7 +4203,11 @@ function DocTree({expanded,setExpanded,active,setActive}){
   });
 
   /* ── context menu actions ── */
-  const handleAssign=(nodeId,catId)=>{moveNodeToCat(nodeId,catId);setAssignModal(null);};
+  const handleAssign=(nodeId,destId,destType)=>{
+    if(destType==='group')moveNodeIntoGroup(nodeId,destId);
+    else moveNodeToCat(nodeId,destId);
+    setAssignModal(null);
+  };
   const handleSplit=(nodeId)=>{
     const loc=findNode(tree,nodeId);
     if(!loc||!loc.node.pages?.length){setCtx(null);return;}
@@ -4245,21 +4278,27 @@ function DocTree({expanded,setExpanded,active,setActive}){
     setSelDocs(newSet.size>0?newSet:new Set());
     selDocLastId.current=docId;
   };
-  const handleBulkDocMove=(catId)=>{
+  const handleBulkDocMove=(destId,destType)=>{
     const n=selDocs.size;
-    const catLabel=tree.find(c=>c.id===catId)?.label||'category';
+    const destLabel=(destType==='group'?findNode(tree,destId)?.node?.label:tree.find(c=>c.id===destId)?.label)||'destination';
     setTree(prev=>{
       const t=clone(prev);
       [...selDocs].forEach(docId=>{
-        const loc=findNode(t,docId);
-        if(!loc||loc.catId===catId)return;
-        const[node]=loc.parentDocs.splice(loc.nodeIdx,1);
-        const cat=t.find(c=>c.id===catId);if(cat)cat.docs.push(node);
+        const loc=findNode(t,docId);if(!loc)return;
+        if(destType==='group'){
+          const grp=findNode(t,destId);if(!grp||!grp.node.docs)return;
+          if(grp.node.docs.some(d=>d.id===docId))return;
+          const[node]=loc.parentDocs.splice(loc.nodeIdx,1);grp.node.docs.push(node);
+        }else{
+          const cat=t.find(c=>c.id===destId);if(!cat)return;
+          if(cat.docs.some(d=>d.id===docId))return;
+          const[node]=loc.parentDocs.splice(loc.nodeIdx,1);cat.docs.push(node);
+        }
       });
       return t;
     });
     setSelDocs(new Set());setBulkDocMoveOpen(false);
-    showToast(`${n} document${n>1?'s':''} moved to ${catLabel}`);
+    showToast(`${n} document${n>1?'s':''} moved to ${destLabel}`);
   };
   const handleBulkDocDelete=()=>{
     const n=selDocs.size;
@@ -4343,13 +4382,16 @@ function DocTree({expanded,setExpanded,active,setActive}){
   };
   const handleBulkDelete=()=>{
     if(!selPages)return;
-    setTree(prev=>{
-      const t=clone(prev);const loc=findNode(t,selPages.docId);
-      if(!loc)return prev;
-      [...selPages.indices].sort((a,b)=>b-a).forEach(i=>loc.node.pages.splice(i,1));
-      return t;
-    });
-    setSelPages(null);
+    const n=selPages.indices.size;
+    setConfirmDel({msg:`Delete ${n} page${n>1?'s':''}?`,onConfirm:()=>{
+      setTree(prev=>{
+        const t=clone(prev);const loc=findNode(t,selPages.docId);
+        if(!loc)return prev;
+        [...selPages.indices].sort((a,b)=>b-a).forEach(i=>loc.node.pages.splice(i,1));
+        return t;
+      });
+      setSelPages(null);
+    }});
   };
   const deletePage=(docId,pi)=>{
     setTree(prev=>{
@@ -4429,7 +4471,7 @@ function DocTree({expanded,setExpanded,active,setActive}){
           <div className="dtree__page-cb" onClick={e=>togglePage(e,doc.id,pi)}>{isSel&&'✓'}</div>
           <span style={{flex:1}}>{pg}</span>
           <button className="dtree__page-more" onClick={e=>openPageCtx(e,doc.id,pi,doc.pages.length)}>⋮</button>
-          <button className="dtree__del" onClick={e=>{e.stopPropagation();deletePage(doc.id,pi);}}>🗑</button>
+          <button className="dtree__del" onClick={e=>{e.stopPropagation();setConfirmDel({msg:`Delete ${pg}?`,onConfirm:()=>deletePage(doc.id,pi)});}}>🗑</button>
         </div>
         {drop?.id===dropId&&drop.pos==='after'&&<InsLine id={dropId}/>}
       </div>
@@ -4489,10 +4531,10 @@ function DocTree({expanded,setExpanded,active,setActive}){
   });
 
   return(
-    <div className="dtree" onClick={()=>{setCtx(null);setPageCtx(null);setRangeModal(null);}}>
-      <input ref={fileUploadRef} type="file" accept=".jpg,.jpeg,.png,.pdf" multiple style={{display:'none'}} onChange={e=>{handleUploadFiles(e.target.files);e.target.value='';}}/>
-      <button className="dtree__create" onClick={()=>fileUploadRef.current?.click()}>+ Upload Document</button>
-      <div className="dtree__tree">
+    <div className="dtree" style={collapsed?{width:36,minWidth:36}:{}} onClick={()=>{setCtx(null);setPageCtx(null);setRangeModal(null);}}>
+      {!collapsed&&<><input ref={fileUploadRef} type="file" accept=".jpg,.jpeg,.png,.pdf" multiple style={{display:'none'}} onChange={e=>{handleUploadFiles(e.target.files);e.target.value='';}}/>
+      <button className="dtree__create" onClick={()=>fileUploadRef.current?.click()}>+ Upload Document</button></>}
+      <div className="dtree__tree" style={collapsed?{display:'none'}:{}}>
         {tree.map(cat=>{
           const isOpen=expanded[cat.id];const hasDocs=cat.docs?.length>0;
           const isCatDrop=drop?.id===`cat-${cat.id}`;
@@ -4512,7 +4554,7 @@ function DocTree({expanded,setExpanded,active,setActive}){
           );
         })}
       </div>
-      {(selDocs.size>0||(selPages&&selPages.indices.size>0))&&(
+      {!collapsed&&(selDocs.size>0||(selPages&&selPages.indices.size>0))&&(
         <div className="dtree__bulk-bar" onClick={e=>e.stopPropagation()}>
           {selDocs.size>0?(
             <>
@@ -4530,13 +4572,13 @@ function DocTree({expanded,setExpanded,active,setActive}){
           )}
         </div>
       )}
-      <div className="dtree__collapse"><button className="dtree__collapse-btn">«</button></div>
+      <div className="dtree__collapse"><button className="dtree__collapse-btn" onClick={e=>{e.stopPropagation();setCollapsed(v=>!v);}}>{collapsed?'»':'«'}</button></div>
       {ctx&&(
         <div className="dtree-ctx" style={{top:ctx.y,left:ctx.x}} onClick={e=>e.stopPropagation()}>
           <button className="dtree-ctx__item" onClick={()=>{setAssignModal({nodeId:ctx.nodeId,catId:ctx.catId});setCtx(null);}}>Move to category</button>
           {!ctx.isGroup&&<>
-            <button className="dtree-ctx__item" onClick={()=>handleSplit(ctx.nodeId)}>Split document</button>
-            <button className="dtree-ctx__item" onClick={()=>{const loc=findNode(tree,ctx.nodeId);setSplitModal({doc:loc?.node,catId:ctx.catId});setCtx(null);}}>Split and assign</button>
+            <button className="dtree-ctx__item" onClick={()=>handleSplit(ctx.nodeId)}>Split all pages into docs</button>
+            <button className="dtree-ctx__item" onClick={()=>{const loc=findNode(tree,ctx.nodeId);setSplitModal({doc:loc?.node,catId:ctx.catId});setCtx(null);}}>Split &amp; assign to categories</button>
           </>}
           <div className="dtree-ctx__sep"/>
           <button className="dtree-ctx__item dtree-ctx__item--danger" onClick={()=>handleDelete(ctx.nodeId)}>Delete</button>
@@ -4569,6 +4611,13 @@ function DocTree({expanded,setExpanded,active,setActive}){
           </button>
         </div>
         </>
+      )}
+      {confirmDel&&(
+        <div className="dtree-confirm" onClick={e=>e.stopPropagation()}>
+          <span className="dtree-confirm__msg">{confirmDel.msg}</span>
+          <button className="dtree-confirm__no" onClick={()=>setConfirmDel(null)}>Cancel</button>
+          <button className="dtree-confirm__yes" onClick={()=>{confirmDel.onConfirm();setConfirmDel(null);}}>Delete</button>
+        </div>
       )}
       {toast&&<div className="dtree__toast">{toast}</div>}
       {bulkMoveOpen&&selPages&&<BulkMoveModal tree={tree} excludeDocId={selPages.docId} sourceLabel={findNode(tree,selPages.docId)?.node?.label||''} count={selPages.indices.size} onMove={handleBulkMove} onClose={()=>setBulkMoveOpen(false)}/>}
