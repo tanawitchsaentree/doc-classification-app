@@ -4069,27 +4069,39 @@ function AssignCatModal({tree,nodeId,nodeLabel,currentCatId,onAssign,onClose}){
 }
 
 function SplitAssignModal({tree,doc,currentCatId,onConfirm,onClose}){
-  const [asgn,setAsgn]=useState((doc.pages||[]).map(pg=>({page:pg,catId:currentCatId||tree[0]?.id||''})));
-  const set=(i,catId)=>setAsgn(a=>a.map((x,j)=>j===i?{...x,catId}:x));
+  const defaultDestId=currentCatId||tree[0]?.id||'';
+  const [asgn,setAsgn]=useState((doc.pages||[]).map(pg=>({page:pg,destId:defaultDestId,destType:'cat'})));
+  const set=(i,encoded)=>{
+    const sep=encoded.indexOf(':');
+    const type=encoded.slice(0,sep);const id=encoded.slice(sep+1);
+    setAsgn(a=>a.map((x,j)=>j===i?{...x,destId:id,destType:type}:x));
+  };
   return(
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal" style={{maxWidth:480}} onClick={e=>e.stopPropagation()}>
-        <div className="modal__header"><span className="modal__title">Split and assign — {doc.label}</span><button className="modal__close" onClick={onClose}>✕</button></div>
+        <div className="modal__header"><span className="modal__title">Split &amp; assign — {doc.label}</span><button className="modal__close" onClick={onClose}>✕</button></div>
         <div className="modal__body">
-          <p style={{fontSize:12,color:'#767676',marginBottom:12}}>Each page becomes a separate document. Assign a category to each.</p>
+          <p style={{fontSize:12,color:'#767676',marginBottom:12}}>Each page becomes a separate document. Assign a destination to each.</p>
           {asgn.length===0&&<p style={{fontSize:13,color:'#767676'}}>This document has no pages to split.</p>}
           {asgn.map((a,i)=>(
             <div key={i} className="sa-row">
               <span className="sa-row__pg">{a.page}</span>
-              <select className="ov-select" style={{flex:1}} value={a.catId} onChange={e=>set(i,e.target.value)}>
-                {tree.map(c=><option key={c.id} value={c.id}>{c.label}</option>)}
+              <select className="ov-select" style={{flex:1}} value={`${a.destType}:${a.destId}`} onChange={e=>set(i,e.target.value)}>
+                {tree.map(c=>(
+                  <React.Fragment key={c.id}>
+                    <option value={`cat:${c.id}`}>{c.label}</option>
+                    {c.docs?.filter(d=>d.type==='group').map(g=>(
+                      <option key={g.id} value={`group:${g.id}`}>{'\u00a0\u00a0\u2514 '}{g.label}</option>
+                    ))}
+                  </React.Fragment>
+                ))}
               </select>
             </div>
           ))}
         </div>
         <div className="modal__footer">
           <button className="btn btn-outline btn-sm" onClick={onClose}>Cancel</button>
-          <button className="btn btn-primary btn-sm" disabled={asgn.length===0} onClick={()=>onConfirm(asgn)}>Split & assign →</button>
+          <button className="btn btn-primary btn-sm" disabled={asgn.length===0} onClick={()=>onConfirm(asgn)}>Split &amp; assign →</button>
         </div>
       </div>
     </div>
@@ -4229,30 +4241,45 @@ function DocTree({expanded,setExpanded,active,setActive}){
     const{doc}=splitModal;
     const ts=Date.now();
     const newIds=asgn.map((_,i)=>`${doc.id}-sa${i}-${ts+i}`);
-    const catIds=[...new Set(asgn.map(a=>a.catId))];
     setTree(prev=>{
       const t=clone(prev);const loc=findNode(t,doc.id);
       if(!loc)return prev;
       loc.parentDocs.splice(loc.nodeIdx,1);
-      asgn.forEach(({page,catId:cid},i)=>{
+      asgn.forEach(({page,destId,destType},i)=>{
         const newDoc={id:newIds[i],type:'document',label:`${doc.label} (${page})`,pages:[page]};
-        const cat=t.find(c=>c.id===cid);if(cat)cat.docs.push(newDoc);
+        if(destType==='group'){
+          const grp=findNode(t,destId);if(grp&&grp.node.docs)grp.node.docs.push(newDoc);
+        }else{
+          const cat=t.find(c=>c.id===destId);if(cat)cat.docs.push(newDoc);
+        }
       });
       return t;
     });
-    // expand target categories so user can see the new nodes
-    setExpanded(prev=>{const next={...prev};catIds.forEach(id=>{next[id]=true;});return next;});
+    // expand categories and groups that received new docs
+    const expandIds=new Set();
+    asgn.forEach(a=>{
+      if(a.destType==='group'){
+        const cat=tree.find(c=>c.docs?.some(d=>d.id===a.destId));
+        if(cat)expandIds.add(cat.id);
+        expandIds.add(a.destId);
+      }else{expandIds.add(a.destId);}
+    });
+    setExpanded(prev=>{const next={...prev};expandIds.forEach(id=>{next[id]=true;});return next;});
     setSplitModal(null);setCtx(null);
     flashNodes(newIds);
-    showToast(`Split into ${asgn.length} doc${asgn.length>1?'s':''} across ${catIds.length} categor${catIds.length>1?'ies':'y'}`);
+    const uniqueDests=new Set(asgn.map(a=>a.destId)).size;
+    showToast(`Split into ${asgn.length} doc${asgn.length>1?'s':''} across ${uniqueDests} destination${uniqueDests>1?'s':''}`);
   };
   const handleDelete=(nodeId)=>{
-    setTree(prev=>{
-      const t=clone(prev);const loc=findNode(t,nodeId);
-      if(!loc)return prev;
-      loc.parentDocs.splice(loc.nodeIdx,1);return t;
-    });
+    const label=findNode(tree,nodeId)?.node?.label||'this item';
     setCtx(null);
+    setConfirmDel({msg:`Delete "${label}"?`,onConfirm:()=>{
+      setTree(prev=>{
+        const t=clone(prev);const loc=findNode(t,nodeId);
+        if(!loc)return prev;
+        loc.parentDocs.splice(loc.nodeIdx,1);return t;
+      });
+    }});
   };
   const openCtx=(e,nodeId,catId,isGroup)=>{
     e.stopPropagation();e.preventDefault();
@@ -4302,15 +4329,17 @@ function DocTree({expanded,setExpanded,active,setActive}){
   };
   const handleBulkDocDelete=()=>{
     const n=selDocs.size;
-    setTree(prev=>{
-      const t=clone(prev);
-      const locs=[...selDocs].map(id=>findNode(t,id)).filter(Boolean);
-      locs.sort((a,b)=>b.nodeIdx-a.nodeIdx);
-      locs.forEach(loc=>loc.parentDocs.splice(loc.nodeIdx,1));
-      return t;
-    });
-    setSelDocs(new Set());
-    showToast(`${n} document${n>1?'s':''} deleted`);
+    setConfirmDel({msg:`Delete ${n} document${n>1?'s':''}?`,onConfirm:()=>{
+      setTree(prev=>{
+        const t=clone(prev);
+        const locs=[...selDocs].map(id=>findNode(t,id)).filter(Boolean);
+        locs.sort((a,b)=>b.nodeIdx-a.nodeIdx);
+        locs.forEach(loc=>loc.parentDocs.splice(loc.nodeIdx,1));
+        return t;
+      });
+      setSelDocs(new Set());
+      showToast(`${n} document${n>1?'s':''} deleted`);
+    }});
   };
 
   /* ── page multi-selection ── */
