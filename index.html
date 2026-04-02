@@ -4556,7 +4556,7 @@ function DocTree({expanded,setExpanded,active,setActive}){
         </div>
         {drop?.id===`ad-${d.id}`&&<InsLine id={`ad-${d.id}`}/>}
         {isOpen&&isGroup&&<div className="dtree__group-sub">{renderDocs(d.docs,catId,depth+1)}</div>}
-        {isOpen&&!isGroup&&hasChildren&&renderPages(d,depth)}
+        {isOpen&&!isGroup&&hasChildren&&renderPages(d,depth+1)}
       </div>
     );
   });
